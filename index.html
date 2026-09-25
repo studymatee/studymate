@@ -1218,7 +1218,8 @@ var state = {
   challenges: [],
   tasks: [],
   userStats: null,
-  theme: 'dark'
+  theme: 'dark',
+  aiCache: JSON.parse(localStorage.getItem('ai_cache') || '{}')
 };
 
 var currentLessonId = null;
@@ -2172,6 +2173,19 @@ function renderContent(){
     (l.cards.length>0 ? '<button class="btn btn-primary btn-sm" onclick="startFlashcards()"><i class="fa-solid fa-play"></i> مراجعة (' + due + ' مستحقة)</button>' : '') +
     '</div></div>' +
 
+'<div class="section">' +
+'<h3><i class="fa-solid fa-robot"></i> مساعد الذكاء الاصطناعي</h3>' +
+'<p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.8">' +
+'خلّي AI يشرح لك الدرس بطريقة مبسطة مع أمثلة.</p>' +
+'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">' +
+'<button class="btn btn-primary btn-sm" onclick="askAI(\'explain\')"><i class="fa-solid fa-lightbulb"></i> اشرح الدرس</button>' +
+'<button class="btn btn-ghost btn-sm" onclick="askAI(\'examples\')"><i class="fa-solid fa-list"></i> أمثلة</button>' +
+'<button class="btn btn-ghost btn-sm" onclick="askAI(\'quiz\')"><i class="fa-solid fa-question"></i> أسئلة</button>' +
+'<button class="btn btn-ghost btn-sm" onclick="askAI(\'summary\')"><i class="fa-solid fa-compress"></i> ملخص</button>' +
+'</div>' +
+'<div id="aiResponse" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:12px;line-height:1.8;font-size:14px"></div>' +
+'</div>' +
+    
     '<div class="section">' +
     '<h3><i class="fa-solid fa-rotate"></i> التكرار المتباعد</h3>' +
     '<div class="sched">' + spacedHtml + '</div>' +
@@ -3722,6 +3736,83 @@ window.addEventListener('load', function(){
     window.speechSynthesis.onvoiceschanged = function(){};
   }
 });
+  /* =====================================================
+   AI ASSISTANT
+===================================================== */
+var AI_WORKER_URL = 'https://studymate-ai.dzdiscord8231.workers.dev';
+
+async function askAI(action){
+  var l = getCurrentLesson();
+  if(!l) return;
+
+  var s = state.subjects.find(function(x){ return x.id === currentSubjectId; });
+  var subjectName = s ? s.name : '';
+  var lessonTitle = l.title;
+
+  var prompts = {
+    explain: 'اشرح لي درس "' + lessonTitle + '" في مادة ' + subjectName + ' بطريقة بسيطة جداً، كأنك تشرح لطالب في المتوسط. أضف أمثلة من الحياة اليومية.',
+    examples: 'أعطني 3 أمثلة عملية على درس "' + lessonTitle + '" في مادة ' + subjectName + '.',
+    quiz: 'اقترح 5 أسئلة قصيرة لاختبار فهمي لدرس "' + lessonTitle + '" في مادة ' + subjectName + '، وأعطني الأجوبة بعدها.',
+    summary: 'لخّص لي درس "' + lessonTitle + '" في مادة ' + subjectName + ' في 5 نقاط رئيسية.'
+  };
+
+  var prompt = prompts[action] || prompts.explain;
+
+  // cache key
+  var cacheKey = currentSubjectId + '_' + currentLessonId + '_' + action;
+  var responseEl = document.getElementById('aiResponse');
+  responseEl.style.display = 'block';
+
+  // استعمل cache
+  if(state.aiCache[cacheKey]){
+    responseEl.innerHTML = '<div style="color:var(--orange);font-weight:700;margin-bottom:8px"><i class="fa-solid fa-robot"></i> AI:</div>' + formatAIText(state.aiCache[cacheKey]);
+    return;
+  }
+
+  responseEl.innerHTML = '<div style="text-align:center;padding:20px"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:var(--orange)"></i><div style="color:var(--muted);margin-top:8px;font-size:13px">جاري التفكير...</div></div>';
+
+  try {
+    var res = await fetch(AI_WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt })
+    });
+
+    var data = await res.json();
+
+    if(data.error){
+      responseEl.innerHTML = '<div style="color:var(--red)"><i class="fa-solid fa-triangle-exclamation"></i> خطأ: ' + escapeHtml(data.error) + '</div>';
+      playSound('error');
+      return;
+    }
+
+    if(!data.reply){
+      responseEl.innerHTML = '<div style="color:var(--muted)">ما وصل رد من AI. حاول مرة ثانية.</div>';
+      return;
+    }
+
+    // خزن في cache
+    state.aiCache[cacheKey] = data.reply;
+    localStorage.setItem('ai_cache', JSON.stringify(state.aiCache));
+
+    responseEl.innerHTML = '<div style="color:var(--orange);font-weight:700;margin-bottom:8px"><i class="fa-solid fa-robot"></i> AI:</div>' + formatAIText(data.reply);
+    playSound('success');
+    celebrate();
+
+  } catch(err){
+    responseEl.innerHTML = '<div style="color:var(--red)"><i class="fa-solid fa-triangle-exclamation"></i> تعذر الاتصال بالخادم</div>';
+    playSound('error');
+  }
+}
+
+function formatAIText(text){
+  // Simple formatting
+  return escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p style="margin-top:10px">')
+    .replace(/\n/g, '<br>')
+    .replace(/^(.+)$/, '<p>$1</p>');
+}
 </script>
 </body>
 </html>
