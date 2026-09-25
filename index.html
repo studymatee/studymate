@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مِذكَرتي — مدير الدراسة</title>
+<link rel="icon" type="image/png" href="/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
@@ -12,6 +13,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <style>
 :root{
   --orange:#FF7A00;
@@ -31,6 +33,7 @@
   --blue:#2196F3;
   --red:#F44336;
   --gray:#9E9E9E;
+  --purple:#8B5CF6;
   --font:'Tajawal','Segoe UI',Tahoma,sans-serif;
   --radius:14px;
   --shadow:0 8px 32px rgba(0,0,0,.4);
@@ -250,8 +253,7 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
   box-shadow:0 2px 8px rgba(244,67,54,.4);
 }
 .icon-btn .badge.hidden{display:none}
-
-/* ============ Notifications Panel ============ */
+  /* ============ Notifications Panel ============ */
 .notif-panel{
   position:fixed;top:70px;left:20px;width:360px;max-height:520px;
   overflow-y:auto;background:var(--card);
@@ -295,7 +297,8 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
 .notif-item .body .time{font-size:11px;color:var(--muted);margin-top:5px}
 .notif-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:13px}
 .notif-empty i{font-size:36px;display:block;margin-bottom:10px;opacity:.4;color:var(--orange)}
-  /* ============ Content ============ */
+
+/* ============ Content ============ */
 .content{flex:1;overflow-y:auto;padding:26px;animation:fadeIn .3s}
 
 /* ============ Empty ============ */
@@ -355,7 +358,7 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
   color:#fff;box-shadow:0 4px 15px rgba(255,122,0,.4);
 }
 
-/* ============ Feynman Editor ============ */
+/* ============ Feynman ============ */
 .feynman-area{position:relative}
 .feynman-area .ql-toolbar{
   background:var(--bg2);border:1px solid var(--border)!important;
@@ -428,6 +431,8 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
 .btn-primary:active{transform:translateY(0)}
 .btn-ghost{background:var(--bg);color:var(--text);border:1px solid var(--border)}
 .btn-ghost:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-soft)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{opacity:.9;transform:translateY(-1px)}
 .btn-sm{padding:9px 16px;font-size:12px}
 
 /* ============ Modals ============ */
@@ -487,7 +492,7 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
 .avatar-option:hover{transform:scale(1.1);border-color:var(--orange)}
 .avatar-option.selected{border-color:var(--orange);box-shadow:0 0 20px rgba(255,122,0,.5)}
 
-/* ============ Permission Banner ============ */
+/* ============ Perm Banner ============ */
 .perm-banner{
   background:linear-gradient(135deg,var(--orange),var(--orange-dark));
   color:#fff;padding:14px 18px;border-radius:13px;
@@ -559,7 +564,7 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
 .pomo .phase{font-size:22px;color:var(--muted);margin-bottom:24px;font-weight:600}
 .pomo .controls{display:flex;gap:14px;margin-top:36px;justify-content:center}
 
-/* ============ Calendar Grid ============ */
+/* ============ Calendar ============ */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:14px}
 .cal-day{
   background:var(--card);border:1px solid var(--border);
@@ -762,6 +767,84 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
 .search-result .sub{font-size:12px;color:var(--muted)}
 .search-result mark{background:var(--orange);color:#fff;padding:0 4px;border-radius:3px}
 
+/* ============ Task List ============ */
+.task-item{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:12px;padding:12px 14px;margin-bottom:8px;
+  display:flex;gap:12px;align-items:flex-start;
+  transition:.2s;
+}
+.task-item:hover{border-color:var(--orange)}
+.task-item.done{opacity:.55}
+.task-item.done .task-title{text-decoration:line-through}
+.task-checkbox{
+  width:22px;height:22px;border-radius:6px;
+  border:2px solid var(--orange);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:.2s;background:transparent;
+}
+.task-checkbox:hover{background:var(--orange-soft)}
+.task-checkbox.checked{background:var(--orange);color:#fff}
+.task-checkbox i{font-size:12px;color:#fff}
+.task-body{flex:1;min-width:0}
+.task-title{font-weight:600;font-size:14px;margin-bottom:4px}
+.task-meta{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.task-del{color:var(--red);cursor:pointer;opacity:.5;transition:.2s;font-size:13px}
+.task-del:hover{opacity:1}
+
+/* ============ Scientific Calculator ============ */
+.calc-display{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:14px;padding:16px;margin-bottom:14px;
+  text-align:left;direction:ltr;
+}
+.calc-expression{
+  font-size:14px;color:var(--muted);min-height:20px;
+  font-family:'Courier New',monospace;word-break:break-all;
+}
+.calc-result{
+  font-size:32px;font-weight:900;color:var(--orange);
+  font-family:'Courier New',monospace;margin-top:6px;
+  word-break:break-all;
+}
+.calc-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:6px;
+}
+.calc-btn{
+  padding:14px 6px;border-radius:10px;
+  border:1px solid var(--border);background:var(--bg);
+  color:var(--text);cursor:pointer;font-size:14px;
+  font-weight:700;transition:.15s;
+  font-family:var(--font);
+}
+.calc-btn:hover{background:var(--card2);border-color:var(--orange);transform:scale(1.02)}
+.calc-btn:active{transform:scale(.97)}
+.calc-btn.op{background:var(--orange-soft);color:var(--orange)}
+.calc-btn.eq{background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff}
+.calc-btn.fn{background:rgba(139,92,246,.15);color:var(--purple);font-size:12px}
+.calc-btn.clear{background:rgba(244,67,54,.15);color:var(--red)}
+
+/* ============ Challenge Badge ============ */
+.challenge-badge{
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--purple),#6D28D9);
+  color:#fff;padding:6px 12px;border-radius:20px;
+  font-size:12px;font-weight:700;
+  box-shadow:0 4px 15px rgba(139,92,246,.4);
+  cursor:pointer;transition:.2s;
+}
+.challenge-badge:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(139,92,246,.6)}
+
+/* ============ XP Bar ============ */
+.xp-bar{
+  background:rgba(255,255,255,.25);height:10px;
+  border-radius:5px;overflow:hidden;
+}
+.xp-bar .fill{
+  height:100%;background:#fff;border-radius:5px;
+  transition:width .5s;
+}
+
 /* ============ Scrollbar ============ */
 ::-webkit-scrollbar{width:9px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -796,6 +879,8 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
   .tabs{padding:0 12px}
   .tab{padding:12px 12px;font-size:12px}
   .tab span{display:none}
+  .calc-grid{grid-template-columns:repeat(5,1fr);gap:4px}
+  .calc-btn{padding:11px 4px;font-size:12px}
 }
 @media(max-width:480px){
   .stats-grid{grid-template-columns:1fr 1fr;gap:10px}
@@ -805,6 +890,7 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
   .monthly-cal .day-header{font-size:10px}
   .monthly-cal .day-cell{font-size:10px}
   .topbar .streak-badge{padding:4px 8px;font-size:11px}
+  .challenge-badge{padding:4px 8px;font-size:11px}
 }
 </style>
 </head>
@@ -831,7 +917,7 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
 <!-- ========== App ========== -->
 <div class="app" id="appContainer" style="display:none">
 
-  <!-- Sidebar -->
+  <!-- ===== Sidebar ===== -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo-mini"><i class="fa-solid fa-graduation-cap"></i></div>
@@ -853,15 +939,22 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
     </div>
   </aside>
 
-  <!-- Main -->
+  <!-- ===== Main ===== -->
   <main class="main">
     <div class="topbar">
       <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
       <div class="title" id="topTitle">اختر درساً من القائمة</div>
+
       <div class="streak-badge" id="streakBadge" title="سلسلة الأيام">
         <i class="fa-solid fa-fire"></i>
         <span id="streakCount">0</span>
       </div>
+
+      <div class="challenge-badge" id="dailyChallengeBadge" onclick="switchTab('challenge')" title="التحدي اليومي">
+        <i class="fa-solid fa-bullseye"></i>
+        <span id="challengeBadgeText">تحدي</span>
+      </div>
+
       <button class="icon-btn" onclick="toggleNotifPanel()" title="الإشعارات">
         <i class="fa-solid fa-bell"></i>
         <span class="badge hidden" id="notifBadge">0</span>
@@ -883,9 +976,13 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
     <!-- Tabs -->
     <div class="tabs" id="tabs">
       <div class="tab active" data-tab="study" onclick="switchTab('study')"><i class="fa-solid fa-book-open"></i><span>الدراسة</span></div>
+      <div class="tab" data-tab="tasks" onclick="switchTab('tasks')"><i class="fa-solid fa-list-check"></i><span>المهام</span></div>
+      <div class="tab" data-tab="challenge" onclick="switchTab('challenge')"><i class="fa-solid fa-bullseye"></i><span>التحدي</span></div>
       <div class="tab" data-tab="calendar" onclick="switchTab('calendar')"><i class="fa-solid fa-calendar-days"></i><span>التقويم</span></div>
       <div class="tab" data-tab="monthly" onclick="switchTab('monthly')"><i class="fa-solid fa-calendar"></i><span>الشهري</span></div>
       <div class="tab" data-tab="schedule" onclick="switchTab('schedule')"><i class="fa-solid fa-table"></i><span>جدول الحصص</span></div>
+      <div class="tab" data-tab="grades" onclick="switchTab('grades')"><i class="fa-solid fa-calculator"></i><span>المعدل</span></div>
+      <div class="tab" data-tab="calc" onclick="switchTab('calc')"><i class="fa-solid fa-square-root-variable"></i><span>آلة حاسبة</span></div>
       <div class="tab" data-tab="stats" onclick="switchTab('stats')"><i class="fa-solid fa-chart-line"></i><span>إحصائيات</span></div>
       <div class="tab" data-tab="achievements" onclick="switchTab('achievements')"><i class="fa-solid fa-trophy"></i><span>الإنجازات</span></div>
       <div class="tab" data-tab="notifs" onclick="switchTab('notifs')"><i class="fa-solid fa-bell"></i><span>الإشعارات</span></div>
@@ -981,6 +1078,39 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
   </div>
 </div>
 
+<!-- ========== Task Modal ========== -->
+<div class="modal-bg" id="taskModal">
+  <div class="modal">
+    <h3><i class="fa-solid fa-list-check"></i> إضافة مهمة</h3>
+    <label>المهمة</label>
+    <input type="text" id="taskTitle" placeholder="مثال: مراجعة الرياضيات">
+    <label>الأولوية</label>
+    <select id="taskPriority">
+      <option value="normal">عادي</option>
+      <option value="high">مهم</option>
+      <option value="low">منخفض</option>
+    </select>
+    <label>التاريخ (اختياري)</label>
+    <input type="date" id="taskDate">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('taskModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="addTask()"><i class="fa-solid fa-check"></i> حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Sound Settings Modal ========== -->
+<div class="modal-bg" id="soundModal">
+  <div class="modal">
+    <h3><i class="fa-solid fa-volume-high"></i> اختيار صوت التنبيه</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">اختر الصوت المفضل لديك:</p>
+    <div id="soundList" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="btn btn-ghost" onclick="closeModal('soundModal')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========== Advanced Search Panel ========== -->
 <div id="advancedSearchPanel" style="display:none"></div>
 
@@ -1007,19 +1137,8 @@ h1,h2,h3,h4,strong,.btn,.tab,.stat-card .num{font-family:var(--font);font-weight
 <!-- ========== Toast ========== -->
 <div class="toast" id="toast"></div>
 
-<!-- ========== Sound Elements ========== -->
-<audio id="soundSuccess" preload="auto">
-  <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
-</audio>
-<audio id="soundClick" preload="auto">
-  <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
-</audio>
-<audio id="soundComplete" preload="auto">
-  <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
-</audio>
-
 <script>
-/* =====================================================
+  /* =====================================================
    SUPABASE CONFIG
 ===================================================== */
 var SUPABASE_URL = 'https://ncrycgbrstafdouvipzc.supabase.co';
@@ -1027,7 +1146,9 @@ var SUPABASE_KEY = 'sb_publishable_6t2dkU27Rkinsoo8MhYAEQ_FSgj4G73';
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 var currentUser = null;
 
-/* ============ Auth ============ */
+/* =====================================================
+   AUTH
+===================================================== */
 async function signInWithGoogle() {
   var result = await sb.auth.signInWithOAuth({
     provider: 'google',
@@ -1037,6 +1158,7 @@ async function signInWithGoogle() {
 }
 
 async function signOut() {
+  if(!confirm('تسجيل الخروج؟')) return;
   await sb.auth.signOut();
   location.reload();
 }
@@ -1055,6 +1177,7 @@ var AVATARS = ['🦁','🐯','🦊','🐺','🐻','🐼','🐨','🐸','🦉','�
 
 function renderUserInfo(user) {
   var info = document.getElementById('userInfo');
+  if(!info) return;
   var meta = user.user_metadata || {};
   var savedAvatar = localStorage.getItem('user_avatar_' + user.id) || '';
   var googleAvatar = meta.avatar_url || '';
@@ -1087,76 +1210,299 @@ sb.auth.onAuthStateChange(async function(event, session) {
 /* =====================================================
    STATE
 ===================================================== */
-var state = {subjects:[], schedule:[], notifications:[], theme:'dark'};
-var currentLessonId = null, currentSubjectId = null, tempSubjectId = null;
+var state = {
+  subjects: [],
+  schedule: [],
+  notifications: [],
+  grades: [],
+  challenges: [],
+  tasks: [],
+  userStats: null,
+  theme: 'dark'
+};
+
+var currentLessonId = null;
+var currentSubjectId = null;
+var tempSubjectId = null;
 var currentTab = 'study';
 var selectedIcon = 'fa-book';
 var selectedAvatar = '';
-var fcQueue = [], fcIndex = 0, fcFlipped = false;
-var pomoInterval = null, pomoTime = 25*60, pomoRunning = false, pomoPhase = 'focus';
+var fcQueue = [];
+var fcIndex = 0;
+var fcFlipped = false;
+var pomoInterval = null;
+var pomoTime = 25 * 60;
+var pomoRunning = false;
+var pomoPhase = 'focus';
 var notifCheckInterval = null;
 var soundEnabled = localStorage.getItem('sound_enabled') !== 'false';
+var selectedSound = localStorage.getItem('sound_choice') || 'soft';
 var quillEditor = null;
 var currentMonthlyDate = new Date();
 var advancedSearchOpen = false;
+var currentSemester = '1';
+var calcExpression = '';
 
 var ICONS = ['fa-calculator','fa-atom','fa-flask','fa-book-open','fa-language','fa-spell-check','fa-landmark','fa-globe','fa-mosque','fa-scale-balanced','fa-dna','fa-earth-africa','fa-palette','fa-music','fa-laptop-code'];
 var DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 var SPACED_INTERVALS = [1, 3, 7, 21];
 
-/* =====================================================
-   SOUND SYSTEM
-===================================================== */
-function playSound(type) {
-  if (!soundEnabled) return;
-  try {
-    var AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-    var ctx = new AudioCtx();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+var BEM_SUBJECTS = [
+  'لغة عربية','رياضيات','فرنسية','إنجليزية','علوم طبيعية',
+  'فيزياء','تاريخ وجغرافيا','تربية إسلامية','تربية مدنية',
+  'تربية فنية','تربية بدنية','معلوماتية'
+];
 
-    if (type === 'success') {
-      osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
-      osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
-      gain.gain.setValueAtTime(0.15, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.4);
-    } else if (type === 'complete') {
-      osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.12);
-      osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.24);
-      osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.36);
-      gain.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.7);
-    } else if (type === 'click') {
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      gain.gain.setValueAtTime(0.05, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.08);
-    } else if (type === 'error') {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(200, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.3);
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.3);
-    }
-  } catch(e) {}
+/* =====================================================
+   CONFETTI / CELEBRATE
+===================================================== */
+function celebrate(){
+  if(typeof confetti === 'undefined') return;
+  var defaults = { spread: 360, ticks: 100, gravity: 0.9, decay: 0.94, startVelocity: 35, shapes: ['star','circle'], colors: ['#FF7A00','#FFB74D','#E65100','#FFD54F','#8B5CF6'] };
+  confetti(Object.assign({}, defaults, { particleCount: 50, origin: { y: 0.6 } }));
+  setTimeout(function(){
+    confetti(Object.assign({}, defaults, { particleCount: 30, angle: 60, origin: { x: 0, y: 0.6 } }));
+    confetti(Object.assign({}, defaults, { particleCount: 30, angle: 120, origin: { x: 1, y: 0.6 } }));
+  }, 200);
 }
 
-function toggleSound() {
+function bigCelebrate(){
+  if(typeof confetti === 'undefined') return;
+  var duration = 2000;
+  var end = Date.now() + duration;
+  var colors = ['#FF7A00','#FFB74D','#E65100','#FFD54F','#8B5CF6','#fff'];
+  (function frame(){
+    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+    if(Date.now() < end) requestAnimationFrame(frame);
+  })();
+  confetti({ particleCount: 120, spread: 100, origin: { y: 0.5 }, colors: colors });
+}
+
+/* =====================================================
+   SOUND SYSTEM — 5 أصوات
+===================================================== */
+var SOUNDS = {
+  soft: { name: '🎵 ناعم', desc: 'نغمة هادئة' },
+  sharp: { name: '⚡ حاد', desc: 'نغمة حادة' },
+  bell: { name: '🔔 جرس', desc: 'مثل جرس' },
+  celebration: { name: '🎊 احتفالي', desc: '4 نغمات' },
+  game: { name: '🎮 لعبة', desc: 'صوت ريترو' }
+};
+
+function playSound(type){
+  if(!soundEnabled) return;
+  try {
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    var ctx = new AudioCtx();
+    var gain = ctx.createGain();
+    gain.connect(ctx.destination);
+
+    if(type === 'success'){
+      playTone(ctx, gain, 'success');
+    } else if(type === 'complete'){
+      playTone(ctx, gain, 'complete');
+    } else if(type === 'click'){
+      playTone(ctx, gain, 'click');
+    } else if(type === 'error'){
+      playTone(ctx, gain, 'error');
+    }
+  } catch(e){}
+}
+
+function playTone(ctx, gain, type){
+  var now = ctx.currentTime;
+  var osc = ctx.createOscillator();
+  osc.connect(gain);
+
+  if(selectedSound === 'soft'){
+    // نغمة ناعمة
+    if(type === 'success'){
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523, now);
+      osc.frequency.exponentialRampToValueAtTime(659, now + 0.15);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc.start(now); osc.stop(now + 0.4);
+    } else if(type === 'complete'){
+      osc.type = 'sine';
+      [523, 659, 783, 1046].forEach(function(f, i){
+        osc.frequency.setValueAtTime(f, now + i*0.12);
+      });
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      osc.start(now); osc.stop(now + 0.6);
+    } else if(type === 'click'){
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.start(now); osc.stop(now + 0.08);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(150, now + 0.3);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.start(now); osc.stop(now + 0.3);
+    }
+  } else if(selectedSound === 'sharp'){
+    // نغمة حادة
+    osc.type = 'square';
+    if(type === 'success'){
+      osc.frequency.setValueAtTime(660, now);
+      osc.frequency.setValueAtTime(880, now + 0.08);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.start(now); osc.stop(now + 0.25);
+    } else if(type === 'complete'){
+      [660, 880, 1100, 1320].forEach(function(f, i){
+        osc.frequency.setValueAtTime(f, now + i*0.08);
+      });
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc.start(now); osc.stop(now + 0.4);
+    } else if(type === 'click'){
+      osc.frequency.setValueAtTime(1200, now);
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.start(now); osc.stop(now + 0.05);
+    } else {
+      osc.frequency.setValueAtTime(250, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.25);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.start(now); osc.stop(now + 0.25);
+    }
+  } else if(selectedSound === 'bell'){
+    // جرس
+    osc.type = 'triangle';
+    if(type === 'success'){
+      osc.frequency.setValueAtTime(880, now);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+      osc.start(now); osc.stop(now + 0.8);
+    } else if(type === 'complete'){
+      [880, 1100, 1320].forEach(function(f, i){
+        var o = ctx.createOscillator();
+        var g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(f, now + i*0.2);
+        g.gain.setValueAtTime(0.15, now + i*0.2);
+        g.gain.exponentialRampToValueAtTime(0.001, now + i*0.2 + 0.6);
+        o.start(now + i*0.2); o.stop(now + i*0.2 + 0.6);
+      });
+      osc.start(now); osc.stop(now);
+    } else if(type === 'click'){
+      osc.frequency.setValueAtTime(1400, now);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.start(now); osc.stop(now + 0.15);
+    } else {
+      osc.frequency.setValueAtTime(500, now);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc.start(now); osc.stop(now + 0.5);
+    }
+  } else if(selectedSound === 'celebration'){
+    // احتفالي
+    osc.type = 'sine';
+    if(type === 'success'){
+      [523, 659, 783, 1046].forEach(function(f, i){
+        osc.frequency.setValueAtTime(f, now + i*0.08);
+      });
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc.start(now); osc.stop(now + 0.5);
+    } else if(type === 'complete'){
+      [523, 659, 783, 1046, 1318].forEach(function(f, i){
+        osc.frequency.setValueAtTime(f, now + i*0.1);
+      });
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+      osc.start(now); osc.stop(now + 0.7);
+    } else if(type === 'click'){
+      osc.frequency.setValueAtTime(659, now);
+      osc.frequency.setValueAtTime(783, now + 0.05);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.start(now); osc.stop(now + 0.12);
+    } else {
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.setValueAtTime(300, now + 0.1);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.start(now); osc.stop(now + 0.3);
+    }
+  } else if(selectedSound === 'game'){
+    // لعبة ريترو
+    osc.type = 'square';
+    if(type === 'success'){
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.setValueAtTime(660, now + 0.1);
+      osc.frequency.setValueAtTime(880, now + 0.2);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc.start(now); osc.stop(now + 0.35);
+    } else if(type === 'complete'){
+      [392, 523, 659, 783, 1046].forEach(function(f, i){
+        osc.frequency.setValueAtTime(f, now + i*0.09);
+      });
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      osc.start(now); osc.stop(now + 0.6);
+    } else if(type === 'click'){
+      osc.frequency.setValueAtTime(800, now);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      osc.start(now); osc.stop(now + 0.06);
+    } else {
+      osc.frequency.setValueAtTime(200, now);
+      osc.frequency.setValueAtTime(150, now + 0.1);
+      osc.frequency.setValueAtTime(100, now + 0.2);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.start(now); osc.stop(now + 0.3);
+    }
+  }
+}
+
+function toggleSound(){
   soundEnabled = !soundEnabled;
   localStorage.setItem('sound_enabled', soundEnabled);
   toast(soundEnabled ? 'تم تشغيل الأصوات' : 'تم كتم الأصوات', 'fa-volume-high');
+}
+
+function openSoundModal(){
+  var list = document.getElementById('soundList');
+  list.innerHTML = Object.keys(SOUNDS).map(function(key){
+    var s = SOUNDS[key];
+    var isSelected = key === selectedSound;
+    return '<div style="display:flex;align-items:center;gap:12px;padding:14px;background:' + (isSelected ? 'var(--orange-soft)' : 'var(--bg)') + ';border:1px solid ' + (isSelected ? 'var(--orange)' : 'var(--border)') + ';border-radius:12px;cursor:pointer;transition:.2s" onclick="pickSound(\'' + key + '\')">' +
+      '<div style="flex:1"><div style="font-weight:700;font-size:14px">' + s.name + '</div>' +
+      '<div style="font-size:12px;color:var(--muted)">' + s.desc + '</div></div>' +
+      '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();testSound(\'' + key + '\')"><i class="fa-solid fa-play"></i></button>' +
+      (isSelected ? '<i class="fa-solid fa-check-circle" style="color:var(--orange);font-size:20px"></i>' : '') +
+      '</div>';
+  }).join('');
+  openModal('soundModal');
+}
+
+function pickSound(key){
+  selectedSound = key;
+  localStorage.setItem('sound_choice', key);
+  playSound('success');
+  openSoundModal();
+  toast('تم اختيار: ' + SOUNDS[key].name);
+}
+
+function testSound(key){
+  var oldSound = selectedSound;
+  selectedSound = key;
+  playSound('complete');
+  selectedSound = oldSound;
 }
 
 /* =====================================================
@@ -1178,7 +1524,7 @@ function uid(){ return Date.now().toString(36) + Math.random().toString(36).slic
 function toast(msg, icon){
   icon = icon || 'fa-circle-check';
   var t = document.getElementById('toast');
-  t.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + msg;
+  t.innerHTML = '<i class="fa-solid ' + icon + '"></i> <span>' + msg + '</span>';
   t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 2400);
 }
@@ -1208,9 +1554,14 @@ async function loadAllData() {
     sb.from('lessons').select('*'),
     sb.from('cards').select('*'),
     sb.from('schedule').select('*'),
-    sb.from('notifications').select('*').order('created_at', {ascending:false}).limit(100)
+    sb.from('notifications').select('*').order('created_at', {ascending:false}).limit(100),
+    sb.from('grades').select('*').order('created_at'),
+    sb.from('daily_challenges').select('*').eq('challenge_date', new Date().toISOString().split('T')[0]),
+    sb.from('user_stats').select('*').eq('user_id', currentUser.id).maybeSingle(),
+    sb.from('tasks').select('*').order('created_at', {ascending:false})
   ]);
   var s = results[0], l = results[1], c = results[2], sc = results[3], n = results[4];
+  var g = results[5], ch = results[6], us = results[7], tk = results[8];
 
   state.subjects = (s.data || []).map(function(sub){
     return {
@@ -1238,11 +1589,26 @@ async function loadAllData() {
 
   state.schedule = (sc.data || []).map(function(x){ return {id:x.id, type:x.type, day:x.day, title:x.title, time:x.time}; });
   state.notifications = (n.data || []).map(function(x){ return {id:x.id, type:x.type, title:x.title, body:x.body, time:new Date(x.created_at).getTime(), read:x.read}; });
+  state.grades = g.data || [];
+  state.challenges = ch.data || [];
+  state.userStats = us.data;
+  state.tasks = tk.data || [];
+
+  // إنشاء stats إذا ما موجودة
+  if(!state.userStats){
+    var newStats = await sb.from('user_stats').insert({user_id: currentUser.id}).select().single();
+    if(newStats.data) state.userStats = newStats.data;
+  }
+
+  // توليد التحدي اليومي
+  await generateDailyChallenge();
+  renderChallengeBadge();
 
   renderSubjects();
   renderContent();
   renderNotifBadge();
   renderNotifList();
+  renderStreak();
   checkAchievements();
   checkSmartReminders();
 }
@@ -1284,6 +1650,7 @@ async function pushNotif(type, title, body){
 function renderNotifBadge(){
   var unread = (state.notifications || []).filter(function(n){ return !n.read; }).length;
   var badge = document.getElementById('notifBadge');
+  if(!badge) return;
   if(unread > 0){
     badge.textContent = unread > 99 ? '99+' : unread;
     badge.classList.remove('hidden');
@@ -1391,6 +1758,7 @@ function applyTheme(){
 function toggleTheme(){
   localStorage.setItem('theme_manual', 'true');
   state.theme = state.theme === 'light' ? 'dark' : 'light';
+  localStorage.setItem('theme_value', state.theme);
   applyTheme();
   playSound('click');
 }
@@ -1457,6 +1825,7 @@ function speakText(text){
 ===================================================== */
 function renderIconPicker(){
   var p = document.getElementById('iconPicker');
+  if(!p) return;
   p.innerHTML = ICONS.map(function(ic){
     return '<i class="fa-solid ' + ic + ' ' + (ic===selectedIcon?'selected':'') + '" onclick="pickIcon(\'' + ic + '\')"></i>';
   }).join('');
@@ -1464,25 +1833,8 @@ function renderIconPicker(){
 function pickIcon(ic){ selectedIcon = ic; renderIconPicker(); }
 
 /* =====================================================
-   STREAK & ACHIEVEMENTS
+   STREAK
 ===================================================== */
-var ACHIEVEMENTS = [
-  {id:'first_lesson', icon:'fa-seedling', title:'البداية', desc:'أضفت أول درس', check:function(s){ return s.subjects.some(function(x){ return x.lessons.length>0; }); }},
-  {id:'first_card', icon:'fa-layer-group', title:'أول بطاقة', desc:'أضفت أول بطاقة حفظ', check:function(s){ return s.subjects.some(function(x){ return x.lessons.some(function(l){ return l.cards.length>0; }); }); }},
-  {id:'ten_cards', icon:'fa-cards-blank', title:'جامع البطاقات', desc:'10 بطاقات حفظ', check:function(s){ var n=0; s.subjects.forEach(function(x){ x.lessons.forEach(function(l){ n += l.cards.length; }); }); return n>=10; }},
-  {id:'fifty_cards', icon:'fa-medal', title:'محترف البطاقات', desc:'50 بطاقة حفظ', check:function(s){ var n=0; s.subjects.forEach(function(x){ x.lessons.forEach(function(l){ n += l.cards.length; }); }); return n>=50; }},
-  {id:'first_feynman', icon:'fa-brain', title:'الفاهم', desc:'فهمت درس بفاينمان', check:function(s){ return s.subjects.some(function(x){ return x.lessons.some(function(l){ return l.feynman && l.feynman.done; }); }); }},
-  {id:'first_memorized', icon:'fa-circle-check', title:'الحافظ', desc:'حفظت درس كامل', check:function(s){ return s.subjects.some(function(x){ return x.lessons.some(function(l){ return l.status === 'memorized'; }); }); }},
-  {id:'five_memorized', icon:'fa-star', title:'نجم الحفظ', desc:'حفظت 5 دروس', check:function(s){ var n=0; s.subjects.forEach(function(x){ x.lessons.forEach(function(l){ if(l.status==='memorized') n++; }); }); return n>=5; }},
-  {id:'ten_lessons', icon:'fa-book-open', title:'المجتهد', desc:'10 دروس في الموقع', check:function(s){ var n=0; s.subjects.forEach(function(x){ n += x.lessons.length; }); return n>=10; }},
-  {id:'streak_3', icon:'fa-fire', title:'3 أيام متتالية', desc:'درس 3 أيام متواصلة', check:function(s){ return getStreak() >= 3; }},
-  {id:'streak_7', icon:'fa-fire-flame-curved', title:'أسبوع كامل', desc:'درس 7 أيام متواصلة', check:function(s){ return getStreak() >= 7; }},
-  {id:'streak_30', icon:'fa-crown', title:'شهر أسطوري', desc:'درس 30 يوم متواصلة', check:function(s){ return getStreak() >= 30; }},
-  {id:'pomodoro', icon:'fa-clock', title:'المركّز', desc:'أكملت جلسة بومودورو', check:function(s){ return localStorage.getItem('pomodoro_done') === 'true'; }},
-  {id:'scheduler', icon:'fa-calendar-check', title:'المنظّم', desc:'أضفت جدول الحصص', check:function(s){ return (s.schedule||[]).length > 0; }},
-  {id:'all_subjects', icon:'fa-graduation-cap', title:'الطالب المثالي', desc:'5 مواد أو أكثر', check:function(s){ return s.subjects.length >= 5; }}
-];
-
 function getStreak(){
   try{ return parseInt(localStorage.getItem('streak_count') || '0'); }catch(e){ return 0; }
 }
@@ -1518,13 +1870,40 @@ function renderStreak(){
   if(el) el.textContent = getStreak();
 }
 
+/* =====================================================
+   ACHIEVEMENTS
+===================================================== */
+var ACHIEVEMENTS = [
+  {id:'first_lesson', icon:'fa-seedling', title:'البداية', desc:'أضفت أول درس', check:function(s){ return s.subjects.some(function(x){ return x.lessons.length>0; }); }},
+  {id:'first_card', icon:'fa-layer-group', title:'أول بطاقة', desc:'أضفت أول بطاقة حفظ', check:function(s){ return s.subjects.some(function(x){ return x.lessons.some(function(l){ return l.cards.length>0; }); }); }},
+  {id:'ten_cards', icon:'fa-cards-blank', title:'جامع البطاقات', desc:'10 بطاقات حفظ', check:function(s){ var n=0; s.subjects.forEach(function(x){ x.lessons.forEach(function(l){ n += l.cards.length; }); }); return n>=10; }},
+  {id:'fifty_cards', icon:'fa-medal', title:'محترف البطاقات', desc:'50 بطاقة حفظ', check:function(s){ var n=0; s.subjects.forEach(function(x){ x.lessons.forEach(function(l){ n += l.cards.length; }); }); return n>=50; }},
+  {id:'first_feynman', icon:'fa-brain', title:'الفاهم', desc:'فهمت درس بفاينمان', check:function(s){ return s.subjects.some(function(x){ return x.lessons.some(function(l){ return l.feynman && l.feynman.done; }); }); }},
+  {id:'first_memorized', icon:'fa-circle-check', title:'الحافظ', desc:'حفظت درس كامل', check:function(s){ return s.subjects.some(function(x){ return x.lessons.some(function(l){ return l.status === 'memorized'; }); }); }},
+  {id:'five_memorized', icon:'fa-star', title:'نجم الحفظ', desc:'حفظت 5 دروس', check:function(s){ var n=0; s.subjects.forEach(function(x){ x.lessons.forEach(function(l){ if(l.status==='memorized') n++; }); }); return n>=5; }},
+  {id:'ten_lessons', icon:'fa-book-open', title:'المجتهد', desc:'10 دروس في الموقع', check:function(s){ var n=0; s.subjects.forEach(function(x){ n += x.lessons.length; }); return n>=10; }},
+  {id:'streak_3', icon:'fa-fire', title:'3 أيام متتالية', desc:'درس 3 أيام متواصلة', check:function(s){ return getStreak() >= 3; }},
+  {id:'streak_7', icon:'fa-fire-flame-curved', title:'أسبوع كامل', desc:'درس 7 أيام متواصلة', check:function(s){ return getStreak() >= 7; }},
+  {id:'streak_30', icon:'fa-crown', title:'شهر أسطوري', desc:'درس 30 يوم متواصلة', check:function(s){ return getStreak() >= 30; }},
+  {id:'pomodoro', icon:'fa-clock', title:'المركّز', desc:'أكملت جلسة بومودورو', check:function(s){ return localStorage.getItem('pomodoro_done') === 'true'; }},
+  {id:'scheduler', icon:'fa-calendar-check', title:'المنظّم', desc:'أضفت جدول الحصص', check:function(s){ return (s.schedule||[]).length > 0; }},
+  {id:'all_subjects', icon:'fa-graduation-cap', title:'الطالب المثالي', desc:'5 مواد أو أكثر', check:function(s){ return s.subjects.length >= 5; }},
+  {id:'first_grade', icon:'fa-calculator', title:'حاسب المعدل', desc:'أضفت أول علامة', check:function(s){ return (s.grades||[]).length > 0; }},
+  {id:'first_task', icon:'fa-list-check', title:'المنظّم الصغير', desc:'أضفت أول مهمة', check:function(s){ return (s.tasks||[]).length > 0; }},
+  {id:'first_challenge', icon:'fa-bullseye', title:'التحدي الأول', desc:'أكملت أول تحدي يومي', check:function(s){ return (s.challenges||[]).some(function(c){ return c.completed; }); }},
+  {id:'ten_challenges', icon:'fa-target', title:'صياد التحديات', desc:'10 تحديات مكتملة', check:function(s){ return (s.userStats && s.userStats.challenges_completed >= 10); }},
+  {id:'level_5', icon:'fa-star-half-stroke', title:'مستوى 5', desc:'وصلت للمستوى 5', check:function(s){ return (s.userStats && s.userStats.level >= 5); }},
+  {id:'level_10', icon:'fa-star', title:'مستوى 10', desc:'وصلت للمستوى 10', check:function(s){ return (s.userStats && s.userStats.level >= 10); }}
+];
+
 function checkAchievements(){
   var unlocked = JSON.parse(localStorage.getItem('achievements') || '[]');
   ACHIEVEMENTS.forEach(function(a){
     if(unlocked.indexOf(a.id) === -1 && a.check(state)){
       unlocked.push(a.id);
       localStorage.setItem('achievements', JSON.stringify(unlocked));
-      playSound('success');
+      playSound('complete');
+      celebrate();
       pushNotif('info', '🏆 إنجاز جديد!', a.title + ' — ' + a.desc);
     }
   });
@@ -1533,7 +1912,6 @@ function checkAchievements(){
 function renderAchievements(content, titleEl){
   titleEl.textContent = 'الإنجازات';
   var unlocked = JSON.parse(localStorage.getItem('achievements') || '[]');
-
   var total = ACHIEVEMENTS.length;
   var done = unlocked.length;
   var pct = Math.round(done/total*100);
@@ -1577,6 +1955,7 @@ async function addSubject(){
   state.subjects.push({ id: result.data.id, name: result.data.name, icon: result.data.icon, lessons: [] });
   closeModal('subjectModal');
   playSound('success');
+  celebrate();
   renderSubjects();
   pushNotif('info', 'مادة جديدة', name);
   checkAchievements();
@@ -1587,6 +1966,7 @@ async function deleteSubject(id){
   await sb.from('subjects').delete().eq('id', id);
   state.subjects = state.subjects.filter(function(s){ return s.id!==id; });
   if(currentSubjectId===id){ currentLessonId=null; currentSubjectId=null; }
+  playSound('click');
   renderSubjects(); renderContent();
   toast('تم الحذف');
 }
@@ -1622,6 +2002,7 @@ async function addLesson(){
   }
   closeModal('lessonModal');
   playSound('success');
+  celebrate();
   renderSubjects();
   pushNotif('study', 'درس جديد', s.name + ': ' + title);
   checkAchievements();
@@ -1633,7 +2014,9 @@ async function deleteLesson(sid, lid){
   var s = state.subjects.find(function(x){ return x.id===sid; });
   if(s) s.lessons = s.lessons.filter(function(l){ return l.id!==lid; });
   if(currentLessonId===lid){ currentLessonId=null; renderContent(); }
+  playSound('click');
   renderSubjects();
+  toast('تم الحذف');
 }
 
 /* =====================================================
@@ -1642,6 +2025,7 @@ async function deleteLesson(sid, lid){
 function renderSubjects(){
   var q = document.getElementById('searchInput').value.trim().toLowerCase();
   var list = document.getElementById('subjectsList');
+  if(!list) return;
   list.innerHTML = '';
   state.subjects.forEach(function(s){
     var filtered = s.lessons.filter(function(l){ return l.title.toLowerCase().indexOf(q) !== -1; });
@@ -1702,9 +2086,13 @@ function renderContent(){
   var content = document.getElementById('content');
   var titleEl = document.getElementById('topTitle');
 
+  if(currentTab === 'tasks') return renderTasks(content, titleEl);
+  if(currentTab === 'challenge') return renderChallenge(content, titleEl);
   if(currentTab === 'calendar') return renderCalendar(content, titleEl);
   if(currentTab === 'monthly') return renderMonthlyCalendar(content, titleEl);
   if(currentTab === 'schedule') return renderSchedule(content, titleEl);
+  if(currentTab === 'grades') return renderGrades(content, titleEl);
+  if(currentTab === 'calc') return renderCalculator(content, titleEl);
   if(currentTab === 'stats') return renderStats(content, titleEl);
   if(currentTab === 'achievements') return renderAchievements(content, titleEl);
   if(currentTab === 'notifs') return renderNotifsTab(content, titleEl);
@@ -1796,7 +2184,7 @@ function renderContent(){
 }
 
 /* =====================================================
-   QUILL EDITOR
+   QUILL
 ===================================================== */
 function initQuill(){
   var editorEl = document.getElementById('feynmanEditor');
@@ -1834,7 +2222,8 @@ function getCurrentLesson(){
   var s = state.subjects.find(function(x){ return x.id===currentSubjectId; });
   return s && s.lessons.find(function(x){ return x.id===currentLessonId; });
 }
-  /* =====================================================
+
+/* =====================================================
    FEYNMAN
 ===================================================== */
 async function saveFeynman(){
@@ -1879,14 +2268,15 @@ async function checkFeynman(){
       l.status = 'reading';
       await sb.from('lessons').update({status:'reading'}).eq('id', l.id);
     }
-    playSound('success');
+    playSound('complete');
+    celebrate();
     renderSubjects();
     updateStreak();
     pushNotif('study', 'أحسنت! فهمت درساً', l.title);
     checkAchievements();
   } else {
     res.className = 'feynman-result show bad';
-    res.innerHTML = '<i class="fa-solid fa-lightbulb"></i> حاول تبسّط أكثر، وأضف أمثلة من حياتك، واستعمل التنسيق (غامق، قوائم).';
+    res.innerHTML = '<i class="fa-solid fa-lightbulb"></i> حاول تبسّط أكثر، وأضف أمثلة من حياتك، واستعمل التنسيق.';
     playSound('error');
   }
 }
@@ -1897,9 +2287,8 @@ function speakFeynman(){
   if(txt.length < 5){ toast('اكتب شي أول','fa-triangle-exclamation'); return; }
   speakText(txt);
 }
-
-/* =====================================================
-   CARDS
+  /* =====================================================
+   CARDS - CRUD
 ===================================================== */
 function openCardModal(){
   document.getElementById('cardQ').value = '';
@@ -1927,9 +2316,11 @@ async function addCard(){
 }
 
 async function deleteCard(cid){
+  if(!confirm('حذف هذي البطاقة؟')) return;
   await sb.from('cards').delete().eq('id', cid);
   var l = getCurrentLesson(); if(!l) return;
   l.cards = l.cards.filter(function(c){ return c.id!==cid; });
+  playSound('click');
   renderContent();
   toast('تم حذف البطاقة');
 }
@@ -1956,7 +2347,8 @@ function renderFlashcard(){
     box.innerHTML = '<div class="q">🎉 خلصت المراجعة!</div><div class="a">راجعت ' + fcQueue.length + ' بطاقة</div>';
     prog.textContent = '';
     playSound('complete');
-    setTimeout(closeFlashcards, 1500);
+    bigCelebrate();
+    setTimeout(closeFlashcards, 1800);
     return;
   }
   var c = fcQueue[fcIndex];
@@ -1978,7 +2370,11 @@ function renderFlashcard(){
   }
 }
 
-function flipCard(){ fcFlipped = true; playSound('click'); renderFlashcard(); }
+function flipCard(){
+  fcFlipped = true;
+  playSound('click');
+  renderFlashcard();
+}
 
 async function rateCard(level){
   var c = fcQueue[fcIndex];
@@ -1999,6 +2395,7 @@ function closeFlashcards(){
   document.getElementById('fcOverlay').classList.remove('show');
   renderContent(); renderSubjects();
   updateStreak();
+  checkAchievements();
 }
 
 /* =====================================================
@@ -2027,7 +2424,8 @@ async function markSpacedReview(){
     spaced_next_review: nextReview,
     status: newStatus
   }).eq('id', l.id);
-  playSound('success');
+  playSound('complete');
+  celebrate();
   renderSubjects(); renderContent();
   updateStreak();
   pushNotif('review', 'أنجزت مراجعة', l.title);
@@ -2079,14 +2477,16 @@ async function addSched(){
 }
 
 async function delSched(id){
+  if(!confirm('حذف هذا الموعد؟')) return;
   await sb.from('schedule').delete().eq('id', id);
   state.schedule = state.schedule.filter(function(x){ return x.id!==id; });
+  playSound('click');
   renderContent();
   toast('تم الحذف');
 }
 
 /* =====================================================
-   CALENDAR (المواعيد القادمة)
+   CALENDAR
 ===================================================== */
 function renderCalendar(content, titleEl){
   titleEl.textContent = 'التقويم والمواعيد';
@@ -2122,7 +2522,7 @@ function renderCalendar(content, titleEl){
 }
 
 /* =====================================================
-   MONTHLY CALENDAR (تقويم شهري)
+   MONTHLY CALENDAR
 ===================================================== */
 function renderMonthlyCalendar(content, titleEl){
   titleEl.textContent = 'التقويم الشهري';
@@ -2133,17 +2533,12 @@ function renderMonthlyCalendar(content, titleEl){
   var firstDay = new Date(year, month, 1);
   var lastDay = new Date(year, month + 1, 0);
   var daysInMonth = lastDay.getDate();
-  var startDayOfWeek = (firstDay.getDay() + 1) % 7; // 0=الأحد
+  var startDayOfWeek = (firstDay.getDay() + 1) % 7;
 
   var today = new Date();
   var isCurrentMonth = (today.getFullYear() === year && today.getMonth() === month);
 
-  // Collect events per day
   var eventsByDay = {};
-  (state.schedule||[]).forEach(function(item){
-    // Schedule items are weekly, so ignore for now unless exam
-  });
-
   state.subjects.forEach(function(s){
     s.lessons.forEach(function(l){
       if(l.spaced && l.spaced.nextReview){
@@ -2157,8 +2552,11 @@ function renderMonthlyCalendar(content, titleEl){
     });
   });
 
+  (state.schedule || []).filter(function(x){ return x.type === 'exam'; }).forEach(function(item){
+    // Schedule exams are weekly - skip for now unless we add dates
+  });
+
   var daysHtml = '';
-  // Empty cells before first day
   for(var i = 0; i < startDayOfWeek; i++){
     daysHtml += '<div class="day-cell other-month"></div>';
   }
@@ -2240,7 +2638,6 @@ function showDayEvents(day, month, year){
   });
   html += '</div>';
 
-  // Create modal dynamically
   var existing = document.getElementById('dayEventsModal');
   if(existing) existing.remove();
 
@@ -2259,6 +2656,8 @@ function showDayEvents(day, month, year){
 /* =====================================================
    STATS + CHARTS
 ===================================================== */
+var statusChartInstance = null;
+
 function renderStats(content, titleEl){
   titleEl.textContent = 'الإحصائيات';
   var totalLessons = 0, memorized = 0, totalCards = 0, dueCards = 0;
@@ -2275,8 +2674,9 @@ function renderStats(content, titleEl){
 
   var pct = totalLessons ? Math.round(memorized/totalLessons*100) : 0;
   var streak = getStreak();
+  var level = state.userStats ? state.userStats.level : 1;
+  var xp = state.userStats ? state.userStats.total_xp : 0;
 
-  // Subject stats
   var subjectStatsHtml = state.subjects.length === 0 ? '<p style="color:var(--muted);text-align:center;padding:20px">أضف مواد لعرض الإحصائيات</p>' :
     state.subjects.map(function(s){
       var total = s.lessons.length;
@@ -2303,13 +2703,16 @@ function renderStats(content, titleEl){
     '<div class="stat-card"><i class="fa-solid fa-layer-group"></i><div class="num">' + totalCards + '</div><div class="lbl">البطاقات</div></div>' +
     '<div class="stat-card"><i class="fa-solid fa-clock"></i><div class="num">' + dueCards + '</div><div class="lbl">بطاقات مستحقة</div></div>' +
     '<div class="stat-card"><i class="fa-solid fa-percent"></i><div class="num">' + pct + '%</div><div class="lbl">نسبة الحفظ</div></div>' +
-    '<div class="stat-card" style="grid-column:span 2;background:linear-gradient(135deg,var(--card),rgba(255,122,0,.1))">' +
+    '<div class="stat-card" style="grid-column:span 1;background:linear-gradient(135deg,var(--card),rgba(255,122,0,.1))">' +
     '<i class="fa-solid fa-fire" style="color:var(--orange)"></i>' +
     '<div class="num">' + streak + '</div><div class="lbl">🔥 سلسلة الأيام</div></div>' +
+    '<div class="stat-card" style="grid-column:span 1;background:linear-gradient(135deg,var(--card),rgba(139,92,246,.1))">' +
+    '<i class="fa-solid fa-star" style="color:var(--purple)"></i>' +
+    '<div class="num">' + level + '</div><div class="lbl">⭐ المستوى (' + xp + ' XP)</div></div>' +
     '</div>' +
 
     '<div class="section" style="margin-top:20px">' +
-    '<h3><i class="fa-solid fa-chart-column"></i> توزيع الدروس حسب الحالة</h3>' +
+    '<h3><i class="fa-solid fa-chart-pie"></i> توزيع الدروس حسب الحالة</h3>' +
     '<div style="height:300px;position:relative"><canvas id="statusChart"></canvas></div>' +
     '</div>' +
 
@@ -2321,15 +2724,10 @@ function renderStats(content, titleEl){
 
   setTimeout(function(){ drawCharts(); }, 100);
 }
-  /* =====================================================
-   CHARTS
-===================================================== */
-var statusChartInstance = null;
 
 function drawCharts(){
   if(typeof Chart === 'undefined') return;
 
-  // Destroy previous
   if(statusChartInstance){
     try { statusChartInstance.destroy(); } catch(e) {}
     statusChartInstance = null;
@@ -2478,7 +2876,6 @@ function runAdvancedSearch(){
       var lessonMatch = (!status || l.status === status);
       var kwMatch = !keyword || l.title.toLowerCase().indexOf(keyword) !== -1;
 
-      // Lessons
       if((type === 'all' || type === 'lessons') && lessonMatch && kwMatch){
         results.push({
           type:'lesson', subjectId:s.id, lessonId:l.id,
@@ -2487,7 +2884,6 @@ function runAdvancedSearch(){
         });
       }
 
-      // Cards
       if(type === 'all' || type === 'cards'){
         l.cards.forEach(function(c){
           var cMatch = !keyword || c.q.toLowerCase().indexOf(keyword) !== -1 || c.a.toLowerCase().indexOf(keyword) !== -1;
@@ -2501,7 +2897,6 @@ function runAdvancedSearch(){
         });
       }
 
-      // Feynman
       if(type === 'all' || type === 'feynman'){
         var ftxt = stripHtml(l.feynman && l.feynman.text || '');
         var fMatch = !keyword || ftxt.toLowerCase().indexOf(keyword) !== -1;
@@ -2543,6 +2938,637 @@ function runAdvancedSearch(){
       '<div class="sub">' + escapeHtml(r.sub) + '</div></div>';
   }).join('');
 }
+  /* =====================================================
+   GRADES CALCULATOR — حاسبة المعدل
+===================================================== */
+function renderGrades(content, titleEl){
+  titleEl.textContent = 'حاسبة المعدل';
+  var semesterGrades = state.grades.filter(function(g){ return g.semester === currentSemester; });
+  var avg = calculateAverage(semesterGrades);
+
+  content.innerHTML = '<div style="max-width:900px;margin:0 auto">' +
+    '<h2 style="color:var(--orange);font-weight:800;margin-bottom:18px"><i class="fa-solid fa-calculator"></i> حاسبة المعدل</h2>' +
+
+    '<div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">' +
+    ['1','2','3'].map(function(s){
+      return '<button class="status-btn ' + (currentSemester===s?'active':'') + '" onclick="switchSemester(\'' + s + '\')">' +
+        '<i class="fa-solid fa-book"></i> الفصل ' + s + '</button>';
+    }).join('') + '</div>' +
+
+    (semesterGrades.length > 0 ?
+      '<div class="section" style="background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff;text-align:center;padding:26px">' +
+      '<div style="font-size:14px;opacity:.9;margin-bottom:8px">المعدل الفصلي</div>' +
+      '<div style="font-size:60px;font-weight:900;line-height:1">' + avg.toFixed(2) + '</div>' +
+      '<div style="font-size:18px;font-weight:700;margin-top:10px">' + getGradeLabel(avg) + '</div>' +
+      '<div style="font-size:12px;opacity:.8;margin-top:8px">' + semesterGrades.length + ' مادة</div>' +
+      '</div>' : '') +
+
+    '<div class="section">' +
+    '<h3><i class="fa-solid fa-plus"></i> إضافة مادة</h3>' +
+    '<div class="form-grid">' +
+    '<div><label>المادة</label>' +
+    '<input id="gradeSubject" list="gradesubjectsList" placeholder="اكتب أو اختر">' +
+    '<datalist id="gradesubjectsList">' +
+    BEM_SUBJECTS.map(function(s){ return '<option value="' + s + '">'; }).join('') +
+    '</datalist></div>' +
+    '<div><label>العلامة / 20</label>' +
+    '<input id="gradeValue" type="number" min="0" max="20" step="0.25" placeholder="15"></div>' +
+    '<div><label>المعامل</label>' +
+    '<input id="gradeCoef" type="number" min="1" max="10" value="1"></div>' +
+    '</div>' +
+    '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">' +
+    '<button class="btn btn-primary" onclick="addGrade()"><i class="fa-solid fa-check"></i> إضافة</button>' +
+    '<button class="btn btn-ghost" onclick="quickFillGrades()"><i class="fa-solid fa-wand-magic-sparkles"></i> ملء سريع بمواد BEM</button>' +
+    '</div></div>' +
+
+    '<div class="section">' +
+    '<h3><i class="fa-solid fa-list"></i> المواد (' + semesterGrades.length + ')</h3>' +
+    (semesterGrades.length === 0 ?
+      '<p style="color:var(--muted);text-align:center;padding:20px">أضف مواد لحساب المعدل</p>' :
+      semesterGrades.map(function(g){
+        return '<div class="card-item">' +
+          '<span class="q" style="font-weight:600">' + escapeHtml(g.subject_name) + '</span>' +
+          '<span style="color:var(--orange);font-weight:800;font-size:15px">' + g.grade + '/20</span>' +
+          '<span class="lvl lvl-2" style="font-size:11px">معامل ' + g.coefficient + '</span>' +
+          '<i class="fa-solid fa-trash del" onclick="delGrade(\'' + g.id + '\')"></i>' +
+          '</div>';
+      }).join('')) +
+    '</div>' +
+
+    (semesterGrades.length > 0 ?
+      '<div style="text-align:center;margin-top:16px">' +
+      '<button class="btn btn-ghost btn-sm" onclick="clearSemester()" style="color:var(--red);border-color:var(--red)">' +
+      '<i class="fa-solid fa-trash"></i> مسح كل مواد الفصل ' + currentSemester + '</button></div>' : '') +
+
+    '</div>';
+}
+
+function switchSemester(s){
+  currentSemester = s;
+  playSound('click');
+  renderContent();
+}
+
+function calculateAverage(grades){
+  if(grades.length === 0) return 0;
+  var totalPoints = 0, totalCoef = 0;
+  grades.forEach(function(g){
+    totalPoints += parseFloat(g.grade) * parseFloat(g.coefficient);
+    totalCoef += parseFloat(g.coefficient);
+  });
+  return totalCoef > 0 ? totalPoints / totalCoef : 0;
+}
+
+function getGradeLabel(avg){
+  if(avg >= 18) return '🏆 ممتاز';
+  if(avg >= 16) return '⭐ جيد جداً';
+  if(avg >= 14) return '👍 جيد';
+  if(avg >= 12) return '✅ مقبول';
+  if(avg >= 10) return '⚠️ ضعيف';
+  return '❌ راسب';
+}
+
+async function addGrade(){
+  updateStreak();
+  var subject = document.getElementById('gradeSubject').value.trim();
+  var grade = parseFloat(document.getElementById('gradeValue').value);
+  var coef = parseFloat(document.getElementById('gradeCoef').value) || 1;
+
+  if(!subject){ toast('اكتب اسم المادة','fa-triangle-exclamation'); return; }
+  if(isNaN(grade) || grade < 0 || grade > 20){ toast('العلامة من 0 إلى 20','fa-triangle-exclamation'); return; }
+
+  var result = await sb.from('grades').insert({
+    user_id: currentUser.id,
+    semester: currentSemester,
+    subject_name: subject,
+    grade: grade,
+    coefficient: coef
+  }).select().single();
+
+  if(result.error){ toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation'); return; }
+
+  state.grades.push(result.data);
+  playSound('success');
+  celebrate();
+  renderContent();
+  checkAchievements();
+  toast('تمت الإضافة');
+}
+
+async function delGrade(id){
+  if(!confirm('حذف هذي المادة؟')) return;
+  await sb.from('grades').delete().eq('id', id);
+  state.grades = state.grades.filter(function(g){ return g.id !== id; });
+  playSound('click');
+  renderContent();
+  toast('تم الحذف');
+}
+
+async function quickFillGrades(){
+  if(!confirm('إضافة كل مواد BEM؟ (راح تضيف 12 مادة بعلامة 0)')) return;
+
+  var existing = state.grades.filter(function(g){ return g.semester === currentSemester; }).map(function(g){ return g.subject_name; });
+  var toAdd = BEM_SUBJECTS.filter(function(s){ return existing.indexOf(s) === -1; });
+
+  if(toAdd.length === 0){ toast('كل المواد مضافة بالفعل','fa-info-circle'); return; }
+
+  var inserts = toAdd.map(function(s){
+    return {
+      user_id: currentUser.id,
+      semester: currentSemester,
+      subject_name: s,
+      grade: 0,
+      coefficient: 1
+    };
+  });
+
+  var result = await sb.from('grades').insert(inserts).select();
+  if(result.error){ toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation'); return; }
+
+  state.grades = state.grades.concat(result.data);
+  playSound('success');
+  celebrate();
+  renderContent();
+  toast('تمت إضافة ' + toAdd.length + ' مادة');
+}
+
+async function clearSemester(){
+  if(!confirm('مسح كل مواد الفصل ' + currentSemester + '؟')) return;
+  await sb.from('grades').delete().eq('user_id', currentUser.id).eq('semester', currentSemester);
+  state.grades = state.grades.filter(function(g){ return g.semester !== currentSemester; });
+  playSound('click');
+  renderContent();
+  toast('تم المسح');
+}
+
+/* =====================================================
+   TASKS — قائمة المهام
+===================================================== */
+function openTaskModal(){
+  document.getElementById('taskTitle').value = '';
+  document.getElementById('taskPriority').value = 'normal';
+  document.getElementById('taskDate').value = '';
+  openModal('taskModal');
+}
+
+function renderTasks(content, titleEl){
+  titleEl.textContent = 'قائمة المهام';
+  var tasks = state.tasks || [];
+  var activeTasks = tasks.filter(function(t){ return !t.completed; });
+  var doneTasks = tasks.filter(function(t){ return t.completed; });
+
+  content.innerHTML = '<div style="max-width:800px;margin:0 auto">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">' +
+    '<h2 style="color:var(--orange);font-weight:800"><i class="fa-solid fa-list-check"></i> قائمة المهام</h2>' +
+    '<button class="btn btn-primary btn-sm" onclick="openTaskModal()"><i class="fa-solid fa-plus"></i> إضافة مهمة</button>' +
+    '</div>' +
+
+    (tasks.length === 0 ?
+      '<div class="empty"><div class="icon-big"><i class="fa-solid fa-list-check"></i></div>' +
+      '<h2>لا مهام بعد</h2><p>أضف مهامك اليومية لتنظيم دراستك</p></div>' :
+      '<div class="section">' +
+      '<h3><i class="fa-solid fa-hourglass-half"></i> المهام النشطة (' + activeTasks.length + ')</h3>' +
+      (activeTasks.length === 0 ? '<p style="color:var(--muted);text-align:center;padding:14px">كل المهام مكتملة! 🎉</p>' :
+        activeTasks.map(function(t){
+          var priorityColor = t.priority === 'high' ? 'var(--red)' : t.priority === 'low' ? 'var(--muted)' : 'var(--orange)';
+          return '<div class="task-item">' +
+            '<div class="task-checkbox" onclick="toggleTask(\'' + t.id + '\')"><i class="fa-solid fa-check" style="display:none"></i></div>' +
+            '<div class="task-body">' +
+            '<div class="task-title">' + escapeHtml(t.title) + '</div>' +
+            '<div class="task-meta">' +
+            '<span style="color:' + priorityColor + '"><i class="fa-solid fa-flag"></i> ' +
+            (t.priority === 'high' ? 'مهم' : t.priority === 'low' ? 'منخفض' : 'عادي') + '</span>' +
+            (t.due_date ? '<span><i class="fa-regular fa-calendar"></i> ' + fmtDate(t.due_date) + '</span>' : '') +
+            '</div></div>' +
+            '<i class="fa-solid fa-trash task-del" onclick="deleteTask(\'' + t.id + '\')"></i>' +
+            '</div>';
+        }).join('')) +
+      '</div>' +
+
+      (doneTasks.length > 0 ?
+        '<div class="section">' +
+        '<h3><i class="fa-solid fa-check-double"></i> المكتملة (' + doneTasks.length + ')</h3>' +
+        doneTasks.slice(0, 20).map(function(t){
+          return '<div class="task-item done">' +
+            '<div class="task-checkbox checked" onclick="toggleTask(\'' + t.id + '\')"><i class="fa-solid fa-check"></i></div>' +
+            '<div class="task-body"><div class="task-title">' + escapeHtml(t.title) + '</div></div>' +
+            '<i class="fa-solid fa-trash task-del" onclick="deleteTask(\'' + t.id + '\')"></i>' +
+            '</div>';
+        }).join('') +
+        '</div>' : '')
+    ) +
+    '</div>';
+}
+
+async function addTask(){
+  updateStreak();
+  var title = document.getElementById('taskTitle').value.trim();
+  var priority = document.getElementById('taskPriority').value;
+  var dueDate = document.getElementById('taskDate').value;
+
+  if(!title){ toast('اكتب المهمة','fa-triangle-exclamation'); return; }
+
+  var result = await sb.from('tasks').insert({
+    user_id: currentUser.id,
+    title: title,
+    priority: priority,
+    due_date: dueDate || null,
+    completed: false
+  }).select().single();
+
+  if(result.error){ toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation'); return; }
+
+  state.tasks.unshift(result.data);
+  closeModal('taskModal');
+  playSound('success');
+  renderContent();
+  checkAchievements();
+  toast('تمت الإضافة');
+}
+
+async function toggleTask(id){
+  var task = state.tasks.find(function(t){ return t.id === id; });
+  if(!task) return;
+
+  var newState = !task.completed;
+  await sb.from('tasks').update({completed: newState}).eq('id', id);
+  task.completed = newState;
+
+  if(newState){
+    playSound('success');
+    celebrate();
+    addXP(5);
+  } else {
+    playSound('click');
+  }
+
+  renderContent();
+}
+
+async function deleteTask(id){
+  if(!confirm('حذف هذي المهمة؟')) return;
+  await sb.from('tasks').delete().eq('id', id);
+  state.tasks = state.tasks.filter(function(t){ return t.id !== id; });
+  playSound('click');
+  renderContent();
+  toast('تم الحذف');
+}
+
+/* =====================================================
+   DAILY CHALLENGE
+===================================================== */
+var CHALLENGE_TYPES = [
+  { type: 'cards', text: 'احفظ {n} بطاقات اليوم', targets: [3, 5, 8], xp: 30 },
+  { type: 'review', text: 'راجع {n} دروس اليوم', targets: [1, 2, 3], xp: 40 },
+  { type: 'feynman', text: 'افهم {n} درس بتقنية فاينمان', targets: [1, 2], xp: 50 },
+  { type: 'new_lesson', text: 'أضف {n} درس جديد', targets: [1, 2], xp: 25 },
+  { type: 'pomodoro', text: 'أكمل {n} جلسة بومودورو', targets: [1, 2, 3], xp: 35 },
+  { type: 'spaced', text: 'أنجز {n} مراجعة متباعدة', targets: [1, 2], xp: 30 }
+];
+
+async function generateDailyChallenge(){
+  if(!currentUser) return;
+  var today = new Date().toISOString().split('T')[0];
+  var existing = state.challenges.find(function(c){ return c.challenge_date === today; });
+  if(existing) return;
+
+  var picked = CHALLENGE_TYPES[Math.floor(Math.random() * CHALLENGE_TYPES.length)];
+  var target = picked.targets[Math.floor(Math.random() * picked.targets.length)];
+  var text = picked.text.replace('{n}', target);
+
+  var result = await sb.from('daily_challenges').insert({
+    user_id: currentUser.id,
+    challenge_date: today,
+    challenge_type: picked.type,
+    challenge_text: text,
+    target: target,
+    xp_reward: picked.xp
+  }).select().single();
+
+  if(result.data) state.challenges.push(result.data);
+}
+
+function renderChallengeBadge(){
+  var today = new Date().toISOString().split('T')[0];
+  var challenge = state.challenges.find(function(c){ return c.challenge_date === today; });
+  var badge = document.getElementById('challengeBadgeText');
+  if(!badge) return;
+  if(!challenge){
+    badge.textContent = 'تحدي';
+    return;
+  }
+  if(challenge.completed){
+    badge.textContent = '✅ تم';
+  } else {
+    badge.textContent = challenge.progress + '/' + challenge.target;
+  }
+}
+
+function renderChallenge(content, titleEl){
+  titleEl.textContent = 'التحدي اليومي';
+  var today = new Date().toISOString().split('T')[0];
+  var challenge = state.challenges.find(function(c){ return c.challenge_date === today; });
+
+  var level = state.userStats ? state.userStats.level : 1;
+  var xp = state.userStats ? state.userStats.total_xp : 0;
+  var xpInLevel = xp % 100;
+  var completedCount = state.userStats ? state.userStats.challenges_completed : 0;
+
+  content.innerHTML = '<div style="max-width:700px;margin:0 auto">' +
+    '<h2 style="color:var(--orange);font-weight:800;margin-bottom:18px"><i class="fa-solid fa-bullseye"></i> التحدي اليومي</h2>' +
+
+    '<div class="section" style="background:linear-gradient(135deg,var(--purple),#6D28D9);color:#fff">' +
+    '<div style="text-align:center;padding:20px">' +
+    '<i class="fa-solid fa-star" style="font-size:36px;margin-bottom:10px"></i>' +
+    '<div style="font-size:14px;opacity:.9">المستوى</div>' +
+    '<div style="font-size:48px;font-weight:900;line-height:1">' + level + '</div>' +
+    '<div class="xp-bar" style="margin-top:16px">' +
+    '<div class="fill" style="width:' + xpInLevel + '%"></div>' +
+    '</div>' +
+    '<div style="font-size:12px;margin-top:8px;opacity:.9">' + xpInLevel + ' / 100 XP — المجموع: ' + xp + ' XP</div>' +
+    '</div></div>' +
+
+    (challenge ?
+      '<div class="section" style="border:2px solid var(--orange)">' +
+      '<h3><i class="fa-solid fa-flag-checkered"></i> تحدي اليوم</h3>' +
+      '<div style="text-align:center;padding:16px">' +
+      '<div style="font-size:18px;font-weight:700;margin-bottom:14px">' + escapeHtml(challenge.challenge_text) + '</div>' +
+      '<div style="font-size:14px;color:var(--muted);margin-bottom:14px">' +
+      'التقدم: <b style="color:var(--orange)">' + challenge.progress + ' / ' + challenge.target + '</b></div>' +
+      '<div style="background:var(--bg);height:14px;border-radius:7px;overflow:hidden;margin-bottom:16px">' +
+      '<div style="height:100%;width:' + Math.min(100, (challenge.progress/challenge.target*100)) + '%;background:linear-gradient(90deg,var(--orange),var(--orange-dark));border-radius:7px;transition:.5s"></div>' +
+      '</div>' +
+      '<div style="font-size:13px;color:var(--muted);margin-bottom:16px">' +
+      '<i class="fa-solid fa-gift"></i> المكافأة: ' + challenge.xp_reward + ' XP</div>' +
+      (challenge.completed ?
+        '<div style="color:#4CAF50;font-size:16px;font-weight:700"><i class="fa-solid fa-check-circle"></i> تم إكمال التحدي! 🎉</div>' :
+        '<button class="btn btn-primary" onclick="progressChallenge()"><i class="fa-solid fa-plus"></i> سجل تقدم</button>') +
+      '</div></div>' :
+      '<div class="empty"><div class="icon-big"><i class="fa-solid fa-bullseye"></i></div><p>لا يوجد تحدي اليوم</p></div>') +
+
+    '<div class="section">' +
+    '<h3><i class="fa-solid fa-trophy"></i> إحصائياتك</h3>' +
+    '<div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">' +
+    '<div class="stat-card"><i class="fa-solid fa-bullseye"></i><div class="num">' + completedCount + '</div><div class="lbl">تحديات مكتملة</div></div>' +
+    '<div class="stat-card"><i class="fa-solid fa-star"></i><div class="num">' + xp + '</div><div class="lbl">مجموع XP</div></div>' +
+    '<div class="stat-card"><i class="fa-solid fa-layer-group"></i><div class="num">' + level + '</div><div class="lbl">المستوى</div></div>' +
+    '</div></div>' +
+
+    '<div class="section">' +
+    '<h3><i class="fa-solid fa-clock-rotate-left"></i> آخر 7 أيام</h3>' +
+    '<div style="display:flex;gap:8px;justify-content:space-around;flex-wrap:wrap">' +
+    getLast7Days().map(function(d){
+      var c = state.challenges.find(function(x){ return x.challenge_date === d.date; });
+      var done = c && c.completed;
+      return '<div style="text-align:center;flex:1;min-width:50px">' +
+        '<div style="width:40px;height:40px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;' +
+        (done ? 'background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff' : 'background:var(--bg);border:1px solid var(--border);color:var(--muted)') + '">' +
+        (done ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-circle"></i>') +
+        '</div>' +
+        '<div style="font-size:10px;color:var(--muted);margin-top:6px">' + d.label + '</div>' +
+        '</div>';
+    }).join('') +
+    '</div></div>' +
+    '</div>';
+}
+
+function getLast7Days(){
+  var days = ['ح','ن','ث','ر','خ','ج','س'];
+  var result = [];
+  for(var i = 6; i >= 0; i--){
+    var d = new Date(Date.now() - i * 86400000);
+    result.push({
+      date: d.toISOString().split('T')[0],
+      label: days[d.getDay()]
+    });
+  }
+  return result;
+}
+
+async function progressChallenge(){
+  var today = new Date().toISOString().split('T')[0];
+  var challenge = state.challenges.find(function(c){ return c.challenge_date === today; });
+  if(!challenge || challenge.completed) return;
+
+  var newProgress = Math.min(challenge.progress + 1, challenge.target);
+  var completed = newProgress >= challenge.target;
+
+  var result = await sb.from('daily_challenges').update({
+    progress: newProgress,
+    completed: completed
+  }).eq('id', challenge.id).select().single();
+
+  if(result.error){ toast('خطأ', 'fa-triangle-exclamation'); return; }
+
+  challenge.progress = newProgress;
+  challenge.completed = completed;
+
+  if(completed){
+    await addXP(challenge.xp_reward);
+    playSound('complete');
+    bigCelebrate();
+    toast('🎉 أكملت التحدي! +' + challenge.xp_reward + ' XP', 'fa-trophy');
+  } else {
+    playSound('click');
+  }
+
+  renderChallengeBadge();
+  renderContent();
+  checkAchievements();
+}
+
+async function addXP(amount){
+  if(!state.userStats) return;
+  var newXP = state.userStats.total_xp + amount;
+  var newLevel = Math.floor(newXP / 100) + 1;
+  var leveledUp = newLevel > state.userStats.level;
+
+  var updates = {
+    total_xp: newXP,
+    level: newLevel,
+    updated_at: new Date().toISOString()
+  };
+
+  var today = new Date().toISOString().split('T')[0];
+  var challenge = state.challenges.find(function(c){ return c.challenge_date === today; });
+  if(challenge && challenge.completed){
+    updates.challenges_completed = (state.userStats.challenges_completed || 0) + 1;
+  }
+
+  var result = await sb.from('user_stats').update(updates).eq('id', state.userStats.id).select().single();
+  if(result.data){
+    state.userStats = result.data;
+    if(leveledUp){
+      setTimeout(function(){
+        toast('⭐ ارتقيت للمستوى ' + newLevel + '!', 'fa-star');
+        bigCelebrate();
+        playSound('complete');
+      }, 800);
+    }
+  }
+}
+
+/* =====================================================
+   SCIENTIFIC CALCULATOR
+===================================================== */
+function renderCalculator(content, titleEl){
+  titleEl.textContent = 'آلة حاسبة علمية';
+  content.innerHTML = '<div style="max-width:500px;margin:0 auto">' +
+    '<h2 style="color:var(--orange);font-weight:800;margin-bottom:18px"><i class="fa-solid fa-square-root-variable"></i> آلة حاسبة علمية</h2>' +
+
+    '<div class="calc-display">' +
+    '<div class="calc-expression" id="calcExpr"></div>' +
+    '<div class="calc-result" id="calcResult">0</div>' +
+    '</div>' +
+
+    '<div class="calc-grid">' +
+    // Row 1: sin, cos, tan, π, e
+    '<button class="calc-btn fn" onclick="calcInput(\'sin(\')">sin</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'cos(\')">cos</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'tan(\')">tan</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'Math.PI\')">π</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'Math.E\')">e</button>' +
+
+    // Row 2: log, ln, √, x², ^
+    '<button class="calc-btn fn" onclick="calcInput(\'Math.log10(\')">log</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'Math.log(\')">ln</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'Math.sqrt(\')">√</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'**2\')">x²</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'**\')">^</button>' +
+
+    // Row 3: C, (, ), %, ÷
+    '<button class="calc-btn clear" onclick="calcClear()">C</button>' +
+    '<button class="calc-btn op" onclick="calcInput(\'(\')">(</button>' +
+    '<button class="calc-btn op" onclick="calcInput(\')\')">)</button>' +
+    '<button class="calc-btn op" onclick="calcInput(\'%\')">%</button>' +
+    '<button class="calc-btn op" onclick="calcInput(\'/\')">÷</button>' +
+
+    // Row 4: 7, 8, 9, DEL, ×
+    '<button class="calc-btn" onclick="calcInput(\'7\')">7</button>' +
+    '<button class="calc-btn" onclick="calcInput(\'8\')">8</button>' +
+    '<button class="calc-btn" onclick="calcInput(\'9\')">9</button>' +
+    '<button class="calc-btn clear" onclick="calcBack()">⌫</button>' +
+    '<button class="calc-btn op" onclick="calcInput(\'*\')">×</button>' +
+
+    // Row 5: 4, 5, 6, −, 1/x
+    '<button class="calc-btn" onclick="calcInput(\'4\')">4</button>' +
+    '<button class="calc-btn" onclick="calcInput(\'5\')">5</button>' +
+    '<button class="calc-btn" onclick="calcInput(\'6\')">6</button>' +
+    '<button class="calc-btn op" onclick="calcInput(\'-\')">−</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'1/\')">1/x</button>' +
+
+    // Row 6: 1, 2, 3, +, =
+    '<button class="calc-btn" onclick="calcInput(\'1\')">1</button>' +
+    '<button class="calc-btn" onclick="calcInput(\'2\')">2</button>' +
+    '<button class="calc-btn" onclick="calcInput(\'3\')">3</button>' +
+    '<button class="calc-btn op" onclick="calcInput(\'+\')">+</button>' +
+    '<button class="calc-btn eq" onclick="calcEquals()">=</button>' +
+
+    // Row 7: ±, 0, .
+    '<button class="calc-btn op" onclick="calcInput(\'-\')">±</button>' +
+    '<button class="calc-btn" onclick="calcInput(\'0\')">0</button>' +
+    '<button class="calc-btn" onclick="calcInput(\'.\')">.</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'Math.abs(\')">|x|</button>' +
+    '<button class="calc-btn fn" onclick="calcInput(\'Math.floor(\')">⌊x⌋</button>' +
+    '</div>' +
+
+    '<div class="section" style="margin-top:20px">' +
+    '<h3><i class="fa-solid fa-clock-rotate-left"></i> آخر النتائج</h3>' +
+    '<div id="calcHistory">' +
+    '<p style="color:var(--muted);font-size:13px;text-align:center;padding:14px">لا نتائج بعد</p>' +
+    '</div></div>' +
+    '</div>';
+}
+
+function calcInput(val){
+  calcExpression += val;
+  updateCalcDisplay();
+  playSound('click');
+}
+
+function calcClear(){
+  calcExpression = '';
+  updateCalcDisplay();
+  playSound('click');
+}
+
+function calcBack(){
+  calcExpression = calcExpression.slice(0, -1);
+  updateCalcDisplay();
+  playSound('click');
+}
+
+function updateCalcDisplay(){
+  var exprEl = document.getElementById('calcExpr');
+  var resEl = document.getElementById('calcResult');
+  if(exprEl) exprEl.textContent = calcExpression || '';
+
+  if(resEl){
+    if(!calcExpression){
+      resEl.textContent = '0';
+      return;
+    }
+    try {
+      var result = Function('"use strict"; return (' + calcExpression + ')')();
+      if(typeof result === 'number' && !isNaN(result) && isFinite(result)){
+        resEl.textContent = formatNumber(result);
+      } else {
+        resEl.textContent = '...';
+      }
+    } catch(e){
+      resEl.textContent = '...';
+    }
+  }
+}
+
+function calcEquals(){
+  if(!calcExpression) return;
+  try {
+    var result = Function('"use strict"; return (' + calcExpression + ')')();
+    if(typeof result === 'number' && !isNaN(result) && isFinite(result)){
+      var formatted = formatNumber(result);
+      addCalcHistory(calcExpression, formatted);
+      calcExpression = String(result);
+      updateCalcDisplay();
+      playSound('success');
+    } else {
+      toast('عملية غير صحيحة', 'fa-triangle-exclamation');
+      playSound('error');
+    }
+  } catch(e){
+    toast('عملية غير صحيحة', 'fa-triangle-exclamation');
+    playSound('error');
+  }
+}
+
+function formatNumber(n){
+  if(Math.abs(n) < 0.0001 && n !== 0) return n.toExponential(4);
+  if(Math.abs(n) > 1e10) return n.toExponential(4);
+  return parseFloat(n.toFixed(8)).toString();
+}
+
+var calcHistoryList = [];
+
+function addCalcHistory(expr, result){
+  calcHistoryList.unshift({expr: expr, result: result, time: Date.now()});
+  if(calcHistoryList.length > 10) calcHistoryList = calcHistoryList.slice(0, 10);
+  renderCalcHistory();
+}
+
+function renderCalcHistory(){
+  var el = document.getElementById('calcHistory');
+  if(!el) return;
+  if(calcHistoryList.length === 0){
+    el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:14px">لا نتائج بعد</p>';
+    return;
+  }
+  el.innerHTML = calcHistoryList.map(function(h){
+    return '<div style="padding:10px 12px;background:var(--bg);border-radius:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:.2s" onclick="calcExpression=\'' + h.result + '\';updateCalcDisplay();">' +
+      '<div style="font-size:12px;color:var(--muted);font-family:Courier New,monospace;direction:ltr;word-break:break-all">' + h.expr + '</div>' +
+      '<div style="font-weight:800;color:var(--orange);font-family:Courier New,monospace;font-size:14px;direction:ltr">= ' + h.result + '</div>' +
+      '</div>';
+  }).join('');
+}
 
 /* =====================================================
    POMODORO
@@ -2558,9 +3584,12 @@ function closePomodoro(){
 function updatePomoDisplay(){
   var m = Math.floor(pomoTime/60).toString().padStart(2,'0');
   var s = (pomoTime%60).toString().padStart(2,'0');
-  document.getElementById('pomoTime').textContent = m + ':' + s;
-  document.getElementById('pomoPhase').textContent = pomoPhase === 'focus' ? 'جلسة تركيز' : 'راحة';
-  document.getElementById('pomoStartBtn').innerHTML = pomoRunning ? '<i class="fa-solid fa-pause"></i> إيقاف' : '<i class="fa-solid fa-play"></i> ابدأ';
+  var t = document.getElementById('pomoTime');
+  var p = document.getElementById('pomoPhase');
+  var b = document.getElementById('pomoStartBtn');
+  if(t) t.textContent = m + ':' + s;
+  if(p) p.textContent = pomoPhase === 'focus' ? 'جلسة تركيز' : 'راحة';
+  if(b) b.innerHTML = pomoRunning ? '<i class="fa-solid fa-pause"></i> إيقاف' : '<i class="fa-solid fa-play"></i> ابدأ';
 }
 function togglePomo(){
   if(pomoRunning){
@@ -2575,7 +3604,9 @@ function togglePomo(){
           localStorage.setItem('pomodoro_done', 'true');
           pomoPhase = 'break'; pomoTime = 5*60;
           playSound('complete');
+          bigCelebrate();
           pushNotif('info', 'خلصت الجلسة!', 'خذ راحة 5 دقائق');
+          addXP(15);
           checkAchievements();
         } else {
           pomoPhase = 'focus'; pomoTime = 25*60;
@@ -2586,12 +3617,14 @@ function togglePomo(){
       updatePomoDisplay();
     }, 1000);
   }
+  playSound('click');
   updatePomoDisplay();
 }
 function resetPomo(){
   clearInterval(pomoInterval); pomoInterval = null; pomoRunning = false;
   pomoPhase = 'focus'; pomoTime = 25*60;
   updatePomoDisplay();
+  playSound('click');
 }
 
 /* =====================================================
@@ -2600,11 +3633,13 @@ function resetPomo(){
 document.addEventListener('keydown', function(e){
   var tag = (e.target.tagName || '').toLowerCase();
   if(tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if(e.target.isContentEditable) return;
 
   if(e.key === 'Escape'){
     closeModal('subjectModal'); closeModal('lessonModal');
     closeModal('cardModal'); closeModal('schedModal');
-    closeModal('avatarModal');
+    closeModal('avatarModal'); closeModal('taskModal');
+    closeModal('soundModal');
     var d = document.getElementById('dayEventsModal');
     if(d) d.remove();
     closePomodoro();
