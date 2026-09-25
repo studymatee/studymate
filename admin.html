@@ -22,6 +22,7 @@
   --border:#2A2A2A;
   --green:#4CAF50;
   --red:#F44336;
+  --blue:#2196F3;
   --font:'Tajawal',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
@@ -31,56 +32,62 @@ body{
   background-image:
     radial-gradient(circle at 20% 20%,var(--orange-soft) 0%,transparent 40%),
     radial-gradient(circle at 80% 80%,var(--orange-soft) 0%,transparent 40%);
+  background-attachment:fixed;
 }
 .app{display:flex;min-height:100vh}
 
-/* Sidebar */
+/* ============ Sidebar ============ */
 .sidebar{
   width:260px;background:var(--bg2);border-left:1px solid var(--border);
   padding:20px;display:flex;flex-direction:column;gap:6px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
 }
 .sidebar .brand{
   display:flex;align-items:center;gap:10px;margin-bottom:20px;
   padding-bottom:18px;border-bottom:1px solid var(--border);
 }
-.sidebar .brand i{
-  color:var(--orange);font-size:24px;
-  width:42px;height:42px;border-radius:12px;
+.sidebar .brand .logo{
+  width:42px;height:42px;border-radius:12px;flex-shrink:0;
   background:linear-gradient(135deg,var(--orange),var(--orange-dark));
-  color:#fff;display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:20px;
+  box-shadow:0 6px 20px rgba(255,122,0,.35);
 }
-.sidebar .brand h1{font-size:17px;color:var(--orange);font-weight:900}
-.sidebar .brand small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.sidebar .brand h1{font-size:16px;color:var(--orange);font-weight:900;line-height:1.2}
+.sidebar .brand small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
 .nav-item{
   padding:12px 14px;border-radius:10px;cursor:pointer;
   display:flex;align-items:center;gap:10px;
   font-size:14px;font-weight:600;color:var(--muted);
-  transition:.2s;
+  transition:.2s;text-decoration:none;
 }
 .nav-item:hover{background:var(--card);color:var(--text)}
 .nav-item.active{background:var(--orange);color:#fff;box-shadow:0 4px 15px rgba(255,122,0,.4)}
 .nav-item i{width:20px;text-align:center;font-size:15px}
+.sidebar-footer{margin-top:auto;padding-top:20px;border-top:1px solid var(--border)}
 
-/* Main */
-.main{flex:1;padding:26px;overflow-y:auto}
+/* ============ Main ============ */
+.main{flex:1;padding:26px;overflow-y:auto;min-width:0}
 .page-head{
   display:flex;justify-content:space-between;align-items:center;
   margin-bottom:22px;flex-wrap:wrap;gap:12px;
 }
-.page-head h2{font-size:22px;font-weight:800;color:var(--orange)}
+.page-head h2{font-size:22px;font-weight:800;color:var(--orange);display:flex;align-items:center;gap:10px}
 .page-head p{color:var(--muted);font-size:13px;margin-top:4px}
 
-/* Cards */
+/* ============ Cards ============ */
 .card{
   background:var(--card);border:1px solid var(--border);
   border-radius:16px;padding:22px;margin-bottom:18px;
+  transition:.2s;
 }
+.card:hover{border-color:rgba(255,122,0,.3)}
 .card h3{
   font-size:16px;color:var(--orange);margin-bottom:16px;
   display:flex;align-items:center;gap:10px;font-weight:700;
 }
 
-/* Form */
+/* ============ Form ============ */
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .form-grid.full{grid-template-columns:1fr}
 label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
@@ -93,47 +100,53 @@ input,select,textarea{
 input:focus,select:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
 textarea{min-height:100px;resize:vertical;line-height:1.7}
 
+/* ============ Buttons ============ */
 .btn{
   padding:11px 20px;border:none;border-radius:10px;
   cursor:pointer;font-size:14px;font-weight:700;
   transition:.2s;display:inline-flex;align-items:center;gap:8px;
   font-family:var(--font);
 }
-.btn-primary{background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(255,122,0,.4)}
+.btn-primary{background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff;box-shadow:0 4px 15px rgba(255,122,0,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(255,122,0,.5)}
 .btn-ghost{background:var(--bg);color:var(--text);border:1px solid var(--border)}
 .btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
 .btn-danger{background:var(--red);color:#fff}
-.btn-danger:hover{opacity:.9}
+.btn-danger:hover{opacity:.9;transform:translateY(-1px)}
 .btn-sm{padding:8px 14px;font-size:12px}
 
-/* List items */
+/* ============ List Items ============ */
 .item{
   background:var(--bg);border:1px solid var(--border);
   border-radius:12px;padding:14px;margin-bottom:10px;
   display:flex;gap:14px;align-items:flex-start;
   transition:.2s;
 }
-.item:hover{border-color:var(--orange)}
+.item:hover{border-color:var(--orange);transform:translateX(-2px)}
 .item .icon{
   width:40px;height:40px;border-radius:10px;
   background:var(--orange-soft);color:var(--orange);
   display:flex;align-items:center;justify-content:center;
   font-size:18px;flex-shrink:0;
 }
-.item .body{flex:1}
+.item .body{flex:1;min-width:0}
 .item .body .title{font-weight:700;margin-bottom:4px}
-.item .body .meta{font-size:12px;color:var(--muted)}
-.item .actions{display:flex;gap:6px}
+.item .body .meta{font-size:12px;color:var(--muted);line-height:1.6}
+.item .actions{display:flex;gap:6px;flex-shrink:0}
 
-/* Login */
-.login-wrap{
+/* ============ Empty ============ */
+.empty-box{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-box i{font-size:40px;color:var(--orange);opacity:.4;margin-bottom:12px;display:block}
+.empty-box p{font-size:14px}
+
+/* ============ Loading / Login ============ */
+.center-wrap{
   display:flex;align-items:center;justify-content:center;
   min-height:100vh;padding:20px;
 }
 .login-box{
   background:var(--card);border:1px solid var(--border);
-  border-radius:20px;padding:40px;max-width:420px;width:100%;
+  border-radius:20px;padding:40px;max-width:440px;width:100%;
   text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);
 }
 .login-box .icon-big{
@@ -141,26 +154,55 @@ textarea{min-height:100px;resize:vertical;line-height:1.7}
   background:linear-gradient(135deg,var(--orange),var(--orange-dark));
   display:flex;align-items:center;justify-content:center;
   color:#fff;font-size:36px;
+  animation:float 3s ease-in-out infinite;
 }
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .login-box h1{color:var(--orange);font-size:24px;margin-bottom:8px;font-weight:900}
-.login-box p{color:var(--muted);font-size:13px;margin-bottom:24px;line-height:1.7}
-
-/* Empty */
-.empty-box{
-  text-align:center;padding:40px 20px;color:var(--muted);
+.login-box p{color:var(--muted);font-size:13px;margin-bottom:24px;line-height:1.8}
+.login-box .back-link{
+  display:inline-flex;align-items:center;gap:6px;margin-top:20px;
+  color:var(--orange);text-decoration:none;font-size:13px;font-weight:600;
+  padding:8px 14px;border-radius:8px;transition:.2s;
 }
-.empty-box i{font-size:40px;color:var(--orange);opacity:.4;margin-bottom:12px}
+.login-box .back-link:hover{background:var(--orange-soft)}
 
-/* Alert */
+/* ============ Alerts ============ */
 .alert{
   padding:14px;border-radius:12px;margin-bottom:16px;
-  display:flex;gap:10px;align-items:center;font-size:13px;
+  display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.6;
 }
 .alert.info{background:rgba(33,150,243,.1);border:1px solid rgba(33,150,243,.3);color:#64B5F6}
 .alert.success{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.3);color:#81C784}
 .alert.error{background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);color:#EF9A9A}
+.alert i{margin-top:2px}
 
-/* Toast */
+/* ============ Stats Grid ============ */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.stat-card{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:14px;padding:20px;text-align:center;
+  transition:.2s;
+}
+.stat-card:hover{border-color:var(--orange);transform:translateY(-3px)}
+.stat-card i{
+  font-size:26px;color:var(--orange);margin-bottom:10px;
+  width:52px;height:52px;border-radius:14px;
+  background:var(--orange-soft);display:inline-flex;
+  align-items:center;justify-content:center;
+}
+.stat-card .num{font-size:28px;font-weight:900;color:var(--orange);line-height:1}
+.stat-card .lbl{font-size:13px;color:var(--muted);margin-top:8px;font-weight:600}
+
+/* ============ Badge ============ */
+.badge{
+  font-size:11px;padding:3px 9px;border-radius:20px;font-weight:700;
+  background:var(--orange-soft);color:var(--orange);
+  display:inline-block;
+}
+.badge.high{background:rgba(244,67,54,.15);color:#EF9A9A}
+
+/* ============ Toast ============ */
 .toast{
   position:fixed;bottom:20px;left:20px;
   background:linear-gradient(135deg,var(--orange),var(--orange-dark));
@@ -169,64 +211,81 @@ textarea{min-height:100px;resize:vertical;line-height:1.7}
   transform:translateY(100px);opacity:0;transition:.3s;
   display:flex;align-items:center;gap:10px;
   box-shadow:0 10px 30px rgba(255,122,0,.5);
+  max-width:calc(100vw - 40px);
 }
 .toast.show{transform:translateY(0);opacity:1}
 
-.badge{
-  font-size:11px;padding:3px 9px;border-radius:20px;font-weight:700;
-  background:var(--orange-soft);color:var(--orange);
-}
-.badge.high{background:rgba(244,67,54,.15);color:#EF9A9A}
-
-@media(max-width:768px){
-  .sidebar{position:fixed;right:0;top:0;height:100vh;z-index:50;transform:translateX(100%);transition:.3s;width:280px}
-  .sidebar.show{transform:translateX(0)}
-  .main{padding:16px}
-  .menu-btn{display:flex!important}
-}
+/* ============ Mobile Menu ============ */
 .menu-btn{
   display:none;position:fixed;top:14px;left:14px;z-index:100;
   width:44px;height:44px;border-radius:12px;border:1px solid var(--border);
   background:var(--bg2);color:var(--orange);cursor:pointer;
   align-items:center;justify-content:center;font-size:18px;
+  box-shadow:0 4px 15px rgba(0,0,0,.4);
+}
+
+/* ============ Scrollbar ============ */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:var(--orange)}
+
+/* ============ Media ============ */
+@media(max-width:768px){
+  .sidebar{
+    position:fixed;right:0;top:0;height:100vh;z-index:50;
+    transform:translateX(100%);transition:.3s;width:280px;
+    box-shadow:-10px 0 40px rgba(0,0,0,.6);
+  }
+  .sidebar.show{transform:translateX(0)}
+  .main{padding:16px;padding-top:70px}
+  .menu-btn{display:flex}
+  .page-head h2{font-size:18px}
+  .card{padding:16px}
+  .form-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
 <!-- ========== LOADING ========== -->
-<div id="loading" style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+<div id="loading" class="center-wrap">
   <div style="text-align:center">
-    <i class="fa-solid fa-spinner fa-spin" style="font-size:40px;color:var(--orange)"></i>
-    <p style="color:var(--muted);margin-top:14px">جاري التحقق...</p>
+    <i class="fa-solid fa-spinner" style="font-size:48px;color:var(--orange);animation:spin 1s linear infinite"></i>
+    <p style="color:var(--muted);margin-top:16px;font-size:14px">جاري التحقق من الصلاحيات...</p>
   </div>
 </div>
 
-<!-- ========== NOT ADMIN / LOGIN ========== -->
-<div id="accessDenied" style="display:none" class="login-wrap">
+<!-- ========== ACCESS DENIED / LOGIN ========== -->
+<div id="accessDenied" class="center-wrap" style="display:none">
   <div class="login-box">
-    <div class="icon-big"><i class="fa-solid fa-lock"></i></div>
+    <div class="icon-big"><i class="fa-solid fa-shield-halved"></i></div>
     <h1>لوحة التحكم</h1>
-    <p>هذي الصفحة للمشرفين فقط.<br>سجّل دخول بحسابك كأدمن.</p>
-    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="signIn()">
+    <p id="deniedMessage">هذي الصفحة للمشرفين فقط.<br>سجّل دخول بحسابك المصرّح.</p>
+    <button id="signInBtn" class="btn btn-primary" style="width:100%;justify-content:center" onclick="signIn()">
       <i class="fa-brands fa-google"></i> تسجيل الدخول بجوجل
     </button>
-    <p style="margin-top:20px;font-size:12px"><a href="/" style="color:var(--orange);text-decoration:none"><i class="fa-solid fa-arrow-right"></i> رجوع للموقع</a></p>
+    <a href="/" class="back-link">
+      <i class="fa-solid fa-arrow-right"></i> رجوع للموقع
+    </a>
   </div>
 </div>
 
 <!-- ========== ADMIN PANEL ========== -->
-<div id="adminPanel" style="display:none" class="app">
-  <button class="menu-btn" onclick="document.getElementById('adminSidebar').classList.toggle('show')"><i class="fa-solid fa-bars"></i></button>
+<div id="adminPanel" class="app" style="display:none">
+  <button class="menu-btn" onclick="document.getElementById('adminSidebar').classList.toggle('show')">
+    <i class="fa-solid fa-bars"></i>
+  </button>
 
   <aside class="sidebar" id="adminSidebar">
     <div class="brand">
-      <i class="fa-solid fa-shield-halved"></i>
+      <div class="logo"><i class="fa-solid fa-shield-halved"></i></div>
       <div>
         <h1>لوحة التحكم</h1>
-        <small id="adminEmail">admin</small>
+        <small id="adminEmail">admin@studymate</small>
       </div>
     </div>
+
     <div class="nav-item active" data-page="exams" onclick="switchPage('exams')">
       <i class="fa-solid fa-file-pen"></i> الامتحانات
     </div>
@@ -237,14 +296,15 @@ textarea{min-height:100px;resize:vertical;line-height:1.7}
       <i class="fa-solid fa-bullhorn"></i> الإعلانات
     </div>
     <div class="nav-item" data-page="stats" onclick="switchPage('stats')">
-      <i class="fa-solid fa-chart-line"></i> إحصائيات
+      <i class="fa-solid fa-chart-line"></i> الإحصائيات
     </div>
-    <div style="margin-top:auto;padding-top:20px;border-top:1px solid var(--border)">
-      <a href="/" class="nav-item" style="text-decoration:none">
-        <i class="fa-solid fa-arrow-right"></i> الموقع
+
+    <div class="sidebar-footer">
+      <a href="/" class="nav-item">
+        <i class="fa-solid fa-house"></i> الموقع الرئيسي
       </a>
       <div class="nav-item" onclick="signOut()">
-        <i class="fa-solid fa-right-from-bracket"></i> خروج
+        <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
       </div>
     </div>
   </aside>
@@ -256,7 +316,7 @@ textarea{min-height:100px;resize:vertical;line-height:1.7}
 
 <script>
 /* =====================================================
-   SUPABASE
+   SUPABASE CONFIG
 ===================================================== */
 var SUPABASE_URL = 'https://ncrycgbrstafdouvipzc.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_6t2dkU27Rkinsoo8MhYAEQ_FSgj4G73';
@@ -265,76 +325,128 @@ var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 var currentUser = null;
 var isAdmin = false;
 var currentPage = 'exams';
-var data = { exams: [], news: [], announcements: [] };
+var data = { exams: [], news: [], announcements: [], stats: {} };
 
-/* ============ Helpers ============ */
+/* =====================================================
+   HELPERS
+===================================================== */
 function toast(msg, icon){
   icon = icon || 'fa-check-circle';
   var t = document.getElementById('toast');
-  t.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + msg;
+  t.innerHTML = '<i class="fa-solid ' + icon + '"></i> <span>' + msg + '</span>';
   t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
-function escapeHtml(s){ return (s||'').replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-function fmtDate(s){ try { return new Date(s).toLocaleDateString('ar-DZ'); } catch(e){ return s; } }
 
-/* ============ Auth ============ */
+function escapeHtml(s){
+  return (s || '').replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+  });
+}
+
+function fmtDate(s){
+  try {
+    var d = new Date(s);
+    return d.toLocaleDateString('ar-DZ', {year:'numeric', month:'long', day:'numeric'});
+  } catch(e){ return s; }
+}
+
+function fmtDateTime(s){
+  try {
+    var d = new Date(s);
+    return d.toLocaleDateString('ar-DZ') + ' - ' + d.toLocaleTimeString('ar-DZ', {hour:'2-digit', minute:'2-digit'});
+  } catch(e){ return s; }
+}
+
+/* =====================================================
+   AUTH
+===================================================== */
 async function signIn(){
-  await sb.auth.signInWithOAuth({
+  var result = await sb.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: window.location.href }
   });
+  if(result.error) alert('خطأ: ' + result.error.message);
 }
+
 async function signOut(){
+  if(!confirm('تسجيل الخروج؟')) return;
   await sb.auth.signOut();
   location.reload();
 }
 
 async function checkAdmin(user){
-  var result = await sb.from('admins').select('*').eq('user_id', user.id).maybeSingle();
+  var result = await sb.from('admins').select('id').eq('user_id', user.id).maybeSingle();
   return !!result.data;
 }
 
-sb.auth.onAuthStateChange(async function(event, session){
+function showLoading(){
   document.getElementById('loading').style.display = 'flex';
   document.getElementById('accessDenied').style.display = 'none';
   document.getElementById('adminPanel').style.display = 'none';
+}
 
+function showDenied(message, showSignIn){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('accessDenied').style.display = 'flex';
+  document.getElementById('adminPanel').style.display = 'none';
+  if(message) document.getElementById('deniedMessage').innerHTML = message;
+  document.getElementById('signInBtn').style.display = showSignIn ? 'inline-flex' : 'none';
+}
+
+function showPanel(user){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('accessDenied').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'flex';
+  document.getElementById('adminEmail').textContent = user.email || 'admin';
+}
+
+sb.auth.onAuthStateChange(async function(event, session){
+  showLoading();
   if(session && session.user){
     currentUser = session.user;
     var admin = await checkAdmin(session.user);
     if(admin){
       isAdmin = true;
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'flex';
-      document.getElementById('adminEmail').textContent = session.user.email;
-      loadData();
+      showPanel(session.user);
+      await loadAllData();
+      renderPage();
     } else {
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('accessDenied').style.display = 'flex';
-      document.querySelector('#accessDenied p').innerHTML = 'إيميلك <b>' + session.user.email + '</b> مو مسجل كأدمن.<br>تواصل مع المسؤول.';
-      document.querySelector('#accessDenied button').style.display = 'none';
+      isAdmin = false;
+      showDenied(
+        'إيميلك <b style="color:var(--orange)">' + escapeHtml(session.user.email) + '</b><br>مو مسجل كمشرف في النظام.<br>تواصل مع المسؤول لإضافتك.',
+        false
+      );
     }
   } else {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('accessDenied').style.display = 'flex';
+    currentUser = null;
+    isAdmin = false;
+    showDenied(null, true);
   }
 });
 
-/* ============ Load Data ============ */
-async function loadData(){
-  var results = await Promise.all([
-    sb.from('exams').select('*').order('exam_date', {ascending:true}),
-    sb.from('news').select('*').order('created_at', {ascending:false}),
-    sb.from('announcements').select('*').order('created_at', {ascending:false})
-  ]);
-  data.exams = results[0].data || [];
-  data.news = results[1].data || [];
-  data.announcements = results[2].data || [];
-  renderPage();
+/* =====================================================
+   LOAD DATA
+===================================================== */
+async function loadAllData(){
+  try {
+    var results = await Promise.all([
+      sb.from('exams').select('*').order('exam_date', {ascending:true}),
+      sb.from('news').select('*').order('created_at', {ascending:false}),
+      sb.from('announcements').select('*').order('created_at', {ascending:false})
+    ]);
+    data.exams = results[0].data || [];
+    data.news = results[1].data || [];
+    data.announcements = results[2].data || [];
+  } catch(e){
+    console.error('Load error:', e);
+    toast('خطأ في تحميل البيانات', 'fa-triangle-exclamation');
+  }
 }
 
-/* ============ Navigation ============ */
+/* =====================================================
+   NAVIGATION
+===================================================== */
 function switchPage(page){
   currentPage = page;
   document.querySelectorAll('.nav-item').forEach(function(el){
@@ -352,43 +464,77 @@ function renderPage(){
   else if(currentPage === 'stats') renderStats(main);
 }
 
-/* ============ EXAMS ============ */
+/* =====================================================
+   EXAMS
+===================================================== */
 function renderExams(main){
-  main.innerHTML = '<div class="page-head">' +
-    '<div><h2><i class="fa-solid fa-file-pen"></i> الامتحانات والفروض</h2>' +
-    '<p>أضف مواعيد الامتحانات لتظهر لكل المستخدمين</p></div></div>' +
-
-    '<div class="card">' +
-    '<h3><i class="fa-solid fa-plus"></i> إضافة امتحان جديد</h3>' +
-    '<div class="form-grid">' +
-    '<div><label>العنوان</label><input id="exTitle" placeholder="مثال: فرض الرياضيات"></div>' +
-    '<div><label>المادة</label><input id="exSubject" placeholder="مثال: رياضيات"></div>' +
-    '<div><label>التاريخ</label><input type="date" id="exDate"></div>' +
-    '<div><label>الوقت</label><input id="exTime" placeholder="مثال: 8:00 - 10:00"></div>' +
-    '<div><label>المستوى</label><select id="exLevel">' +
-    '<option value="1AM">1 متوسط</option><option value="2AM">2 متوسط</option>' +
-    '<option value="3AM">3 متوسط</option><option value="4AM">4 متوسط</option>' +
-    '<option value="all">الكل</option></select></div>' +
+  main.innerHTML =
+    '<div class="page-head">' +
+      '<div>' +
+        '<h2><i class="fa-solid fa-file-pen"></i> الامتحانات والفروض</h2>' +
+        '<p>أضف مواعيد الامتحانات لتظهر لكل المستخدمين</p>' +
+      '</div>' +
     '</div>' +
-    '<div style="margin-top:12px"><label>ملاحظات (اختياري)</label>' +
-    '<textarea id="exNotes" placeholder="مثال: يشمل الوحدة 1 و 2"></textarea></div>' +
-    '<div style="margin-top:14px"><button class="btn btn-primary" onclick="addExam()">' +
-    '<i class="fa-solid fa-check"></i> إضافة</button></div></div>' +
+
+    '<div class="alert info">' +
+      '<i class="fa-solid fa-info-circle"></i>' +
+      '<span>الامتحانات راح تظهر لكل المستخدمين في صفحة "التقويم" تلقائياً.</span>' +
+    '</div>' +
 
     '<div class="card">' +
-    '<h3><i class="fa-solid fa-list"></i> الامتحانات (' + data.exams.length + ')</h3>' +
-    (data.exams.length === 0 ? '<div class="empty-box"><i class="fa-solid fa-file-pen"></i><p>لا امتحانات بعد</p></div>' :
-      data.exams.map(function(e){
-        return '<div class="item">' +
-          '<div class="icon"><i class="fa-solid fa-file-pen"></i></div>' +
-          '<div class="body"><div class="title">' + escapeHtml(e.title) + '</div>' +
-          '<div class="meta"><i class="fa-regular fa-calendar"></i> ' + fmtDate(e.exam_date) +
-          (e.exam_time ? ' · ' + escapeHtml(e.exam_time) : '') +
-          (e.subject ? ' · ' + escapeHtml(e.subject) : '') + '</div>' +
-          (e.notes ? '<div class="meta" style="margin-top:4px">' + escapeHtml(e.notes) + '</div>' : '') + '</div>' +
-          '<div class="actions"><button class="btn btn-danger btn-sm" onclick="delExam(\'' + e.id + '\')"><i class="fa-solid fa-trash"></i></button></div>' +
+      '<h3><i class="fa-solid fa-plus"></i> إضافة امتحان جديد</h3>' +
+      '<div class="form-grid">' +
+        '<div><label>العنوان</label><input id="exTitle" placeholder="مثال: فرض الرياضيات"></div>' +
+        '<div><label>المادة</label><input id="exSubject" placeholder="مثال: رياضيات"></div>' +
+        '<div><label>التاريخ</label><input type="date" id="exDate"></div>' +
+        '<div><label>الوقت</label><input id="exTime" placeholder="مثال: 8:00 - 10:00"></div>' +
+        '<div><label>المستوى</label>' +
+          '<select id="exLevel">' +
+            '<option value="1AM">1 متوسط</option>' +
+            '<option value="2AM">2 متوسط</option>' +
+            '<option value="3AM">3 متوسط</option>' +
+            '<option value="4AM">4 متوسط</option>' +
+            '<option value="all">الكل</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:12px">' +
+        '<label>ملاحظات (اختياري)</label>' +
+        '<textarea id="exNotes" placeholder="مثال: يشمل الوحدة 1 و 2"></textarea>' +
+      '</div>' +
+      '<div style="margin-top:14px">' +
+        '<button class="btn btn-primary" onclick="addExam()">' +
+          '<i class="fa-solid fa-check"></i> إضافة الامتحان' +
+        '</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-list"></i> الامتحانات (' + data.exams.length + ')</h3>' +
+      (data.exams.length === 0 ?
+        '<div class="empty-box"><i class="fa-solid fa-file-pen"></i><p>لا امتحانات بعد</p></div>' :
+        data.exams.map(function(e){
+          return '<div class="item">' +
+            '<div class="icon"><i class="fa-solid fa-file-pen"></i></div>' +
+            '<div class="body">' +
+              '<div class="title">' + escapeHtml(e.title) + '</div>' +
+              '<div class="meta">' +
+                '<i class="fa-regular fa-calendar"></i> ' + fmtDate(e.exam_date) +
+                (e.exam_time ? ' · <i class="fa-regular fa-clock"></i> ' + escapeHtml(e.exam_time) : '') +
+                (e.subject ? ' · ' + escapeHtml(e.subject) : '') +
+                (e.level ? ' · ' + e.level : '') +
+              '</div>' +
+              (e.notes ? '<div class="meta" style="margin-top:6px"><i class="fa-solid fa-note-sticky"></i> ' + escapeHtml(e.notes) + '</div>' : '') +
+            '</div>' +
+            '<div class="actions">' +
+              '<button class="btn btn-danger btn-sm" onclick="delExam(\'' + e.id + '\')" title="حذف">' +
+                '<i class="fa-solid fa-trash"></i>' +
+              '</button>' +
+            '</div>' +
           '</div>';
-      }).join('')) + '</div>';
+        }).join('')
+      ) +
+    '</div>';
 }
 
 async function addExam(){
@@ -398,62 +544,111 @@ async function addExam(){
   var exam_time = document.getElementById('exTime').value.trim();
   var level = document.getElementById('exLevel').value;
   var notes = document.getElementById('exNotes').value.trim();
-  if(!title || !exam_date){ toast('العنوان والتاريخ مطلوبين','fa-triangle-exclamation'); return; }
-  var result = await sb.from('exams').insert({title, subject, exam_date, exam_time, level, notes}).select().single();
-  if(result.error){ toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation'); return; }
+
+  if(!title || !exam_date){
+    toast('العنوان والتاريخ مطلوبين', 'fa-triangle-exclamation');
+    return;
+  }
+
+  var result = await sb.from('exams').insert({
+    title: title, subject: subject, exam_date: exam_date,
+    exam_time: exam_time, level: level, notes: notes
+  }).select().single();
+
+  if(result.error){
+    toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation');
+    return;
+  }
+
   data.exams.push(result.data);
-  toast('تمت الإضافة');
+  data.exams.sort(function(a,b){ return new Date(a.exam_date) - new Date(b.exam_date); });
+  toast('تمت إضافة الامتحان بنجاح');
   renderPage();
 }
 
 async function delExam(id){
   if(!confirm('حذف هذا الامتحان؟')) return;
-  await sb.from('exams').delete().eq('id', id);
+  var result = await sb.from('exams').delete().eq('id', id);
+  if(result.error){ toast('خطأ في الحذف', 'fa-triangle-exclamation'); return; }
   data.exams = data.exams.filter(function(e){ return e.id !== id; });
   toast('تم الحذف');
   renderPage();
 }
 
-/* ============ NEWS ============ */
+/* =====================================================
+   NEWS
+===================================================== */
 function renderNews(main){
-  main.innerHTML = '<div class="page-head">' +
-    '<div><h2><i class="fa-solid fa-newspaper"></i> الأخبار</h2>' +
-    '<p>انشر أخبار تعليمية لكل المستخدمين</p></div></div>' +
-
-    '<div class="card">' +
-    '<h3><i class="fa-solid fa-plus"></i> إضافة خبر</h3>' +
-    '<div class="form-grid">' +
-    '<div><label>العنوان</label><input id="nwTitle" placeholder="عنوان الخبر"></div>' +
-    '<div><label>الأيقونة</label><select id="nwIcon">' +
-    '<option value="fa-newspaper">📰 صحيفة</option>' +
-    '<option value="fa-bullhorn">📢 إعلان</option>' +
-    '<option value="fa-calendar-check">📅 موعد</option>' +
-    '<option value="fa-star">⭐ مهم</option>' +
-    '<option value="fa-info-circle">ℹ️ معلومة</option>' +
-    '<option value="fa-graduation-cap">🎓 تعليمي</option>' +
-    '</select></div>' +
-    '<div><label>الأهمية</label><select id="nwPriority">' +
-    '<option value="normal">عادي</option>' +
-    '<option value="high">عالي</option></select></div>' +
+  main.innerHTML =
+    '<div class="page-head">' +
+      '<div>' +
+        '<h2><i class="fa-solid fa-newspaper"></i> الأخبار</h2>' +
+        '<p>انشر أخباراً تعليمية تظهر لكل المستخدمين</p>' +
+      '</div>' +
     '</div>' +
-    '<div style="margin-top:12px"><label>المحتوى</label>' +
-    '<textarea id="nwContent" placeholder="اكتب الخبر كامل..."></textarea></div>' +
-    '<div style="margin-top:14px"><button class="btn btn-primary" onclick="addNews()">' +
-    '<i class="fa-solid fa-check"></i> نشر</button></div></div>' +
 
     '<div class="card">' +
-    '<h3><i class="fa-solid fa-list"></i> الأخبار (' + data.news.length + ')</h3>' +
-    (data.news.length === 0 ? '<div class="empty-box"><i class="fa-solid fa-newspaper"></i><p>لا أخبار بعد</p></div>' :
-      data.news.map(function(n){
-        return '<div class="item">' +
-          '<div class="icon"><i class="fa-solid ' + (n.icon || 'fa-newspaper') + '"></i></div>' +
-          '<div class="body"><div class="title">' + escapeHtml(n.title) +
-          (n.priority === 'high' ? ' <span class="badge high">مهم</span>' : '') + '</div>' +
-          '<div class="meta" style="margin-top:6px;line-height:1.6">' + escapeHtml(n.content).substring(0, 150) + (n.content.length > 150 ? '...' : '') + '</div>' +
-          '<div class="meta" style="margin-top:6px"><i class="fa-regular fa-clock"></i> ' + fmtDate(n.created_at) + '</div></div>' +
-          '<div class="actions"><button class="btn btn-danger btn-sm" onclick="delNews(\'' + n.id + '\')"><i class="fa-solid fa-trash"></i></button></div>' +
+      '<h3><i class="fa-solid fa-plus"></i> إضافة خبر جديد</h3>' +
+      '<div class="form-grid">' +
+        '<div><label>العنوان</label><input id="nwTitle" placeholder="عنوان الخبر"></div>' +
+        '<div><label>الأيقونة</label>' +
+          '<select id="nwIcon">' +
+            '<option value="fa-newspaper">📰 صحيفة</option>' +
+            '<option value="fa-bullhorn">📢 إعلان</option>' +
+            '<option value="fa-calendar-check">📅 موعد</option>' +
+            '<option value="fa-star">⭐ مهم</option>' +
+            '<option value="fa-info-circle">ℹ️ معلومة</option>' +
+            '<option value="fa-graduation-cap">🎓 تعليمي</option>' +
+            '<option value="fa-trophy">🏆 إنجاز</option>' +
+            '<option value="fa-heart">❤️ تشجيع</option>' +
+          '</select>' +
+        '</div>' +
+        '<div><label>الأهمية</label>' +
+          '<select id="nwPriority">' +
+            '<option value="normal">عادي</option>' +
+            '<option value="high">مهم</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:12px">' +
+        '<label>المحتوى</label>' +
+        '<textarea id="nwContent" placeholder="اكتب الخبر كاملاً..."></textarea>' +
+      '</div>' +
+      '<div style="margin-top:14px">' +
+        '<button class="btn btn-primary" onclick="addNews()">' +
+          '<i class="fa-solid fa-paper-plane"></i> نشر الخبر' +
+        '</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-list"></i> الأخبار المنشورة (' + data.news.length + ')</h3>' +
+      (data.news.length === 0 ?
+        '<div class="empty-box"><i class="fa-solid fa-newspaper"></i><p>لا أخبار بعد</p></div>' :
+        data.news.map(function(n){
+          return '<div class="item">' +
+            '<div class="icon"><i class="fa-solid ' + escapeHtml(n.icon || 'fa-newspaper') + '"></i></div>' +
+            '<div class="body">' +
+              '<div class="title">' + escapeHtml(n.title) +
+                (n.priority === 'high' ? ' <span class="badge high">مهم</span>' : '') +
+              '</div>' +
+              '<div class="meta" style="margin-top:6px">' +
+                escapeHtml(n.content).substring(0, 200) +
+                (n.content.length > 200 ? '...' : '') +
+              '</div>' +
+              '<div class="meta" style="margin-top:6px">' +
+                '<i class="fa-regular fa-clock"></i> ' + fmtDateTime(n.created_at) +
+              '</div>' +
+            '</div>' +
+            '<div class="actions">' +
+              '<button class="btn btn-danger btn-sm" onclick="delNews(\'' + n.id + '\')" title="حذف">' +
+                '<i class="fa-solid fa-trash"></i>' +
+              '</button>' +
+            '</div>' +
           '</div>';
-      }).join('')) + '</div>';
+        }).join('')
+      ) +
+    '</div>';
 }
 
 async function addNews(){
@@ -461,61 +656,113 @@ async function addNews(){
   var content = document.getElementById('nwContent').value.trim();
   var icon = document.getElementById('nwIcon').value;
   var priority = document.getElementById('nwPriority').value;
-  if(!title || !content){ toast('العنوان والمحتوى مطلوبين','fa-triangle-exclamation'); return; }
-  var result = await sb.from('news').insert({title, content, icon, priority}).select().single();
-  if(result.error){ toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation'); return; }
+
+  if(!title || !content){
+    toast('العنوان والمحتوى مطلوبين', 'fa-triangle-exclamation');
+    return;
+  }
+
+  var result = await sb.from('news').insert({
+    title: title, content: content, icon: icon, priority: priority
+  }).select().single();
+
+  if(result.error){
+    toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation');
+    return;
+  }
+
   data.news.unshift(result.data);
-  toast('تم نشر الخبر');
+  toast('تم نشر الخبر بنجاح');
   renderPage();
 }
 
 async function delNews(id){
   if(!confirm('حذف هذا الخبر؟')) return;
-  await sb.from('news').delete().eq('id', id);
+  var result = await sb.from('news').delete().eq('id', id);
+  if(result.error){ toast('خطأ في الحذف', 'fa-triangle-exclamation'); return; }
   data.news = data.news.filter(function(n){ return n.id !== id; });
   toast('تم الحذف');
   renderPage();
 }
 
-/* ============ ANNOUNCEMENTS ============ */
+/* =====================================================
+   ANNOUNCEMENTS
+===================================================== */
 function renderAnnouncements(main){
-  main.innerHTML = '<div class="page-head">' +
-    '<div><h2><i class="fa-solid fa-bullhorn"></i> الإعلانات</h2>' +
-    '<p>أرسل إشعاراً لكل المستخدمين</p></div></div>' +
-
-    '<div class="alert info"><i class="fa-solid fa-info-circle"></i>' +
-    '<span>الإعلان يظهر كإشعار لكل مستخدم عند دخوله التالي للموقع.</span></div>' +
-
-    '<div class="card">' +
-    '<h3><i class="fa-solid fa-plus"></i> إرسال إعلان جديد</h3>' +
-    '<div class="form-grid full">' +
-    '<div><label>العنوان</label><input id="anTitle" placeholder="مثال: تحديث جديد"></div>' +
+  main.innerHTML =
+    '<div class="page-head">' +
+      '<div>' +
+        '<h2><i class="fa-solid fa-bullhorn"></i> الإعلانات</h2>' +
+        '<p>أرسل إشعاراً يظهر لكل المستخدمين</p>' +
+      '</div>' +
     '</div>' +
-    '<div style="margin-top:12px"><label>الرسالة</label>' +
-    '<textarea id="anMessage" placeholder="اكتب رسالتك..."></textarea></div>' +
-    '<div style="margin-top:14px"><button class="btn btn-primary" onclick="addAnnouncement()">' +
-    '<i class="fa-solid fa-paper-plane"></i> إرسال للكل</button></div></div>' +
+
+    '<div class="alert info">' +
+      '<i class="fa-solid fa-info-circle"></i>' +
+      '<span>الإعلان راح يظهر كمصدر إشعار لكل مستخدم عند دخوله القادم للموقع.</span>' +
+    '</div>' +
 
     '<div class="card">' +
-    '<h3><i class="fa-solid fa-list"></i> الإعلانات المرسلة (' + data.announcements.length + ')</h3>' +
-    (data.announcements.length === 0 ? '<div class="empty-box"><i class="fa-solid fa-bullhorn"></i><p>لا إعلانات بعد</p></div>' :
-      data.announcements.map(function(a){
-        return '<div class="item">' +
-          '<div class="icon"><i class="fa-solid fa-bullhorn"></i></div>' +
-          '<div class="body"><div class="title">' + escapeHtml(a.title) + '</div>' +
-          '<div class="meta" style="margin-top:4px;line-height:1.6">' + escapeHtml(a.message) + '</div>' +
-          '<div class="meta" style="margin-top:6px"><i class="fa-regular fa-clock"></i> ' + fmtDate(a.created_at) + '</div></div>' +
-          '<div class="actions"><button class="btn btn-danger btn-sm" onclick="delAnnouncement(\'' + a.id + '\')"><i class="fa-solid fa-trash"></i></button></div>' +
+      '<h3><i class="fa-solid fa-paper-plane"></i> إرسال إعلان جديد</h3>' +
+      '<div class="form-grid full">' +
+        '<div><label>عنوان الإعلان</label>' +
+          '<input id="anTitle" placeholder="مثال: تحديث مهم للجدول">' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:12px">' +
+        '<label>نص الرسالة</label>' +
+        '<textarea id="anMessage" placeholder="اكتب رسالتك هنا..."></textarea>' +
+      '</div>' +
+      '<div style="margin-top:14px">' +
+        '<button class="btn btn-primary" onclick="addAnnouncement()">' +
+          '<i class="fa-solid fa-bullhorn"></i> إرسال للجميع' +
+        '</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-list"></i> الإعلانات المرسلة (' + data.announcements.length + ')</h3>' +
+      (data.announcements.length === 0 ?
+        '<div class="empty-box"><i class="fa-solid fa-bullhorn"></i><p>لا إعلانات بعد</p></div>' :
+        data.announcements.map(function(a){
+          return '<div class="item">' +
+            '<div class="icon"><i class="fa-solid fa-bullhorn"></i></div>' +
+            '<div class="body">' +
+              '<div class="title">' + escapeHtml(a.title) + '</div>' +
+              '<div class="meta" style="margin-top:6px">' + escapeHtml(a.message) + '</div>' +
+              '<div class="meta" style="margin-top:6px">' +
+                '<i class="fa-regular fa-clock"></i> ' + fmtDateTime(a.created_at) +
+              '</div>' +
+            '</div>' +
+            '<div class="actions">' +
+              '<button class="btn btn-danger btn-sm" onclick="delAnnouncement(\'' + a.id + '\')" title="حذف">' +
+                '<i class="fa-solid fa-trash"></i>' +
+              '</button>' +
+            '</div>' +
           '</div>';
-      }).join('')) + '</div>';
+        }).join('')
+      ) +
+    '</div>';
 }
 
 async function addAnnouncement(){
   var title = document.getElementById('anTitle').value.trim();
   var message = document.getElementById('anMessage').value.trim();
-  if(!title || !message){ toast('العنوان والرسالة مطلوبين','fa-triangle-exclamation'); return; }
-  var result = await sb.from('announcements').insert({title, message}).select().single();
-  if(result.error){ toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation'); return; }
+
+  if(!title || !message){
+    toast('العنوان والرسالة مطلوبين', 'fa-triangle-exclamation');
+    return;
+  }
+
+  var result = await sb.from('announcements').insert({
+    title: title, message: message
+  }).select().single();
+
+  if(result.error){
+    toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation');
+    return;
+  }
+
   data.announcements.unshift(result.data);
   toast('تم الإرسال لكل المستخدمين');
   renderPage();
@@ -523,18 +770,111 @@ async function addAnnouncement(){
 
 async function delAnnouncement(id){
   if(!confirm('حذف هذا الإعلان؟')) return;
-  await sb.from('announcements').delete().eq('id', id);
+  var result = await sb.from('announcements').delete().eq('id', id);
+  if(result.error){ toast('خطأ في الحذف', 'fa-triangle-exclamation'); return; }
   data.announcements = data.announcements.filter(function(a){ return a.id !== id; });
   toast('تم الحذف');
   renderPage();
 }
 
-/* ============ STATS ============ */
+/* =====================================================
+   STATS
+===================================================== */
 async function renderStats(main){
-  main.innerHTML = '<div class="page-head">' +
-    '<div><h2><i class="fa-solid fa-chart-line"></i> إحصائيات الموقع</h2>' +
-    '<p>نظرة سريعة على استخدام الموقع</p></div></div>' +
-    '<div id="statsContent"><div class="empty-box"><i class="fa-solid fa-spinner fa-spin"></i><p>جاري التحميل...</p></div></div>';
+  main.innerHTML =
+    '<div class="page-head">' +
+      '<div>' +
+        '<h2><i class="fa-solid fa-chart-line"></i> إحصائيات الموقع</h2>' +
+        '<p>نظرة عامة على استخدام الموقع</p>' +
+      '</div>' +
+    '</div>' +
+    '<div id="statsContent">' +
+      '<div class="empty-box">' +
+        '<i class="fa-solid fa-spinner" style="animation:spin 1s linear infinite"></i>' +
+        '<p>جاري تحميل الإحصائيات...</p>' +
+      '</div>' +
+    '</div>';
 
-  var results = await Promise.all([
-    sb.from('subjects').select('*', {
+  try {
+    var results = await Promise.all([
+      sb.from('subjects').select('*'),
+      sb.from('lessons').select('*'),
+      sb.from('cards').select('*'),
+      sb.from('notifications').select('*')
+    ]);
+
+    var subjects = results[0].data || [];
+    var lessons = results[1].data || [];
+    var cards = results[2].data || [];
+    var notifications = results[3].data || [];
+
+    var usersSet = {};
+    subjects.forEach(function(s){ if(s.user_id) usersSet[s.user_id] = true; });
+    var usersCount = Object.keys(usersSet).length;
+
+    var memorized = lessons.filter(function(l){ return l.status === 'memorized'; }).length;
+
+    var content = document.getElementById('statsContent');
+    content.innerHTML =
+      '<div class="stats-grid">' +
+        '<div class="stat-card">' +
+          '<i class="fa-solid fa-users"></i>' +
+          '<div class="num">' + usersCount + '</div>' +
+          '<div class="lbl">مستخدم نشط</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<i class="fa-solid fa-book"></i>' +
+          '<div class="num">' + subjects.length + '</div>' +
+          '<div class="lbl">مادة إجمالاً</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<i class="fa-solid fa-file-lines"></i>' +
+          '<div class="num">' + lessons.length + '</div>' +
+          '<div class="lbl">درس إجمالاً</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<i class="fa-solid fa-circle-check"></i>' +
+          '<div class="num">' + memorized + '</div>' +
+          '<div class="lbl">درس محفوظ</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<i class="fa-solid fa-layer-group"></i>' +
+          '<div class="num">' + cards.length + '</div>' +
+          '<div class="lbl">بطاقة حفظ</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<i class="fa-solid fa-bell"></i>' +
+          '<div class="num">' + notifications.length + '</div>' +
+          '<div class="lbl">إشعار</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="card" style="margin-top:20px">' +
+        '<h3><i class="fa-solid fa-database"></i> محتوى الأدمن</h3>' +
+        '<div class="stats-grid">' +
+          '<div class="stat-card">' +
+            '<i class="fa-solid fa-file-pen"></i>' +
+            '<div class="num">' + data.exams.length + '</div>' +
+            '<div class="lbl">امتحان</div>' +
+          '</div>' +
+          '<div class="stat-card">' +
+            '<i class="fa-solid fa-newspaper"></i>' +
+            '<div class="num">' + data.news.length + '</div>' +
+            '<div class="lbl">خبر</div>' +
+          '</div>' +
+          '<div class="stat-card">' +
+            '<i class="fa-solid fa-bullhorn"></i>' +
+            '<div class="num">' + data.announcements.length + '</div>' +
+            '<div class="lbl">إعلان</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+  } catch(e){
+    document.getElementById('statsContent').innerHTML =
+      '<div class="alert error"><i class="fa-solid fa-triangle-exclamation"></i> خطأ في تحميل الإحصائيات</div>';
+  }
+}
+</script>
+</body>
+</html>
