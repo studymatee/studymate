@@ -23,12 +23,12 @@
   --green:#4CAF50;
   --red:#F44336;
   --blue:#2196F3;
+  --purple:#8B5CF6;
   --font:'Tajawal',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
 body{
-  background:var(--bg);color:var(--text);
-  min-height:100vh;
+  background:var(--bg);color:var(--text);min-height:100vh;
   background-image:
     radial-gradient(circle at 20% 20%,var(--orange-soft) 0%,transparent 40%),
     radial-gradient(circle at 80% 80%,var(--orange-soft) 0%,transparent 40%);
@@ -41,6 +41,7 @@ body{
   width:260px;background:var(--bg2);border-left:1px solid var(--border);
   padding:20px;display:flex;flex-direction:column;gap:6px;
   position:sticky;top:0;height:100vh;overflow-y:auto;
+  transition:.3s;
 }
 .sidebar .brand{
   display:flex;align-items:center;gap:10px;margin-bottom:20px;
@@ -54,7 +55,7 @@ body{
   box-shadow:0 6px 20px rgba(255,122,0,.35);
 }
 .sidebar .brand h1{font-size:16px;color:var(--orange);font-weight:900;line-height:1.2}
-.sidebar .brand small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+.sidebar .brand small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
 .nav-item{
   padding:12px 14px;border-radius:10px;cursor:pointer;
   display:flex;align-items:center;gap:10px;
@@ -201,6 +202,7 @@ textarea{min-height:100px;resize:vertical;line-height:1.7}
   display:inline-block;
 }
 .badge.high{background:rgba(244,67,54,.15);color:#EF9A9A}
+.badge.green{background:rgba(76,175,80,.15);color:#81C784}
 
 /* ============ Toast ============ */
 .toast{
@@ -298,6 +300,9 @@ textarea{min-height:100px;resize:vertical;line-height:1.7}
     <div class="nav-item" data-page="stats" onclick="switchPage('stats')">
       <i class="fa-solid fa-chart-line"></i> الإحصائيات
     </div>
+    <div class="nav-item" data-page="admins" onclick="switchPage('admins')">
+      <i class="fa-solid fa-users-gear"></i> المشرفون
+    </div>
 
     <div class="sidebar-footer">
       <a href="/" class="nav-item">
@@ -325,7 +330,7 @@ var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 var currentUser = null;
 var isAdmin = false;
 var currentPage = 'exams';
-var data = { exams: [], news: [], announcements: [], stats: {} };
+var data = { exams: [], news: [], announcements: [], admins: [], stats: {} };
 
 /* =====================================================
    HELPERS
@@ -433,11 +438,13 @@ async function loadAllData(){
     var results = await Promise.all([
       sb.from('exams').select('*').order('exam_date', {ascending:true}),
       sb.from('news').select('*').order('created_at', {ascending:false}),
-      sb.from('announcements').select('*').order('created_at', {ascending:false})
+      sb.from('announcements').select('*').order('created_at', {ascending:false}),
+      sb.from('admins').select('*').order('created_at', {ascending:false})
     ]);
     data.exams = results[0].data || [];
     data.news = results[1].data || [];
     data.announcements = results[2].data || [];
+    data.admins = results[3].data || [];
   } catch(e){
     console.error('Load error:', e);
     toast('خطأ في تحميل البيانات', 'fa-triangle-exclamation');
@@ -462,6 +469,7 @@ function renderPage(){
   else if(currentPage === 'news') renderNews(main);
   else if(currentPage === 'announcements') renderAnnouncements(main);
   else if(currentPage === 'stats') renderStats(main);
+  else if(currentPage === 'admins') renderAdmins(main);
 }
 
 /* =====================================================
@@ -493,7 +501,7 @@ function renderExams(main){
             '<option value="1AM">1 متوسط</option>' +
             '<option value="2AM">2 متوسط</option>' +
             '<option value="3AM">3 متوسط</option>' +
-            '<option value="4AM">4 متوسط</option>' +
+            '<option value="4AM" selected>4 متوسط</option>' +
             '<option value="all">الكل</option>' +
           '</select>' +
         '</div>' +
@@ -778,6 +786,102 @@ async function delAnnouncement(id){
 }
 
 /* =====================================================
+   ADMINS MANAGEMENT
+===================================================== */
+function renderAdmins(main){
+  main.innerHTML =
+    '<div class="page-head">' +
+      '<div>' +
+        '<h2><i class="fa-solid fa-users-gear"></i> المشرفون</h2>' +
+        '<p>أضف أو احذف المشرفين للوحة التحكم</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="alert info">' +
+      '<i class="fa-solid fa-info-circle"></i>' +
+      '<span>المشرف لازم يكون <b>سجّل دخول في الموقع</b> قبل ما تضيفه. ابحث عن إيميله في قائمة المستخدمين.</span>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-user-plus"></i> إضافة مشرف جديد</h3>' +
+      '<div class="form-grid full">' +
+        '<div><label>إيميل المشرف</label>' +
+          '<input id="admEmail" type="email" placeholder="example@gmail.com">' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:14px">' +
+        '<button class="btn btn-primary" onclick="addAdmin()">' +
+          '<i class="fa-solid fa-plus"></i> إضافة كمشرف' +
+        '</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-list"></i> المشرفون الحاليون (' + data.admins.length + ')</h3>' +
+      (data.admins.length === 0 ?
+        '<div class="empty-box"><i class="fa-solid fa-users-gear"></i><p>لا مشرفين بعد</p></div>' :
+        data.admins.map(function(a){
+          var isMe = currentUser && a.user_id === currentUser.id;
+          return '<div class="item">' +
+            '<div class="icon"><i class="fa-solid fa-user-shield"></i></div>' +
+            '<div class="body">' +
+              '<div class="title">' + escapeHtml(a.email) +
+                (isMe ? ' <span class="badge green">أنت</span>' : '') +
+              '</div>' +
+              '<div class="meta">' +
+                '<i class="fa-regular fa-clock"></i> أضيف: ' + fmtDateTime(a.created_at) +
+              '</div>' +
+            '</div>' +
+            '<div class="actions">' +
+              (isMe ? '' :
+                '<button class="btn btn-danger btn-sm" onclick="delAdmin(\'' + a.id + '\', \'' + escapeHtml(a.email) + '\')" title="حذف">' +
+                  '<i class="fa-solid fa-trash"></i>' +
+                '</button>') +
+            '</div>' +
+          '</div>';
+        }).join('')
+      ) +
+    '</div>';
+}
+
+async function addAdmin(){
+  var email = document.getElementById('admEmail').value.trim().toLowerCase();
+  if(!email || email.indexOf('@') === -1){
+    toast('اكتب إيميل صحيح', 'fa-triangle-exclamation');
+    return;
+  }
+
+  // ابحث عن المستخدم في auth.users
+  // ملاحظة: ما نقدر نوصل لـ auth.users مباشرة، لكن نقدر نبحث في subjects
+  // بدلاً من ذلك، نطلب من المستخدم إنه سجل دخول، ونضيفه بـ user_id
+
+  // للأسف Supabase ما يسمح بالوصول لـ auth.users من الواجهة
+  // الحل: الأدمن الحالي يضيف الإيميل، والمستخدم يسجل دخول بعدين
+  // لكن الـ user_id ما نعرفه إلا بعد تسجيل الدخول
+
+  toast('هذي الميزة تحتاج إعداد إضافي في Supabase', 'fa-triangle-exclamation');
+  alert(
+    '📌 لإضافة مشرف جديد:\n\n' +
+    '1. اطلب من المشرف يسجل دخول في الموقع مرة وحدة\n' +
+    '2. روح Supabase → SQL Editor\n' +
+    '3. شغّل:\n\n' +
+    "insert into admins (user_id, email)\n" +
+    "select id, email from auth.users\n" +
+    "where email = '" + email + "';\n\n" +
+    '4. ارجع هنا واعمل تحديث للصفحة'
+  );
+}
+
+async function delAdmin(id, email){
+  if(!confirm('حذف "' + email + '" من المشرفين؟')) return;
+  var result = await sb.from('admins').delete().eq('id', id);
+  if(result.error){ toast('خطأ في الحذف', 'fa-triangle-exclamation'); return; }
+  data.admins = data.admins.filter(function(a){ return a.id !== id; });
+  toast('تم الحذف');
+  renderPage();
+}
+
+/* =====================================================
    STATS
 ===================================================== */
 async function renderStats(main){
@@ -800,16 +904,22 @@ async function renderStats(main){
       sb.from('subjects').select('*'),
       sb.from('lessons').select('*'),
       sb.from('cards').select('*'),
-      sb.from('notifications').select('*')
+      sb.from('notifications').select('*'),
+      sb.from('grades').select('*'),
+      sb.from('tasks').select('*')
     ]);
 
     var subjects = results[0].data || [];
     var lessons = results[1].data || [];
     var cards = results[2].data || [];
     var notifications = results[3].data || [];
+    var grades = results[4].data || [];
+    var tasks = results[5].data || [];
 
     var usersSet = {};
     subjects.forEach(function(s){ if(s.user_id) usersSet[s.user_id] = true; });
+    lessons.forEach(function(l){ if(l.user_id) usersSet[l.user_id] = true; });
+    cards.forEach(function(c){ if(c.user_id) usersSet[c.user_id] = true; });
     var usersCount = Object.keys(usersSet).length;
 
     var memorized = lessons.filter(function(l){ return l.status === 'memorized'; }).length;
@@ -847,6 +957,16 @@ async function renderStats(main){
           '<div class="num">' + notifications.length + '</div>' +
           '<div class="lbl">إشعار</div>' +
         '</div>' +
+        '<div class="stat-card">' +
+          '<i class="fa-solid fa-calculator"></i>' +
+          '<div class="num">' + grades.length + '</div>' +
+          '<div class="lbl">علامة مسجلة</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<i class="fa-solid fa-list-check"></i>' +
+          '<div class="num">' + tasks.length + '</div>' +
+          '<div class="lbl">مهمة</div>' +
+        '</div>' +
       '</div>' +
 
       '<div class="card" style="margin-top:20px">' +
@@ -866,6 +986,11 @@ async function renderStats(main){
             '<i class="fa-solid fa-bullhorn"></i>' +
             '<div class="num">' + data.announcements.length + '</div>' +
             '<div class="lbl">إعلان</div>' +
+          '</div>' +
+          '<div class="stat-card">' +
+            '<i class="fa-solid fa-users-gear"></i>' +
+            '<div class="num">' + data.admins.length + '</div>' +
+            '<div class="lbl">مشرف</div>' +
           '</div>' +
         '</div>' +
       '</div>';
