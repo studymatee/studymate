@@ -4369,14 +4369,9 @@ function showLoading(){
   document.getElementById('loadingScreen').classList.add('show');
 }
 
-/* =====================================================
-   AUTH STATE
-===================================================== */
 sb.auth.onAuthStateChange(async function(event, session){
-  if(event === 'PASSWORD_RECOVERY'){
-    showLoginMsg('يمكنك تغيير كلمة السر الآن', 'info');
-    return;
-  }
+  // في index.html ما نتعامل مع recovery
+  // صفحات recovery لها ملف منفصل
 
   if(session && session.user){
     currentUser = session.user;
