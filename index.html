@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#FF7A00">
-<meta name="description" content="مِذكَرتي — منصة دراسة ذكية للطلاب الجزائريين">
+<meta name="description" content="مذكَرتي — منصة دراسة ذكية للطلاب الجزائريين">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>مِذكَرتي — مدير الدراسة الذكي</title>
+<title>مذكَرتي — مدير الدراسة الذكي</title>
 <link rel="icon" type="image/png" href="/icon.png">
 <link rel="apple-touch-icon" href="/icon.png">
 <link rel="manifest" href="/manifest.json">
@@ -3350,7 +3350,7 @@ h1,h2,h3,h4{font-weight:700;letter-spacing:-.02em}
     <div class="login-logo">
       <i class="fa-solid fa-graduation-cap"></i>
     </div>
-    <h1 class="login-title">مِذكَرتي</h1>
+    <h1 class="login-title">مذكَرتي</h1>
     <p class="login-subtitle">منصتك الذكية للدراسة — نظّم دروسك، احفظ بذكاء، وتابع تقدمك</p>
 
     <!-- Login Tabs -->
@@ -3512,7 +3512,7 @@ h1,h2,h3,h4{font-weight:700;letter-spacing:-.02em}
       <div class="sidebar-brand">
         <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
         <div class="sidebar-brand-text">
-          <h1>مِذكَرتي</h1>
+          <h1>مذكَرتي</h1>
           <small>مدير الدراسة الذكي</small>
         </div>
       </div>
@@ -4554,7 +4554,7 @@ function navigateTo(page, options){
   options = options || {};
   currentPage = page;
 
-  var titles = PAGE_TITLES[page] || {title:'مِذكَرتي', subtitle:''};
+  var titles = PAGE_TITLES[page] || {title:'مذكَرتي', subtitle:''};
   var titleEl = document.getElementById('pageTitle');
   var subEl = document.getElementById('pageSubtitle');
   if(titleEl) titleEl.textContent = titles.title;
@@ -7820,7 +7820,7 @@ function renderSettingsContent(){
           {name: 'El Messiri', label: 'المسيري — كلاسيكي'}
         ].map(function(f){
           return '<div class="font-option" data-font="' + f.name + '" onclick="changeFont(\'' + f.name + '\')" style="font-family:\'' + f.name + '\',sans-serif">' +
-            '<div class="font-option-preview">مِذكَرتي — ' + f.name + '</div>' +
+            '<div class="font-option-preview">مذكَرتي — ' + f.name + '</div>' +
             '<div class="font-option-name">' + f.label + '</div>' +
           '</div>';
         }).join('') +
@@ -7932,7 +7932,7 @@ function renderSettingsContent(){
     // ===== عن التطبيق =====
     '<div class="settings-section" style="text-align:center">' +
       '<div style="color:var(--muted);font-size:12px;line-height:1.8">' +
-        '<div style="font-size:20px;font-weight:900;color:var(--primary);margin-bottom:6px">مِذكَرتي</div>' +
+        '<div style="font-size:20px;font-weight:900;color:var(--primary);margin-bottom:6px">مذكَرتي</div>' +
         '<div>الإصدار 2.0 · صُنع بحب في الجزائر 🇩🇿</div>' +
       '</div>' +
     '</div>'
@@ -8595,7 +8595,7 @@ if('serviceWorker' in navigator){
   });
 }
 
-console.log('%c🟠 مِذكَرتي v2.0 — جاهز!', 'color:#FF7A00;font-size:16px;font-weight:bold');
+console.log('%c🟠 صنع بواسطة رامي طلاح ', 'color:#FF7A00;font-size:16px;font-weight:bold');
 console.log('%cاختصارات: N، S، T، P، M، K، ?', 'color:#FF7A00;font-size:12px');
    /* =====================================================
    SEARCH MODAL
@@ -9131,7 +9131,7 @@ function showInstallBanner(){
   banner.innerHTML =
     '<i class="fa-solid fa-download" style="font-size:22px;flex-shrink:0"></i>' +
     '<div style="flex:1;min-width:0">' +
-      '<div style="font-weight:800;font-size:14px;margin-bottom:2px">ثبّت مِذكَرتي</div>' +
+      '<div style="font-weight:800;font-size:14px;margin-bottom:2px">ثبّت مذكَرتي</div>' +
       '<div style="font-size:12px;opacity:.9">تطبيق على جوالك، يشتغل بدون إنترنت</div>' +
     '</div>' +
     '<button onclick="installPWA()" style="background:#fff;color:var(--primary-dark);border:none;padding:8px 14px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font);white-space:nowrap">تثبيت</button>' +
@@ -9211,7 +9211,7 @@ function debounce(fn, delay){
   updateTimeWallpaper();
   setInterval(updateTimeWallpaper, 30 * 60 * 1000);
 
-  console.log('%c🟠 مِذكَرتي v2.0', 'color:#FF7A00;font-size:24px;font-weight:900;text-shadow:0 2px 8px rgba(255,122,0,.4)');
+  console.log('%c🟠 بواسطة رامي طلاح', 'color:#FF7A00;font-size:24px;font-weight:900;text-shadow:0 2px 8px rgba(255,122,0,.4)');
   console.log('%cمشروع دراسة ذكي — جاهز! 🚀', 'color:#FF7A00;font-size:14px');
   console.log('%cاختصارات: N، S، T، P، M، K، ?', 'color:#8A8A8A;font-size:12px');
 })();
@@ -9223,7 +9223,7 @@ setTimeout(function(){
   if(currentUser && !localStorage.getItem('welcome_shown_' + currentUser.id)){
     localStorage.setItem('welcome_shown_' + currentUser.id, '1');
     setTimeout(function(){
-      toast('👋 أهلاً بك في مِذكَرتي!', 'success');
+      toast('👋 أهلاً بك في مذكَرتي!', 'success');
     }, 500);
     setTimeout(function(){
       toast('💡 ابدأ بإضافة مادة جديدة', 'info');
