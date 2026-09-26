@@ -7456,6 +7456,588 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').catch(function(){});
   });
 }
+   /* =====================================================
+   SEARCH SYSTEM (Search Modal)
+===================================================== */
+function openSearchModal(){
+  var existing = document.getElementById('searchOverlay');
+  if(existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'searchOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:250;display:flex;align-items:flex-start;justify-content:center;padding:80px 20px 20px;animation:fadeIn .2s';
+  overlay.onclick = function(e){ if(e.target === overlay) overlay.remove(); };
+
+  overlay.innerHTML =
+    '<div style="background:var(--bg-1);border:1px solid var(--border);border-radius:16px;width:100%;max-width:600px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:popIn .3s">' +
+      '<div style="display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)">' +
+        '<i class="fa-solid fa-magnifying-glass" style="color:var(--primary);font-size:18px"></i>' +
+        '<input type="text" id="searchQuickInput" placeholder="ابحث عن درس، مادة، أو بطاقة..." ' +
+          'style="flex:1;background:none;border:none;color:var(--text);font-size:16px;font-family:var(--font);outline:none" ' +
+          'autofocus>' +
+        '<button onclick="document.getElementById(\'searchOverlay\').remove()" ' +
+          'style="background:var(--surface);border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:14px">' +
+          '<i class="fa-solid fa-xmark"></i>' +
+        '</button>' +
+      '</div>' +
+      '<div id="searchResults" style="max-height:500px;overflow-y:auto;padding:8px"></div>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+
+  var input = document.getElementById('searchQuickInput');
+  input.addEventListener('input', function(){ performSearch(this.value); });
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') overlay.remove();
+  });
+
+  performSearch('');
+}
+
+function performSearch(query){
+  var results = document.getElementById('searchResults');
+  if(!results) return;
+
+  query = query.trim().toLowerCase();
+
+  if(!query){
+    results.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">' +
+      '<i class="fa-solid fa-lightbulb" style="font-size:24px;opacity:.5;display:block;margin-bottom:8px"></i>' +
+      'اكتب للبحث في المواد والدروس والبطاقات' +
+    '</div>';
+    return;
+  }
+
+  var matches = [];
+
+  state.subjects.forEach(function(s){
+    if(s.name.toLowerCase().indexOf(query) !== -1){
+      matches.push({
+        type: 'subject',
+        title: s.name,
+        sub: s.lessons.length + ' درس',
+        icon: s.icon,
+        color: s.color,
+        subjectId: s.id
+      });
+    }
+
+    s.lessons.forEach(function(l){
+      if(l.title.toLowerCase().indexOf(query) !== -1){
+        matches.push({
+          type: 'lesson',
+          title: l.title,
+          sub: s.name,
+          icon: 'fa-file-lines',
+          color: s.color,
+          subjectId: s.id,
+          lessonId: l.id
+        });
+      }
+
+      l.cards.forEach(function(c){
+        if(c.q.toLowerCase().indexOf(query) !== -1 || c.a.toLowerCase().indexOf(query) !== -1){
+          matches.push({
+            type: 'card',
+            title: c.q.length > 60 ? c.q.substring(0, 60) + '...' : c.q,
+            sub: s.name + ' · ' + l.title,
+            icon: 'fa-layer-group',
+            color: s.color,
+            subjectId: s.id,
+            lessonId: l.id
+          });
+        }
+      });
+    });
+  });
+
+  if(matches.length === 0){
+    results.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">' +
+      '<i class="fa-solid fa-search" style="font-size:24px;opacity:.5;display:block;margin-bottom:8px"></i>' +
+      'لا نتائج لـ "' + escapeHtml(query) + '"' +
+    '</div>';
+    return;
+  }
+
+  var typeLabels = {subject: 'مادة', lesson: 'درس', card: 'بطاقة'};
+
+  results.innerHTML = matches.slice(0, 30).map(function(m){
+    var onclick = m.type === 'subject' ?
+      'openSubject(\'' + m.subjectId + '\');closeSearch()' :
+      'openLessonFromSearch(\'' + m.subjectId + '\',\'' + m.lessonId + '\')';
+
+    return '<div onclick="' + onclick + '" ' +
+      'style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:.2s;margin-bottom:2px" ' +
+      'onmouseover="this.style.background=\'var(--surface)\'" ' +
+      'onmouseout="this.style.background=\'transparent\'">' +
+      '<div style="width:38px;height:38px;border-radius:10px;background:' + (m.color || 'var(--primary)') + '1a;color:' + (m.color || 'var(--primary)') + ';display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">' +
+        '<i class="fa-solid ' + m.icon + '"></i>' +
+      '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:700;font-size:14px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(m.title) + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);display:flex;gap:8px">' +
+          '<span style="padding:1px 6px;border-radius:6px;background:var(--surface);font-size:10px;font-weight:600">' + typeLabels[m.type] + '</span>' +
+          '<span>' + escapeHtml(m.sub) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<i class="fa-solid fa-chevron-left" style="color:var(--muted);font-size:12px"></i>' +
+    '</div>';
+  }).join('') +
+
+  (matches.length > 30 ?
+    '<div style="padding:12px;text-align:center;color:var(--muted);font-size:12px">+' + (matches.length - 30) + ' نتيجة أخرى</div>' : '');
+}
+
+function closeSearch(){
+  var overlay = document.getElementById('searchOverlay');
+  if(overlay) overlay.remove();
+}
+
+function openLessonFromSearch(subjectId, lessonId){
+  closeSearch();
+  currentSubjectId = subjectId;
+  currentLessonId = lessonId;
+  navigateTo('lesson', {subjectId: subjectId, lessonId: lessonId});
+}
+
+/* =====================================================
+   OVERRIDE openTool (لتشغيل الأدوات صح)
+===================================================== */
+window.openTool = function(tool){
+  if(tool === 'calculator'){ openCalculator(); }
+  else if(tool === 'grades'){ openGradesCalculator(); }
+  else if(tool === 'pomodoro'){ openPomodoro(); }
+  else if(tool === 'ai'){
+    if(currentLessonId){
+      navigateTo('lesson', {subjectId: currentSubjectId, lessonId: currentLessonId});
+      setTimeout(function(){
+        var el = document.getElementById('aiResponse');
+        if(el){
+          el.style.display = 'block';
+          el.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+      }, 300);
+    } else {
+      toast('افتح درساً أول لاستعمال AI', 'info');
+    }
+  }
+  else if(tool === 'search'){
+    openSearchModal();
+  }
+};
+
+/* =====================================================
+   LEITNER SYSTEM
+===================================================== */
+function openLeitnerSystem(){
+  var overlay = document.getElementById('calcOverlay');
+  if(!overlay) return;
+
+  var container = document.getElementById('calcContainer');
+  renderLeitnerUI(container);
+  overlay.classList.add('show');
+}
+
+function renderLeitnerUI(container){
+  // 5 صناديق
+  var boxes = [1, 2, 3, 4, 5];
+  var boxesData = {};
+
+  boxes.forEach(function(b){ boxesData[b] = []; });
+
+  state.subjects.forEach(function(s){
+    s.lessons.forEach(function(l){
+      l.cards.forEach(function(c){
+        var box = c.box || 1;
+        if(box < 1) box = 1;
+        if(box > 5) box = 5;
+        boxesData[box].push({card: c, lesson: l, subject: s});
+      });
+    });
+  });
+
+  var totalCards = 0;
+  boxes.forEach(function(b){ totalCards += boxesData[b].length; });
+
+  var boxInfo = [
+    {box: 1, label: 'كل يوم', color: '#EF4444', icon: 'fa-inbox'},
+    {box: 2, label: 'كل 3 أيام', color: '#F59E0B', icon: 'fa-box'},
+    {box: 3, label: 'كل أسبوع', color: '#3B82F6', icon: 'fa-box-open'},
+    {box: 4, label: 'كل أسبوعين', color: '#8B5CF6', icon: 'fa-cube'},
+    {box: 5, label: 'كل شهر', color: '#10B981', icon: 'fa-archive'}
+  ];
+
+  container.innerHTML =
+    '<h2 style="color:var(--primary);font-weight:800;margin-bottom:8px;text-align:center;font-size:20px">' +
+      '<i class="fa-solid fa-inbox"></i> صناديق Leitner' +
+    '</h2>' +
+    '<p style="color:var(--muted);font-size:12px;text-align:center;margin-bottom:18px;line-height:1.6">' +
+      'نظام مراجعة ذكي: البطاقات تنتقل من صندوق لصندوق كل ما حفظتها' +
+    '</p>' +
+
+    (totalCards === 0 ?
+      '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
+        '<i class="fa-solid fa-inbox" style="font-size:40px;opacity:.3;display:block;margin-bottom:12px"></i>' +
+        '<p style="font-size:13px">لا بطاقات بعد. أضف بطاقات لتستعمل النظام.</p>' +
+      '</div>' :
+
+      '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">' +
+        boxInfo.map(function(bi){
+          var cards = boxesData[bi.box];
+          var pct = totalCards ? Math.round(cards.length / totalCards * 100) : 0;
+          return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;transition:.2s">' +
+            '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">' +
+              '<div style="width:40px;height:40px;border-radius:10px;background:' + bi.color + '20;color:' + bi.color + ';display:flex;align-items:center;justify-content:center;font-size:16px">' +
+                '<i class="fa-solid ' + bi.icon + '"></i>' +
+              '</div>' +
+              '<div style="flex:1">' +
+                '<div style="font-weight:700;font-size:14px">صندوق ' + bi.box + '</div>' +
+                '<div style="font-size:11px;color:var(--muted)">' + bi.label + '</div>' +
+              '</div>' +
+              '<div style="text-align:left">' +
+                '<div style="font-size:20px;font-weight:900;color:' + bi.color + ';line-height:1">' + cards.length + '</div>' +
+                '<div style="font-size:10px;color:var(--muted)">بطاقة</div>' +
+              '</div>' +
+            '</div>' +
+            '<div style="height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden">' +
+              '<div style="height:100%;width:' + pct + '%;background:' + bi.color + ';border-radius:3px;transition:.5s"></div>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+
+      '<div style="background:var(--primary-soft);border:1px solid var(--primary);border-radius:12px;padding:14px;margin-bottom:16px;font-size:12px;line-height:1.7;color:var(--text-2)">' +
+        '<strong style="color:var(--primary)"><i class="fa-solid fa-lightbulb"></i> كيف يشتغل؟</strong><br>' +
+        '• بطاقة جديدة → صندوق 1<br>' +
+        '• حفظتها صح → تصعد صندوق<br>' +
+        '• نسيتها → ترجع للصندوق 1<br>' +
+        '• كل صندوق له فترة مراجعة أطول' +
+      '</div>'
+    ) +
+
+    '<button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="closeCalculator()">' +
+      '<i class="fa-solid fa-xmark"></i> إغلاق' +
+    '</button>';
+}
+
+/* =====================================================
+   CONCEPTS LINKING (ربط المفاهيم)
+===================================================== */
+function openConceptsSystem(){
+  var overlay = document.getElementById('calcOverlay');
+  if(!overlay) return;
+
+  var container = document.getElementById('calcContainer');
+  renderConceptsUI(container);
+  overlay.classList.add('show');
+}
+
+function renderConceptsUI(container){
+  // جمع كل الدروس
+  var allLessons = [];
+  state.subjects.forEach(function(s){
+    s.lessons.forEach(function(l){
+      allLessons.push({lesson: l, subject: s});
+    });
+  });
+
+  container.innerHTML =
+    '<h2 style="color:var(--primary);font-weight:800;margin-bottom:8px;text-align:center;font-size:20px">' +
+      '<i class="fa-solid fa-diagram-project"></i> ربط المفاهيم' +
+    '</h2>' +
+    '<p style="color:var(--muted);font-size:12px;text-align:center;margin-bottom:18px;line-height:1.6">' +
+      'اربط الدروس المتشابهة لتفهم العلاقة بينها' +
+    '</p>' +
+
+    (allLessons.length < 2 ?
+      '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
+        '<i class="fa-solid fa-diagram-project" style="font-size:40px;opacity:.3;display:block;margin-bottom:12px"></i>' +
+        '<p style="font-size:13px">تحتاج درسين على الأقل لربط المفاهيم.</p>' +
+      '</div>' :
+
+      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">' +
+        '<h4 style="font-size:13px;color:var(--primary);margin-bottom:12px;font-weight:700">' +
+          '<i class="fa-solid fa-plus"></i> ربط جديد' +
+        '</h4>' +
+        '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">' +
+          '<select id="conceptLesson1" style="padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px">' +
+            '<option value="">— اختر الدرس الأول —</option>' +
+            allLessons.map(function(item, i){
+              return '<option value="' + i + '">' + escapeHtml(item.subject.name) + ' · ' + escapeHtml(item.lesson.title) + '</option>';
+            }).join('') +
+          '</select>' +
+          '<select id="conceptLesson2" style="padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px">' +
+            '<option value="">— اختر الدرس الثاني —</option>' +
+            allLessons.map(function(item, i){
+              return '<option value="' + i + '">' + escapeHtml(item.subject.name) + ' · ' + escapeHtml(item.lesson.title) + '</option>';
+            }).join('') +
+          '</select>' +
+          '<input id="conceptRelation" placeholder="العلاقة (مثال: مشترك، متقدم، سابق)" ' +
+            'style="padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px">' +
+          '<button class="btn btn-primary btn-sm" onclick="addConceptLink()" style="justify-content:center">' +
+            '<i class="fa-solid fa-link"></i> إضافة رابط' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div style="background:var(--primary-soft);border:1px solid var(--primary);border-radius:12px;padding:14px;margin-bottom:16px;font-size:12px;line-height:1.7;color:var(--text-2)">' +
+        '<strong style="color:var(--primary)"><i class="fa-solid fa-lightbulb"></i> فكرة:</strong><br>' +
+        'لما تربط درسين، تقدر تشوفهم مع بعض وتراجعهم بشكل مترابط. هذي طريقة فعالة لتقوية الفهم.' +
+      '</div>'
+    ) +
+
+    '<button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="closeCalculator()">' +
+      '<i class="fa-solid fa-xmark"></i> إغلاق' +
+    '</button>';
+}
+
+function addConceptLink(){
+  var i1 = document.getElementById('conceptLesson1').value;
+  var i2 = document.getElementById('conceptLesson2').value;
+  var relation = document.getElementById('conceptRelation').value.trim();
+
+  if(i1 === '' || i2 === ''){
+    toast('اختر الدرسين', 'warning');
+    return;
+  }
+  if(i1 === i2){
+    toast('لا يمكن ربط الدرس بنفسه', 'warning');
+    return;
+  }
+  if(!relation){
+    toast('اكتب نوع العلاقة', 'warning');
+    return;
+  }
+
+  toast('تم الربط! (سيتم الحفظ قريباً)', 'success');
+  playSound('success');
+  celebrate();
+}
+
+/* =====================================================
+   MEMORY PALACE (قصر الذاكرة)
+===================================================== */
+function openMemoryPalace(){
+  var overlay = document.getElementById('calcOverlay');
+  if(!overlay) return;
+
+  var container = document.getElementById('calcContainer');
+  renderMemoryPalaceUI(container);
+  overlay.classList.add('show');
+}
+
+function renderMemoryPalaceUI(container){
+  container.innerHTML =
+    '<h2 style="color:var(--primary);font-weight:800;margin-bottom:8px;text-align:center;font-size:20px">' +
+      '<i class="fa-solid fa-landmark"></i> قصر الذاكرة' +
+    '</h2>' +
+    '<p style="color:var(--muted);font-size:12px;text-align:center;margin-bottom:18px;line-height:1.6">' +
+      'اربط المعلومة بمكان مألوف لديك لتتذكرها بسهولة' +
+    '</p>' +
+
+    '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">' +
+      '<div style="font-size:13px;line-height:1.8;color:var(--text-2)">' +
+        '<strong style="color:var(--primary);display:block;margin-bottom:8px"><i class="fa-solid fa-lightbulb"></i> طريقة عملية:</strong>' +
+        '1. تخيّل مكان تعرفه جيداً (بيتك، مدرستك، الشارع)<br>' +
+        '2. اختر معلومات تحتاج حفظها<br>' +
+        '3. اربط كل معلومة بمكان معين<br>' +
+        '4. عند المراجعة، امشِ في المكان وتذكّر' +
+      '</div>' +
+    '</div>' +
+
+    '<div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border-radius:12px;padding:16px;text-align:center;margin-bottom:16px">' +
+      '<i class="fa-solid fa-brain" style="font-size:32px;margin-bottom:8px"></i>' +
+      '<div style="font-size:14px;font-weight:700;margin-bottom:4px">جرب قصر ذاكرتك الأول</div>' +
+      '<div style="font-size:12px;opacity:.9;margin-bottom:12px">اختر غرفة من بيتك وابدأ الربط</div>' +
+      '<button class="btn btn-ghost btn-sm" onclick="startMemoryPalace()" style="background:#fff;color:var(--primary-dark)">' +
+        '<i class="fa-solid fa-play"></i> ابدأ' +
+      '</button>' +
+    '</div>' +
+
+    '<div style="display:flex;gap:8px;margin-bottom:8px">' +
+      '<button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center" onclick="openTool(\'leitner\')">' +
+        '<i class="fa-solid fa-inbox"></i> Leitner' +
+      '</button>' +
+      '<button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center" onclick="openTool(\'concepts\')">' +
+        '<i class="fa-solid fa-diagram-project"></i> المفاهيم' +
+      '</button>' +
+    '</div>' +
+
+    '<button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="closeCalculator()">' +
+      '<i class="fa-solid fa-xmark"></i> إغلاق' +
+    '</button>';
+}
+
+function startMemoryPalace(){
+  toast('🚧 قريباً — سيتم إضافة الغرف والمعلومات', 'info');
+}
+
+/* =====================================================
+   OVERRIDE openSystem
+===================================================== */
+window.openSystem = function(sys){
+  if(sys === 'leitner') openLeitnerSystem();
+  else if(sys === 'concepts') openConceptsSystem();
+  else if(sys === 'memory-palace') openMemoryPalace();
+};
+
+/* =====================================================
+   OVERRIDE openLesson (للتأكد)
+===================================================== */
+window.openLesson = function(id){
+  currentLessonId = id;
+  navigateTo('lesson', {subjectId: currentSubjectId, lessonId: id});
+};
+
+/* =====================================================
+   OVERRIDE openSubject
+===================================================== */
+window.openSubject = function(id){
+  currentSubjectId = id;
+  navigateTo('subject', {subjectId: id});
+};
+
+/* =====================================================
+   OVERRIDE openSettings (للتأكد)
+===================================================== */
+window.openSettings = function(section){
+  var body = document.getElementById('settingsBody');
+  if(!body) return;
+  body.innerHTML = renderSettingsContent();
+  setTimeout(function(){
+    document.querySelectorAll('.theme-option').forEach(function(el){
+      el.classList.toggle('selected', el.dataset.theme === state.settings.theme);
+    });
+    document.querySelectorAll('.font-option').forEach(function(el){
+      el.classList.toggle('selected', el.dataset.font === state.settings.font);
+    });
+  }, 50);
+  openModal('settingsModal');
+};
+
+/* =====================================================
+   OVERRIDE navigateTo ليعمل openSettings صح
+===================================================== */
+var _origNavigateTo = navigateTo;
+window.navigateTo = function(page, options){
+  if(page === 'settings'){
+    openSettings();
+    // نخلي الصفحة subjects تحت المودال
+    _origNavigateTo('subjects');
+    return;
+  }
+  _origNavigateTo(page, options);
+};
+
+/* =====================================================
+   OVERRIDE renderSettingsPage
+===================================================== */
+window.renderSettingsPage = function(el){
+  openSettings();
+  // نعرض رسالة أن الإعدادات في modal
+  el.innerHTML =
+    '<div class="empty-state">' +
+      '<div class="empty-state-icon"><i class="fa-solid fa-gear"></i></div>' +
+      '<h2>الإعدادات مفتوحة</h2>' +
+      '<p>تم فتح نافذة الإعدادات</p>' +
+      '<button class="btn btn-primary" onclick="openSettings()">' +
+        '<i class="fa-solid fa-gear"></i> فتح الإعدادات' +
+      '</button>' +
+    '</div>';
+};
+
+/* =====================================================
+   OVERRIDE renderChallengeBadge
+===================================================== */
+window.renderChallengeBadge = function(){
+  var today = new Date().toISOString().split('T')[0];
+  var challenge = state.challenges.find(function(c){ return c.challenge_date === today; });
+  var badge = document.getElementById('challengeText');
+  if(!badge) return;
+  if(!challenge){
+    badge.textContent = 'ابدأ';
+  } else if(challenge.completed){
+    badge.textContent = '✅ تم';
+  } else {
+    badge.textContent = challenge.progress + '/' + challenge.target;
+  }
+};
+
+/* =====================================================
+   OVERRIDE closeFlashcards
+===================================================== */
+window.closeFlashcards = function(){
+  var overlay = document.getElementById('fcOverlay');
+  if(overlay) overlay.classList.remove('show');
+  fcQueue = [];
+  fcIndex = 0;
+  updateStreak();
+};
+
+/* =====================================================
+   OVERRIDE closePomodoro
+===================================================== */
+window.closePomodoro = function(){
+  var overlay = document.getElementById('pomoOverlay');
+  if(overlay) overlay.classList.remove('show');
+  if(pomoInterval){
+    clearInterval(pomoInterval);
+    pomoInterval = null;
+    pomoRunning = false;
+  }
+};
+
+/* =====================================================
+   OVERRIDE closeCalculator
+===================================================== */
+window.closeCalculator = function(){
+  var overlay = document.getElementById('calcOverlay');
+  if(overlay) overlay.classList.remove('show');
+};
+
+/* =====================================================
+   RENDER RIGHT PANEL — استدعها عند كل navigation
+===================================================== */
+var _origRenderPage = renderPage;
+window.renderPage = function(page, options){
+  _origRenderPage(page, options);
+  renderRightPanel();
+};
+
+/* =====================================================
+   LEFT SIDEBAR BUTTON HANDLERS (تأكد)
+===================================================== */
+document.addEventListener('click', function(e){
+  var item = e.target.closest('.nav-item[data-page]');
+  if(item){
+    var page = item.dataset.page;
+    navigateTo(page);
+    return;
+  }
+  var tab = e.target.closest('.bottom-tab[data-tab]');
+  if(tab){
+    var tabPage = tab.dataset.tab;
+    navigateTo(tabPage);
+    return;
+  }
+});
+
+/* =====================================================
+   INIT — التأكد من تشغيل كل شي
+===================================================== */
+(function(){
+  // استدعاء الدوال المعادة تعريفها بعد التحميل
+  if(state.notifications && state.notifications.length > 0){
+    renderNotifBadge();
+    renderNotifList();
+  }
+  renderStreak();
+  updateTasksBadge();
+  renderRightPanel();
+})();
+
+console.log('%c🟠 مِذكَرتي v2.0 — جاهز!', 'color:#FF7A00;font-size:16px;font-weight:bold');
+console.log('%cاختصارات: N، S، T، P، M، ?', 'color:#FF7A00;font-size:12px');
 </script>
 </body>
 </html>
