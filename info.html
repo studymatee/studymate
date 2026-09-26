@@ -1,1 +1,1591 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FF7A00">
+<title>دليل الاستخدام — مِذكَرتي</title>
+<link rel="icon" type="image/png" href="/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --primary:#FF7A00;
+  --primary-dark:#E65100;
+  --primary-glow:rgba(255,122,0,.25);
+  --primary-soft:rgba(255,122,0,.08);
+  --bg:#0A0A0A;
+  --bg-1:#0F0F0F;
+  --surface:#1E1E1E;
+  --surface-2:#242424;
+  --text:#F5F5F5;
+  --text-2:#B0B0B0;
+  --muted:#7A7A7A;
+  --border:rgba(255,255,255,.08);
+  --green:#22C55E;
+  --yellow:#EAB308;
+  --blue:#3B82F6;
+  --red:#EF4444;
+  --purple:#8B5CF6;
+  --pink:#EC4899;
+  --font:'Tajawal','Segoe UI',Tahoma,sans-serif;
+  --radius:12px;
+  --radius-md:16px;
+  --radius-lg:20px;
+  --transition:.25s cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  background-image:
+    radial-gradient(circle at 20% 20%, var(--primary-soft) 0%, transparent 45%),
+    radial-gradient(circle at 80% 80%, var(--primary-soft) 0%, transparent 45%);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.7;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
 
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:5px}
+::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.85;transform:scale(1.05)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* ============ HEADER ============ */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(15,15,15,.85);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  display:flex;align-items:center;gap:14px;
+}
+.back-btn{
+  width:42px;height:42px;
+  border-radius:var(--radius);
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  transition:var(--transition);
+  flex-shrink:0;
+}
+.back-btn:hover{
+  background:var(--primary);
+  color:#fff;
+  border-color:var(--primary);
+  transform:translateX(3px);
+}
+.header-title{
+  flex:1;min-width:0;
+  display:flex;align-items:center;gap:12px;
+}
+.header-icon{
+  width:42px;height:42px;
+  border-radius:var(--radius);
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;
+  box-shadow:0 6px 20px var(--primary-glow);
+  flex-shrink:0;
+}
+.header-title h1{
+  font-size:18px;font-weight:900;color:var(--primary);
+  letter-spacing:-.3px;
+}
+.header-title p{
+  font-size:12px;color:var(--muted);margin-top:2px;
+}
+
+/* ============ CONTAINER ============ */
+.container{
+  max-width:900px;
+  margin:0 auto;
+  padding:24px 20px 80px;
+}
+
+/* ============ HERO ============ */
+.hero{
+  text-align:center;
+  padding:32px 20px 40px;
+  margin-bottom:24px;
+}
+.hero-icon{
+  width:100px;height:100px;
+  border-radius:28px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:46px;
+  margin:0 auto 20px;
+  box-shadow:0 20px 60px var(--primary-glow);
+  animation:float 4s ease-in-out infinite;
+}
+.hero h1{
+  font-size:30px;font-weight:900;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:10px;letter-spacing:-1px;
+}
+.hero p{
+  font-size:15px;color:var(--text-2);
+  max-width:500px;margin:0 auto;line-height:1.8;
+}
+
+/* ============ SEARCH ============ */
+.search-box{
+  position:relative;
+  margin-bottom:24px;
+}
+.search-box i{
+  position:absolute;right:18px;top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);font-size:15px;
+  pointer-events:none;
+}
+.search-box input{
+  width:100%;
+  padding:15px 48px 15px 18px;
+  border-radius:var(--radius-md);
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  color:var(--text);
+  font-size:15px;
+  font-family:var(--font);
+  outline:none;
+  transition:var(--transition);
+}
+.search-box input:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px var(--primary-soft);
+}
+.search-box input::placeholder{color:var(--muted)}
+
+/* ============ TOC ============ */
+.toc{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:20px;
+  margin-bottom:28px;
+}
+.toc-title{
+  font-size:14px;color:var(--primary);
+  font-weight:800;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.toc-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:8px;
+}
+.toc-item{
+  padding:10px 14px;
+  border-radius:10px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  color:var(--text-2);
+  font-size:13px;font-weight:600;
+  cursor:pointer;
+  transition:var(--transition);
+  display:flex;align-items:center;gap:10px;
+}
+.toc-item:hover{
+  border-color:var(--primary);
+  color:var(--primary);
+  background:var(--primary-soft);
+  transform:translateX(-3px);
+}
+.toc-item i{
+  width:20px;text-align:center;
+  font-size:14px;color:var(--primary);
+}
+
+/* ============ SECTION ============ */
+.section{
+  margin-bottom:24px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  animation:slideUp .4s ease-out backwards;
+  scroll-margin-top:80px;
+}
+.section-header{
+  padding:18px 22px;
+  display:flex;align-items:center;gap:14px;
+  cursor:pointer;
+  user-select:none;
+  transition:var(--transition);
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.section-header:hover{
+  background:var(--surface-2);
+}
+.section-header::before{
+  content:'';
+  position:absolute;right:0;top:0;bottom:0;
+  width:4px;
+  background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+  transform:scaleY(0);
+  transition:transform .3s;
+  transform-origin:top;
+}
+.section:hover .section-header::before{transform:scaleY(1)}
+.section-icon{
+  width:48px;height:48px;
+  border-radius:14px;
+  background:var(--primary-soft);
+  color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  flex-shrink:0;
+}
+.section-title{
+  flex:1;min-width:0;
+}
+.section-title h3{
+  font-size:17px;font-weight:800;
+  color:var(--text);
+  margin-bottom:3px;
+}
+.section-title p{
+  font-size:12px;color:var(--muted);
+}
+.section-toggle{
+  width:32px;height:32px;
+  border-radius:50%;
+  background:var(--bg);
+  border:1px solid var(--border);
+  color:var(--muted);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;
+  transition:transform .3s;
+  flex-shrink:0;
+}
+.section.open .section-toggle{
+  transform:rotate(180deg);
+  background:var(--primary);
+  color:#fff;
+  border-color:var(--primary);
+}
+.section-body{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .5s cubic-bezier(.4,0,.2,1);
+}
+.section.open .section-body{
+  max-height:3000px;
+}
+.section-content{
+  padding:22px;
+  line-height:1.9;
+}
+.section-content p{
+  color:var(--text-2);
+  font-size:14px;
+  margin-bottom:14px;
+}
+.section-content p:last-child{margin-bottom:0}
+
+/* ============ FEATURE ITEM ============ */
+.feature{
+  display:flex;gap:14px;
+  padding:14px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  margin-bottom:10px;
+  transition:var(--transition);
+}
+.feature:hover{
+  border-color:var(--primary);
+  transform:translateX(-3px);
+}
+.feature-icon{
+  width:40px;height:40px;
+  border-radius:11px;
+  background:var(--primary-soft);
+  color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;
+  flex-shrink:0;
+}
+.feature-body{flex:1;min-width:0}
+.feature-title{
+  font-size:14px;font-weight:800;
+  color:var(--text);
+  margin-bottom:5px;
+  display:flex;align-items:center;gap:8px;
+  flex-wrap:wrap;
+}
+.feature-desc{
+  font-size:13px;color:var(--text-2);
+  line-height:1.7;
+}
+
+/* ============ STEPS ============ */
+.steps{
+  counter-reset:step;
+  margin:14px 0;
+}
+.step{
+  display:flex;gap:14px;
+  padding:12px 0;
+  position:relative;
+}
+.step::before{
+  counter-increment:step;
+  content:counter(step);
+  width:32px;height:32px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;
+  flex-shrink:0;
+  box-shadow:0 4px 12px var(--primary-glow);
+}
+.step-text{
+  flex:1;
+  font-size:14px;
+  color:var(--text-2);
+  line-height:1.8;
+  padding-top:5px;
+}
+.step-text strong{color:var(--text);font-weight:700}
+
+/* ============ TIP ============ */
+.tip{
+  display:flex;gap:12px;
+  padding:14px 16px;
+  border-radius:var(--radius);
+  margin:14px 0;
+  font-size:13px;
+  line-height:1.7;
+}
+.tip i{
+  font-size:18px;flex-shrink:0;margin-top:2px;
+}
+.tip.info{
+  background:rgba(59,130,246,.08);
+  border:1px solid rgba(59,130,246,.25);
+  color:#93C5FD;
+}
+.tip.success{
+  background:rgba(34,197,94,.08);
+  border:1px solid rgba(34,197,94,.25);
+  color:#86EFAC;
+}
+.tip.warning{
+  background:rgba(234,179,8,.08);
+  border:1px solid rgba(234,179,8,.25);
+  color:#FDE68A;
+}
+.tip.danger{
+  background:rgba(239,68,68,.08);
+  border:1px solid rgba(239,68,68,.25);
+  color:#FCA5A5;
+}
+
+/* ============ KBD ============ */
+kbd{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:6px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-bottom-width:2px;
+  font-family:'Courier New',monospace;
+  font-size:12px;
+  font-weight:700;
+  color:var(--primary);
+  margin:0 2px;
+}
+
+/* ============ BACK TO TOP ============ */
+.back-to-top{
+  position:fixed;
+  bottom:24px;left:24px;
+  width:50px;height:50px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px var(--primary-glow);
+  cursor:pointer;
+  transition:var(--transition);
+  opacity:0;pointer-events:none;
+  z-index:90;
+}
+.back-to-top.show{
+  opacity:1;pointer-events:auto;
+}
+.back-to-top:hover{
+  transform:translateY(-4px) scale(1.05);
+  box-shadow:0 12px 32px var(--primary-glow);
+}
+
+/* ============ SEARCH HIGHLIGHT ============ */
+.highlight{
+  background:var(--primary);
+  color:#fff;
+  padding:0 4px;
+  border-radius:3px;
+}
+
+/* ============ FOOTER ============ */
+.footer{
+  text-align:center;
+  padding:32px 20px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.8;
+  border-top:1px solid var(--border);
+  margin-top:40px;
+}
+.footer strong{color:var(--primary)}
+
+/* ============ MOBILE ============ */
+@media (max-width:600px){
+  .container{padding:16px 14px 80px}
+  .hero{padding:20px 14px 30px}
+  .hero-icon{width:80px;height:80px;font-size:36px;border-radius:22px}
+  .hero h1{font-size:24px}
+  .hero p{font-size:14px}
+  .section-header{padding:14px 16px;gap:12px}
+  .section-icon{width:42px;height:42px;font-size:17px;border-radius:12px}
+  .section-title h3{font-size:15px}
+  .section-title p{font-size:11px}
+  .section-content{padding:16px}
+  .section-content p{font-size:13px}
+  .feature{padding:12px;gap:12px}
+  .feature-icon{width:36px;height:36px;font-size:15px;border-radius:10px}
+  .feature-title{font-size:13px}
+  .feature-desc{font-size:12px}
+  .toc-grid{grid-template-columns:1fr}
+  .back-to-top{bottom:16px;left:16px;width:44px;height:44px;font-size:16px}
+  .step::before{width:28px;height:28px;font-size:13px}
+  .step-text{font-size:13px}
+  .header{padding:12px 14px}
+  .header-title h1{font-size:16px}
+  .header-title p{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <button class="back-btn" onclick="history.back()" title="رجوع">
+    <i class="fa-solid fa-arrow-right"></i>
+  </button>
+  <div class="header-title">
+    <div class="header-icon"><i class="fa-solid fa-circle-question"></i></div>
+    <div>
+      <h1>دليل الاستخدام</h1>
+      <p>تعلّم كل ميزات مِذكَرتي في دقائق</p>
+    </div>
+  </div>
+</header>
+
+<!-- ============ CONTAINER ============ -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+    <h1>مرحباً بك في مِذكَرتي</h1>
+    <p>دليلك الشامل لكل ميزة في الموقع — بأسلوب مبسط ومختصر</p>
+  </div>
+
+  <!-- Search -->
+  <div class="search-box">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" id="searchInput" placeholder="ابحث عن ميزة أو شرح...">
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title"><i class="fa-solid fa-list"></i> فهرس المحتويات</div>
+    <div class="toc-grid" id="tocGrid"></div>
+  </div>
+
+  <!-- Sections Container -->
+  <div id="sectionsContainer">
+
+    <!-- 1. البدء -->
+    <div class="section" id="getting-started" data-title="البدء تسجيل الدخول حساب">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-rocket"></i></div>
+        <div class="section-title">
+          <h3>🚀 البدء السريع</h3>
+          <p>كيف تسجل وتدخل الموقع</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>مِذكَرتي يدعم طريقة تسجيل دخول واحدة أو أكثر. اختر اللي يريحك:</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-brands fa-google"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">تسجيل بجوجل <span class="badge-soft">الأسرع</span></div>
+              <div class="feature-desc">اضغط زر "جوجل" → اختر حسابك → خلاص! ما يحتاج كلمة سر.</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-envelope"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">تسجيل بالإيميل</div>
+              <div class="feature-desc">اكتب إيميلك وكلمة سر (8 أحرف على الأقل) → سجّل حساب جديد أو ادخل بحساب موجود.</div>
+            </div>
+          </div>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step-text">افتح <strong>studymatee.github.io</strong> في المتصفح</div>
+            </div>
+            <div class="step">
+              <div class="step-text">اختر طريقة التسجيل (جوجل أو إيميل)</div>
+            </div>
+            <div class="step">
+              <div class="step-text">إذا اخترت إيميل → افتح بريدك وأكّد الحساب</div>
+            </div>
+            <div class="step">
+              <div class="step-text">خلاص! راح تدخل مباشرة للموقع</div>
+            </div>
+          </div>
+
+          <div class="tip info">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span>إذا نسيت كلمة السر → اضغط "نسيت كلمة السر؟" في صفحة الدخول، وراح يوصلك رابط لإعادة تعيينها.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. المواد -->
+    <div class="section" id="subjects" data-title="المواد إضافة رياضيات فيزياء">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-book"></i></div>
+        <div class="section-title">
+          <h3>📚 إدارة المواد</h3>
+          <p>نظّم دروسك حسب المواد</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>المواد هي الأساس. كل مادة فيها دروس، وكل درس فيه بطاقات حفظ.</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-plus"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">إضافة مادة</div>
+              <div class="feature-desc">اضغط "إضافة مادة" → اكتب الاسم → اختر أيقونة ولون → حفظ</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-thumbtack"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">تثبيت مادة مهمة</div>
+              <div class="feature-desc">مرّر على المادة → اضغط 📌 → تطلع أول القائمة</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-pen"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">تعديل أو حذف</div>
+              <div class="feature-desc">مرّر على المادة → ✏️ للتعديل أو 🗑️ للحذف</div>
+            </div>
+          </div>
+
+          <div class="tip success">
+            <i class="fa-solid fa-check-circle"></i>
+            <span><strong>نصيحة:</strong> اختر لون مختلف لكل مادة عشان تفرق بينها بسرعة.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. الدروس -->
+    <div class="section" id="lessons" data-title="الدروس إضافة درس جديد">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-file-lines"></i></div>
+        <div class="section-title">
+          <h3>📝 إدارة الدروس</h3>
+          <p>أضف دروسك وتابع حالتها</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>بعد ما تفتح مادة، تقدر تضيف دروس وتحدد حالة كل درس.</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-circle"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">حالات الدرس (5 حالات)</div>
+              <div class="feature-desc">
+                ⚪ <strong>جديد</strong> — لسا ما بدأت<br>
+                🟡 <strong>قيد الفهم</strong> — عم تقرأ وتفهم<br>
+                🔵 <strong>محفوظ جزئي</strong> — حفظت بعض البطاقات<br>
+                🟢 <strong>محفوظ</strong> — حفظته كامل<br>
+                🔴 <strong>يحتاج مراجعة</strong> — نسيت أجزاء منه
+              </div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-star"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">المفضلة</div>
+              <div class="feature-desc">اضغط ⭐ جنب الدرس → يطلع في فلتر "المفضلة"</div>
+            </div>
+          </div>
+
+          <div class="tip info">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span><strong>اختصار:</strong> اضغط <kbd>N</kbd> لإضافة درس جديد بسرعة.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. الفهم بالفاينمان -->
+    <div class="section" id="feynman" data-title="فاينمان فهم تقنية شرح">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-lightbulb"></i></div>
+        <div class="section-title">
+          <h3>💡 نظام الفهم — فاينمان</h3>
+          <p>اشرح الدرس بطريقتك</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>تقنية فاينمان: اشرح الدرس بكلماتك البسيطة، لو ما قدرت تبسّطه يعني ما فهمته.</p>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step-text">افتح الدرس → قسم <strong>"نظام الفهم"</strong></div>
+            </div>
+            <div class="step">
+              <div class="step-text">اكتب شرحك بأسلوبك (استعمل <strong>غامق، قوائم، ألوان</strong>)</div>
+            </div>
+            <div class="step">
+              <div class="step-text">اضغط <strong>"اختبر فهمي"</strong></div>
+            </div>
+            <div class="step">
+              <div class="step-text">النظام راح يقيّم شرحك: ✅ ممتاز أو ⚠️ حاول تبسّط أكثر</div>
+            </div>
+          </div>
+
+          <div class="tip success">
+            <i class="fa-solid fa-brain"></i>
+            <span><strong>مؤشر الفهم:</strong> النظام يحسب عدد الكلمات + الأمثلة + البساطة. كل ما كانت أوضح، كانت النتيجة أعلى.</span>
+          </div>
+
+          <div class="tip warning">
+            <i class="fa-solid fa-volume-high"></i>
+            <span>اضغط زر <strong>"اسمع"</strong> لتسمع شرحك بصوت عال — مفيد للمراجعة.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. البطاقات -->
+    <div class="section" id="cards" data-title="بطاقات حفظ سؤال جواب">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="section-title">
+          <h3>🃏 بطاقات الحفظ</h3>
+          <p>سؤال وجواب للحفظ السريع</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>البطاقات = سؤال في جهة وجواب في جهة. أضفها للدرس اللي تبغى تحفظه.</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-plus"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">إضافة بطاقة</div>
+              <div class="feature-desc">افتح الدرس → "إضافة بطاقة" → اكتب السؤال والجواب → حفظ</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-play"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">وضع المراجعة</div>
+              <div class="feature-desc">اضغط "مراجعة" → تشوف السؤال → اكشف الجواب → قيّم نفسك: صعب / متوسط / سهل</div>
+            </div>
+          </div>
+
+          <div class="tip info">
+            <i class="fa-solid fa-clock"></i>
+            <span><strong>ذكي:</strong> النظام يحدد متى ترجع لك كل بطاقة حسب تقييمك — البطاقات الصعبة ترجع قريب، السهلة ترجع بعد أيام.</span>
+          </div>
+
+          <div class="tip success">
+            <i class="fa-solid fa-keyboard"></i>
+            <span><strong>اختصار:</strong> داخل المراجعة → <kbd>Space</kbd> اكشف الجواب، <kbd>1</kbd> صعب، <kbd>2</kbd> متوسط، <kbd>3</kbd> سهل.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. التكرار المتباعد -->
+    <div class="section" id="spaced" data-title="تكرار متباعد مراجعة منحنى النسيان">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-rotate"></i></div>
+        <div class="section-title">
+          <h3>🔁 التكرار المتباعد</h3>
+          <p>راجع في الوقت المناسب</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>بدل ما تراجع كل يوم، راجع على فترات متزايدة عشان تكسر منحنى النسيان.</p>
+
+          <p><strong>الجدول:</strong></p>
+          <div class="steps">
+            <div class="step"><div class="step-text"><strong>J+1</strong> — راجع بعد يوم</div></div>
+            <div class="step"><div class="step-text"><strong>J+3</strong> — راجع بعد 3 أيام</div></div>
+            <div class="step"><div class="step-text"><strong>J+7</strong> — راجع بعد أسبوع</div></div>
+            <div class="step"><div class="step-text"><strong>J+21</strong> — راجع بعد 3 أسابيع</div></div>
+          </div>
+
+          <div class="tip success">
+            <i class="fa-solid fa-check"></i>
+            <span>بعد كل مراجعة، اضغط <strong>"أنجزت مراجعة هذه المرحلة"</strong> → النظام يحسب المراجعة القادمة تلقائياً.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. التقويم -->
+    <div class="section" id="calendar" data-title="تقويم مواعيد امتحانات فروض">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-calendar-days"></i></div>
+        <div class="section-title">
+          <h3>📅 التقويم والمواعيد</h3>
+          <p>لا تنسى امتحان أو مراجعة</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>التقويم يجمع لك كل شي بمكان واحد:</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-rotate"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">مراجعات متباعدة</div>
+              <div class="feature-desc">تلقائياً تظهر مواعيد مراجعة دروسك</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-file-pen"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">امتحانات وفروض</div>
+              <div class="feature-desc">الإدارة تضيفها، وتظهر لك تلقائياً في التقويم</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-calendar"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">تقويم شهري</div>
+              <div class="feature-desc">نظرة شاملة على الشهر — اضغط أي يوم تشوف مواعيده</div>
+            </div>
+          </div>
+
+          <div class="tip info">
+            <i class="fa-solid fa-clock"></i>
+            <span>أضف جدول حصصك الأسبوعي من زر <strong>"موعد جديد"</strong>.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. المهام -->
+    <div class="section" id="tasks" data-title="مهام قائمة تودو">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-list-check"></i></div>
+        <div class="section-title">
+          <h3>📝 قائمة المهام</h3>
+          <p>نظّم يومك</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>أضف مهامك اليومية وتابع إنجازها.</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-plus"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">إضافة مهمة</div>
+              <div class="feature-desc">اكتب المهمة → اختر الأولوية (مهم / عادي / منخفض) → حفظ</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-check"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">إكمال مهمة</div>
+              <div class="feature-desc">اضغط على المربع جنب المهمة → تصير ✅ → تاخذ +5 XP</div>
+            </div>
+          </div>
+
+          <div class="tip success">
+            <i class="fa-solid fa-fire"></i>
+            <span><strong>مكافأة:</strong> كل مهمة تكملها تعطيك نقاط XP!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. التحدي اليومي -->
+    <div class="section" id="challenge" data-title="تحدي يومي XP نقاط مستوى">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-bullseye"></i></div>
+        <div class="section-title">
+          <h3>🎯 التحدي اليومي</h3>
+          <p>اكسب XP وارتقِ بالمستويات</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>كل يوم يظهر لك تحدي جديد — أكملة تاخذ XP!</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-star"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">نظام XP والمستويات</div>
+              <div class="feature-desc">
+                • كل 100 XP → مستوى جديد<br>
+                • كل 5 مستويات → شارة جديدة<br>
+                • كل ما ترتفع، تطلع شارات أحلى
+              </div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-fire"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">سلسلة الأيام (Streak)</div>
+              <div class="feature-desc">كل يوم تدخل وتدرس → السلسلة تزيد → ما تكسرها!</div>
+            </div>
+          </div>
+
+          <div class="tip warning">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span><strong>تحدي:</strong> حاول تكمل تحدي كل يوم لمدة أسبوع → تاخذ شارة "أسبوع كامل" 🔥</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. الإنجازات -->
+    <div class="section" id="achievements" data-title="إنجازات شارات ميداليات">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-trophy"></i></div>
+        <div class="section-title">
+          <h3>🏆 الإنجازات</h3>
+          <p>شارات عند تحقيق أهداف</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>عند كل إنجاز، تاخذ شارة وتنبيه احتفالي 🎉</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-seedling"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">البداية</div>
+              <div class="feature-desc">أضفت أول درس</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">الفاهم</div>
+              <div class="feature-desc">فهمت أول درس بفاينمان</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">الحافظ</div>
+              <div class="feature-desc">حفظت درس كامل</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-fire"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">3 أيام / أسبوع / شهر</div>
+              <div class="feature-desc">حافظ على السلسلة</div>
+            </div>
+          </div>
+
+          <div class="tip info">
+            <i class="fa-solid fa-info-circle"></i>
+            <span>في <strong>18 إنجاز</strong> مختلف — جرّب تفتحهم كلهم!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. الإحصائيات -->
+    <div class="section" id="stats" data-title="إحصائيات تقدم رسوم بيانية">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="section-title">
+          <h3>📊 الإحصائيات</h3>
+          <p>شوف تقدمك بصرياً</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>الإحصائيات تعطيك نظرة شاملة على تقدمك:</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-chart-pie"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">توزيع الدروس</div>
+              <div class="feature-desc">رسم بياني يوضح كم درس في كل حالة</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-percent"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">نسبة الحفظ</div>
+              <div class="feature-desc">كم % من دروسك حفظتها</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">التقدم في كل مادة</div>
+              <div class="feature-desc">شوف أي مادة تحتاج تركيز أكثر</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12. الأدوات -->
+    <div class="section" id="tools" data-title="أدوات حاسبة علمية معدل بومودورو">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-toolbox"></i></div>
+        <div class="section-title">
+          <h3>🛠️ الأدوات</h3>
+          <p>آلة حاسبة، معدل، بومودورو</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-square-root-variable"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">🧮 آلة حاسبة علمية</div>
+              <div class="feature-desc">sin, cos, tan, log, √, π, e وغيرها — مع سجل آخر النتائج</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-calculator"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">📊 حاسبة المعدل</div>
+              <div class="feature-desc">احسب معدلك الفصلي مع المعاملات → يظهر التقدير (ممتاز/جيد/...)</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">⏱️ بومودورو</div>
+              <div class="feature-desc">25 دقيقة تركيز + 5 دقائق راحة — ياخذ +15 XP لكل جلسة</div>
+            </div>
+          </div>
+
+          <div class="tip info">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>اضغط <kbd>K</kbd> لفتح <strong>البحث السريع</strong> في أي وقت.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13. أنظمة الحفظ -->
+    <div class="section" id="systems" data-title="Leitner مفاهيم قصر ذاكرة أنظمة">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-brain"></i></div>
+        <div class="section-title">
+          <h3>🧠 أنظمة الحفظ المتقدمة</h3>
+          <p>Leitner، المفاهيم، قصر الذاكرة</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-inbox"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">📦 صناديق Leitner</div>
+              <div class="feature-desc">
+                5 صناديق للبطاقات:<br>
+                • صندوق 1: تراجع كل يوم<br>
+                • صندوق 2: كل 3 أيام<br>
+                • صندوق 3: كل أسبوع<br>
+                • صندوق 4: كل أسبوعين<br>
+                • صندوق 5: كل شهر<br>
+                حفظت صح → صعد صندوق | نسيت → رجع للصندوق 1
+              </div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-diagram-project"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">🔗 ربط المفاهيم</div>
+              <div class="feature-desc">اربط درس بدرس آخر — كل ما فهمت العلاقة، ثبت المعلومة أكثر</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-landmark"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">🏛️ قصر الذاكرة</div>
+              <div class="feature-desc">اربط كل معلومة بمكان مألوف — تقنية قديمة لكن فعّالة جداً</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14. الذكاء الاصطناعي -->
+    <div class="section" id="ai" data-title="AI ذكاء اصطناعي مساعد شرح">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-robot"></i></div>
+        <div class="section-title">
+          <h3>🤖 مساعد الذكاء الاصطناعي</h3>
+          <p>اسأل AI يشرحلك أي درس</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>داخل كل درس، تلقى قسم AI فيه 4 أزرار:</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-lightbulb"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">اشرح الدرس</div>
+              <div class="feature-desc">AI يشرحلك الدرس بطريقة مبسطة مع أمثلة من حياتك اليومية</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-list"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">أمثلة</div>
+              <div class="feature-desc">3 أمثلة عملية على الدرس</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-question"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">أسئلة</div>
+              <div class="feature-desc">5 أسئلة لاختبار فهمك + الأجوبة</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-compress"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">ملخص</div>
+              <div class="feature-desc">الدرس في 5 نقاط رئيسية</div>
+            </div>
+          </div>
+
+          <div class="tip success">
+            <i class="fa-solid fa-bolt"></i>
+            <span><strong>Cache:</strong> أول مرة ياخذ وقت، بعدها الرد يجي فوري من الذاكرة.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15. الإشعارات -->
+    <div class="section" id="notifications" data-title="إشعارات تنبيهات أخبار">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-bell"></i></div>
+        <div class="section-title">
+          <h3>🔔 الإشعارات</h3>
+          <p>لا يفوتك شي مهم</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>الإشعارات توصلك في عدة أماكن:</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-bell"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">زر الجرس 🔔</div>
+              <div class="feature-desc">في الشريط العلوي — فيه العدد غير المقروء</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-desktop"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">إشعارات المتصفح</div>
+              <div class="feature-desc">تطلعلك حتى لو الموقع مقفل — اضغط "تفعيل" أول مرة</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">إعلانات الإدارة</div>
+              <div class="feature-desc">الإدارة ترسل إعلانات لكل المستخدمين</div>
+            </div>
+          </div>
+
+          <div class="tip warning">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>لا تنسى <strong>تفعّل الإشعارات</strong> عشان ما يفوتك فرض أو مراجعة!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 16. الإعدادات -->
+    <div class="section" id="settings" data-title="إعدادات ثيمات ألوان خطوط">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-gear"></i></div>
+        <div class="section-title">
+          <h3>⚙️ الإعدادات</h3>
+          <p>خصّص الموقع حسب ذوقك</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-palette"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">🎨 6 ألوان</div>
+              <div class="feature-desc">برتقالي، بنفسجي، أزرق، أخضر، وردي، ذهبي</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-moon"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">🌙 وضع ليلي/نهاري</div>
+              <div class="feature-desc">يتبدل تلقائياً حسب الوقت — أو اختاره يدوياً</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-font"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">🔤 4 خطوط عربية</div>
+              <div class="feature-desc">Tajawal، Cairo، Almarai، El Messiri</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-database"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">💾 تصدير البيانات</div>
+              <div class="feature-desc">نزّل نسخة احتياطية بصيغة JSON</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 17. اختصارات -->
+    <div class="section" id="shortcuts" data-title="اختصارات لوحة مفاتيح كيبورد">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-keyboard"></i></div>
+        <div class="section-title">
+          <h3>⌨️ اختصارات لوحة المفاتيح</h3>
+          <p>اشتغل بسرعة أكبر</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>اضغط هذي الاختصارات في أي وقت:</p>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-plus"></i></div>
+            <div class="feature-body">
+              <div class="feature-title"><kbd>N</kbd> — إضافة جديد</div>
+              <div class="feature-desc">درس جديد أو مادة جديدة حسب الصفحة</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-book"></i></div>
+            <div class="feature-body">
+              <div class="feature-title"><kbd>S</kbd> — مادة جديدة</div>
+              <div class="feature-desc">افتح مودال إضافة مادة بسرعة</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-moon"></i></div>
+            <div class="feature-body">
+              <div class="feature-title"><kbd>T</kbd> — تبديل الوضع</div>
+              <div class="feature-desc">ليلي ↔ نهاري</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="feature-body">
+              <div class="feature-title"><kbd>P</kbd> — بومودورو</div>
+              <div class="feature-desc">ابدأ جلسة تركيز</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="feature-body">
+              <div class="feature-title"><kbd>K</kbd> — بحث سريع</div>
+              <div class="feature-desc">ابحث في كل شي</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-volume-xmark"></i></div>
+            <div class="feature-body">
+              <div class="feature-title"><kbd>M</kbd> — كتم الأصوات</div>
+              <div class="feature-desc">تفعيل/إيقاف أصوات الموقع</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-xmark"></i></div>
+            <div class="feature-body">
+              <div class="feature-title"><kbd>Esc</kbd> — إغلاق</div>
+              <div class="feature-desc">إغلاق أي مودال أو نافذة مفتوحة</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-question"></i></div>
+            <div class="feature-body">
+              <div class="feature-title"><kbd>?</kbd> — قائمة الاختصارات</div>
+              <div class="feature-desc">عرض كل الاختصارات في نافذة</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 18. PWA -->
+    <div class="section" id="pwa" data-title="PWA تطبيق جوال تثبيت بدون انترنت">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+        <div class="section-title">
+          <h3>📱 تثبيت التطبيق على الجوال</h3>
+          <p>يشتغل بدون إنترنت</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <p>مِذكَرتي يشتغل كتطبيق حقيقي على الجوال:</p>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step-text">افتح الموقع من متصفح جوالك (Chrome أو Safari)</div>
+            </div>
+            <div class="step">
+              <div class="step-text">اضغط على <strong>قائمة المتصفح</strong> ⋮</div>
+            </div>
+            <div class="step">
+              <div class="step-text">اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong> أو <strong>"تثبيت التطبيق"</strong></div>
+            </div>
+            <div class="step">
+              <div class="step-text">راح يظهر أيقونة التطبيق على جوالك — افتحه كتطبيق عادي!</div>
+            </div>
+          </div>
+
+          <div class="tip success">
+            <i class="fa-solid fa-check-circle"></i>
+            <span><strong>فايدة:</strong> التطبيق يشتغل بدون إنترنت، وبيفتح بسرعة أكبر.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 19. الأسئلة الشائعة -->
+    <div class="section" id="faq" data-title="أسئلة شائعة مشاكل حلول">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon"><i class="fa-solid fa-circle-question"></i></div>
+        <div class="section-title">
+          <h3>❓ الأسئلة الشائعة</h3>
+          <p>أجوبة سريعة على أكثر الأسئلة</p>
+        </div>
+        <button class="section-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="section-body">
+        <div class="section-content">
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-key"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">نسيت كلمة السر، وش أسوي؟</div>
+              <div class="feature-desc">في صفحة الدخول → اضغط "نسيت كلمة السر؟" → اكتب إيميلك → راح يوصلك رابط لإعادة التعيين</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">ما وصلني إيميل التأكيد؟</div>
+              <div class="feature-desc">افحص مجلد <strong>Spam</strong> — وأحياناً ياخذ 5-10 دقائق. لو ما وصل، جرّب تسجل مرة ثانية.</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-robot"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">AI ما يشتغل؟</div>
+              <div class="feature-desc">إذا طلع خطأ "Rate Limit" → انتظر دقيقة وجرّب. حد الطبقة المجانية 5 طلبات/دقيقة.</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-rotate"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">الموقع ما يتحدث؟</div>
+              <div class="feature-desc">اضغط <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (تحديث قوي) — أو امسح الكاش من الإعدادات</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-mobile"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">الموقع ما يشتغل على الجوال؟</div>
+              <div class="feature-desc">تأكد من تحديث المتصفح — وإذا استعملت Safari، جرّب Chrome</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-database"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">كيف آخذ نسخة احتياطية؟</div>
+              <div class="feature-desc">الإعدادات → البيانات → "تصدير JSON" → راح ينزل ملف فيه كل بياناتك</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">كيف أشارك الدروس مع صاحب؟</div>
+              <div class="feature-desc">حالياً ما فيه مشاركة مباشرة — لكن قريباً راح نضيف هذي الميزة</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon"><i class="fa-solid fa-trash"></i></div>
+            <div class="feature-body">
+              <div class="feature-title">حذفت شي بالغلط، كيف أرجع؟</div>
+              <div class="feature-desc">إذا عندك نسخة احتياطية → الإعدادات → استيراد. للأسف بدون نسخة، صعب نرجعه.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p><strong>مِذكَرتي</strong> — مدير الدراسة الذكي</p>
+    <p>صُنع بحب في الجزائر 🇩🇿 · الإصدار 2.0</p>
+    <p style="margin-top:12px"><a href="/" style="color:var(--primary);font-weight:700"><i class="fa-solid fa-house"></i> رجوع للموقع</a></p>
+  </div>
+
+</div>
+
+<!-- Back to top -->
+<button class="back-to-top" id="backToTop" onclick="scrollToTop()">
+  <i class="fa-solid fa-arrow-up"></i>
+</button>
+
+<script>
+/* =====================================================
+   TOGGLE SECTION
+===================================================== */
+function toggleSection(header){
+  var section = header.parentElement;
+  section.classList.toggle('open');
+}
+
+/* =====================================================
+   SCROLL TO TOP
+===================================================== */
+function scrollToTop(){
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+window.addEventListener('scroll', function(){
+  var btn = document.getElementById('backToTop');
+  if(window.scrollY > 400){
+    btn.classList.add('show');
+  } else {
+    btn.classList.remove('show');
+  }
+});
+
+/* =====================================================
+   SCROLL TO SECTION
+===================================================== */
+function scrollToSection(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('open');
+  setTimeout(function(){
+    el.scrollIntoView({behavior: 'smooth', block: 'start'});
+  }, 100);
+}
+
+/* =====================================================
+   TOC
+===================================================== */
+function buildTOC(){
+  var sections = document.querySelectorAll('.section');
+  var tocGrid = document.getElementById('tocGrid');
+  if(!tocGrid) return;
+
+  tocGrid.innerHTML = Array.prototype.map.call(sections, function(s){
+    var title = s.querySelector('.section-title h3').textContent;
+    var icon = s.querySelector('.section-icon i').className;
+    return '<div class="toc-item" onclick="scrollToSection(\'' + s.id + '\')">' +
+      '<i class="' + icon + '"></i>' +
+      '<span>' + title + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+/* =====================================================
+   SEARCH
+===================================================== */
+function performSearch(query){
+  query = query.trim().toLowerCase();
+  var sections = document.querySelectorAll('.section');
+
+  if(!query){
+    sections.forEach(function(s){
+      s.style.display = '';
+    });
+    return;
+  }
+
+  var found = 0;
+  sections.forEach(function(s){
+    var text = (s.textContent || '').toLowerCase();
+    if(text.indexOf(query) !== -1){
+      s.style.display = '';
+      s.classList.add('open');
+      found++;
+    } else {
+      s.style.display = 'none';
+    }
+  });
+
+  if(found === 0){
+    // ما لقى، رجّع كل شي
+    sections.forEach(function(s){ s.style.display = ''; });
+  }
+}
+
+document.getElementById('searchInput').addEventListener('input', function(){
+  performSearch(this.value);
+});
+
+/* =====================================================
+   OPEN FIRST SECTION
+===================================================== */
+buildTOC();
+
+setTimeout(function(){
+  var first = document.querySelector('.section');
+  if(first) first.classList.add('open');
+}, 100);
+
+/* =====================================================
+   KEYBOARD SHORTCUTS
+===================================================== */
+document.addEventListener('keydown', function(e){
+  var tag = (e.target.tagName || '').toLowerCase();
+  if(tag === 'input' || tag === 'textarea') return;
+
+  // / للبحث
+  if(e.key === '/'){
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+
+  // Esc لمسح البحث
+  if(e.key === 'Escape'){
+    document.getElementById('searchInput').value = '';
+    performSearch('');
+    document.getElementById('searchInput').blur();
+  }
+});
+
+/* =====================================================
+   WELCOME
+===================================================== */
+console.log('%c📖 دليل مِذكَرتي', 'color:#FF7A00;font-size:18px;font-weight:bold');
+console.log('%cاضغط / للبحث', 'color:#8A8A8A;font-size:13px');
+</script>
+</body>
+</html>
