@@ -6754,4 +6754,708 @@ function renderAchievementsPage(el){
       }).join('') +
     '</div>';
 }
-  
+/* =====================================================
+   DAILY CHALLENGE
+===================================================== */
+var CHALLENGE_TYPES = [
+  {type: 'cards', text: 'احفظ {n} بطاقات اليوم', targets: [3, 5, 8], xp: 30},
+  {type: 'review', text: 'راجع {n} دروس اليوم', targets: [1, 2, 3], xp: 40},
+  {type: 'feynman', text: 'افهم {n} درس بتقنية فاينمان', targets: [1, 2], xp: 50},
+  {type: 'new_lesson', text: 'أضف {n} درس جديد', targets: [1, 2], xp: 25},
+  {type: 'pomodoro', text: 'أكمل {n} جلسة بومودورو', targets: [1, 2, 3], xp: 35},
+  {type: 'spaced', text: 'أنجز {n} مراجعة متباعدة', targets: [1, 2], xp: 30}
+];
+
+async function generateDailyChallenge(){
+  if(!currentUser) return;
+  var today = new Date().toISOString().split('T')[0];
+  var existing = state.challenges.find(function(c){ return c.challenge_date === today; });
+  if(existing) return;
+
+  var picked = CHALLENGE_TYPES[Math.floor(Math.random() * CHALLENGE_TYPES.length)];
+  var target = picked.targets[Math.floor(Math.random() * picked.targets.length)];
+  var text = picked.text.replace('{n}', target);
+
+  var result = await sb.from('daily_challenges').insert({
+    user_id: currentUser.id,
+    challenge_date: today,
+    challenge_type: picked.type,
+    challenge_text: text,
+    target: target,
+    xp_reward: picked.xp
+  }).select().single();
+
+  if(result.data) state.challenges.push(result.data);
+}
+
+function renderChallengeBadge(){
+  var today = new Date().toISOString().split('T')[0];
+  var challenge = state.challenges.find(function(c){ return c.challenge_date === today; });
+  var badge = document.getElementById('challengeText');
+  if(!badge) return;
+
+  if(!challenge){
+    badge.textContent = 'ابدأ';
+    return;
+  }
+  if(challenge.completed){
+    badge.textContent = '✅ تم';
+  } else {
+    badge.textContent = challenge.progress + '/' + challenge.target;
+  }
+}
+
+function renderChallengePage(el){
+  var today = new Date().toISOString().split('T')[0];
+  var challenge = state.challenges.find(function(c){ return c.challenge_date === today; });
+
+  var level = state.userStats ? state.userStats.level : 1;
+  var xp = state.userStats ? state.userStats.total_xp : 0;
+  var xpInLevel = xp % 100;
+  var completedCount = state.userStats ? state.userStats.challenges_completed : 0;
+
+  var days7 = getLast7Days();
+  var weekHtml = days7.map(function(d){
+    var c = state.challenges.find(function(x){ return x.challenge_date === d.date; });
+    var done = c && c.completed;
+    return '<div style="text-align:center;flex:1;min-width:44px">' +
+      '<div style="width:40px;height:40px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;' +
+      (done ? 'background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 4px 12px var(--primary-glow)' : 'background:var(--surface);border:1px solid var(--border);color:var(--muted)') + '">' +
+      (done ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-circle" style="font-size:8px"></i>') +
+      '</div>' +
+      '<div style="font-size:10px;color:var(--muted);margin-top:6px;font-weight:600">' + d.label + '</div>' +
+    '</div>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="page-header">' +
+      '<div class="page-header-left">' +
+        '<h1><i class="fa-solid fa-bullseye"></i> التحدي اليومي</h1>' +
+        '<p>أكمل التحديات، اكسب XP، وارتقِ بالمستويات</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;border-radius:var(--radius-md);padding:24px;margin-bottom:20px;text-align:center;box-shadow:0 12px 40px rgba(139,92,246,.4)">' +
+      '<i class="fa-solid fa-star" style="font-size:36px;margin-bottom:10px"></i>' +
+      '<div style="font-size:13px;opacity:.9">المستوى</div>' +
+      '<div style="font-size:52px;font-weight:900;line-height:1">' + level + '</div>' +
+      '<div style="background:rgba(255,255,255,.25);height:10px;border-radius:5px;margin-top:16px;overflow:hidden">' +
+        '<div style="height:100%;width:' + xpInLevel + '%;background:#fff;border-radius:5px;transition:.5s"></div>' +
+      '</div>' +
+      '<div style="font-size:12px;margin-top:8px;opacity:.9">' + xpInLevel + ' / 100 XP — المجموع: ' + xp + ' XP</div>' +
+    '</div>' +
+
+    (challenge ?
+      '<div class="section" style="background:var(--surface);border:2px solid var(--primary);border-radius:var(--radius-md);padding:24px;margin-bottom:16px">' +
+        '<h3 style="font-size:15px;color:var(--primary);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px">' +
+          '<i class="fa-solid fa-flag-checkered"></i> تحدي اليوم' +
+        '</h3>' +
+        '<div style="text-align:center;padding:16px 0">' +
+          '<div style="font-size:18px;font-weight:700;margin-bottom:14px">' + escapeHtml(challenge.challenge_text) + '</div>' +
+          '<div style="font-size:13px;color:var(--muted);margin-bottom:14px">' +
+            'التقدم: <b style="color:var(--primary);font-size:15px">' + challenge.progress + ' / ' + challenge.target + '</b>' +
+          '</div>' +
+          '<div style="background:var(--surface-2);height:14px;border-radius:7px;overflow:hidden;margin-bottom:16px">' +
+            '<div style="height:100%;width:' + Math.min(100, (challenge.progress / challenge.target * 100)) + '%;background:linear-gradient(90deg,var(--primary),var(--primary-dark));border-radius:7px;transition:.5s"></div>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--muted);margin-bottom:18px">' +
+            '<i class="fa-solid fa-gift"></i> المكافأة: <b style="color:var(--primary)">' + challenge.xp_reward + ' XP</b>' +
+          '</div>' +
+          (challenge.completed ?
+            '<div style="color:var(--green);font-size:16px;font-weight:700">' +
+              '<i class="fa-solid fa-check-circle"></i> تم إكمال التحدي! 🎉' +
+            '</div>' :
+            '<button class="btn btn-primary" onclick="progressChallenge()">' +
+              '<i class="fa-solid fa-plus"></i> سجل تقدم' +
+            '</button>') +
+        '</div>' +
+      '</div>' :
+
+      '<div class="empty-state" style="min-height:30vh">' +
+        '<div class="empty-state-icon"><i class="fa-solid fa-bullseye"></i></div>' +
+        '<h2>لا يوجد تحدي اليوم</h2>' +
+        '<p>سيتم إنشاء تحدٍ جديد تلقائياً</p>' +
+      '</div>') +
+
+    '<div class="section" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;margin-bottom:16px">' +
+      '<h3 style="font-size:15px;color:var(--primary);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px">' +
+        '<i class="fa-solid fa-trophy"></i> إحصائياتك' +
+      '</h3>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">' +
+        '<div style="text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px">' +
+          '<i class="fa-solid fa-bullseye" style="font-size:24px;color:var(--primary);margin-bottom:8px;display:inline-block"></i>' +
+          '<div style="font-size:24px;font-weight:900;color:var(--primary)">' + completedCount + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px;font-weight:600">تحديات مكتملة</div>' +
+        '</div>' +
+        '<div style="text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px">' +
+          '<i class="fa-solid fa-star" style="font-size:24px;color:var(--primary);margin-bottom:8px;display:inline-block"></i>' +
+          '<div style="font-size:24px;font-weight:900;color:var(--primary)">' + xp + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px;font-weight:600">مجموع XP</div>' +
+        '</div>' +
+        '<div style="text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px">' +
+          '<i class="fa-solid fa-layer-group" style="font-size:24px;color:var(--primary);margin-bottom:8px;display:inline-block"></i>' +
+          '<div style="font-size:24px;font-weight:900;color:var(--primary)">' + level + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px;font-weight:600">المستوى</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="section" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px">' +
+      '<h3 style="font-size:15px;color:var(--primary);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px">' +
+        '<i class="fa-solid fa-clock-rotate-left"></i> آخر 7 أيام' +
+      '</h3>' +
+      '<div style="display:flex;gap:8px;justify-content:space-around;flex-wrap:wrap">' + weekHtml + '</div>' +
+    '</div>';
+}
+
+function getLast7Days(){
+  var days = ['ح','ن','ث','ر','خ','ج','س'];
+  var result = [];
+  for(var i = 6; i >= 0; i--){
+    var d = new Date(Date.now() - i * 86400000);
+    result.push({
+      date: d.toISOString().split('T')[0],
+      label: days[d.getDay()]
+    });
+  }
+  return result;
+}
+
+async function progressChallenge(){
+  var today = new Date().toISOString().split('T')[0];
+  var challenge = state.challenges.find(function(c){ return c.challenge_date === today; });
+  if(!challenge || challenge.completed) return;
+
+  var newProgress = Math.min(challenge.progress + 1, challenge.target);
+  var completed = newProgress >= challenge.target;
+
+  var result = await sb.from('daily_challenges').update({
+    progress: newProgress,
+    completed: completed
+  }).eq('id', challenge.id).select().single();
+
+  if(result.error){
+    toast('خطأ', 'error');
+    return;
+  }
+
+  challenge.progress = newProgress;
+  challenge.completed = completed;
+
+  if(completed){
+    await addXP(challenge.xp_reward);
+    playSound('complete');
+    bigCelebrate();
+    toast('🎉 أكملت التحدي! +' + challenge.xp_reward + ' XP', 'success');
+  } else {
+    playSound('click');
+  }
+
+  renderChallengeBadge();
+  navigateTo('challenge');
+}
+
+/* =====================================================
+   SETTINGS PAGE / MODAL
+===================================================== */
+function openSettings(section){
+  var body = document.getElementById('settingsBody');
+  if(!body) return;
+
+  body.innerHTML = renderSettingsContent();
+
+  // تطبيق الـ current settings
+  setTimeout(function(){
+    var theme = state.settings.theme;
+    document.querySelectorAll('.theme-option').forEach(function(el){
+      el.classList.toggle('selected', el.dataset.theme === theme);
+    });
+    var font = state.settings.font;
+    document.querySelectorAll('.font-option').forEach(function(el){
+      el.classList.toggle('selected', el.dataset.font === font);
+    });
+  }, 50);
+
+  openModal('settingsModal');
+}
+
+function renderSettingsPage(el){
+  // بدلاً من فتح المودال
+  openSettings();
+  // نبقى على الصفحة الحالية
+}
+
+function renderSettingsContent(){
+  var s = state.settings;
+
+  return (
+    // ===== المظهر =====
+    '<div class="settings-section">' +
+      '<div class="settings-section-head">' +
+        '<div class="settings-section-icon"><i class="fa-solid fa-palette"></i></div>' +
+        '<div class="settings-section-title">' +
+          '<h3>المظهر</h3>' +
+          '<p>خصّص شكل التطبيق حسب ذوقك</p>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="form-group">' +
+        '<label class="form-label">اللون الأساسي</label>' +
+        '<div class="theme-options" id="settingsThemeOptions">' +
+          ['orange','purple','blue','green','pink','gold'].map(function(t){
+            return '<div class="theme-option" data-theme="' + t + '" onclick="changeTheme(\'' + t + '\')"></div>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+
+      '<div class="settings-row">' +
+        '<div class="settings-row-info">' +
+          '<div class="settings-row-label"><i class="fa-solid fa-moon"></i> الوضع الليلي</div>' +
+          '<div class="settings-row-desc">تبديل بين الوضع الليلي والنهاري</div>' +
+        '</div>' +
+        '<label class="switch">' +
+          '<input type="checkbox" ' + (s.mode === 'dark' ? 'checked' : '') + ' onchange="toggleThemeMode()">' +
+          '<span class="switch-track"></span>' +
+        '</label>' +
+      '</div>' +
+
+      '<div class="settings-row">' +
+        '<div class="settings-row-info">' +
+          '<div class="settings-row-label"><i class="fa-solid fa-clock"></i> تبديل تلقائي</div>' +
+          '<div class="settings-row-desc">يتبدل الوضع تلقائياً حسب الوقت</div>' +
+        '</div>' +
+        '<label class="switch">' +
+          '<input type="checkbox" ' + (s.autoTheme ? 'checked' : '') + ' onchange="toggleAutoTheme(this.checked)">' +
+          '<span class="switch-track"></span>' +
+        '</label>' +
+      '</div>' +
+    '</div>' +
+
+    // ===== الخط =====
+    '<div class="settings-section">' +
+      '<div class="settings-section-head">' +
+        '<div class="settings-section-icon"><i class="fa-solid fa-font"></i></div>' +
+        '<div class="settings-section-title">' +
+          '<h3>الخط</h3>' +
+          '<p>اختر الخط المريح لعينك</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="font-options">' +
+        [
+          {name: 'Tajawal', label: 'طجوال — ناعم وحديث'},
+          {name: 'Cairo', label: 'القاهرة — واضح ومتوازن'},
+          {name: 'Almarai', label: 'المراعي — بسيط وأنيق'},
+          {name: 'El Messiri', label: 'المسيري — كلاسيكي'}
+        ].map(function(f){
+          return '<div class="font-option" data-font="' + f.name + '" onclick="changeFont(\'' + f.name + '\')" style="font-family:\'' + f.name + '\',sans-serif">' +
+            '<div class="font-option-preview">مِذكَرتي — ' + f.name + '</div>' +
+            '<div class="font-option-name">' + f.label + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>' +
+
+    // ===== الصوت =====
+    '<div class="settings-section">' +
+      '<div class="settings-section-head">' +
+        '<div class="settings-section-icon"><i class="fa-solid fa-volume-high"></i></div>' +
+        '<div class="settings-section-title">' +
+          '<h3>الصوت</h3>' +
+          '<p>تحكم في الأصوات والتنبيهات</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="settings-row">' +
+        '<div class="settings-row-info">' +
+          '<div class="settings-row-label"><i class="fa-solid fa-bell"></i> تفعيل الأصوات</div>' +
+          '<div class="settings-row-desc">أصوات عند الإنجاز والأزرار</div>' +
+        '</div>' +
+        '<label class="switch">' +
+          '<input type="checkbox" ' + (soundEnabled ? 'checked' : '') + ' onchange="toggleSoundSetting(this.checked)">' +
+          '<span class="switch-track"></span>' +
+        '</label>' +
+      '</div>' +
+    '</div>' +
+
+    // ===== الإشعارات =====
+    '<div class="settings-section">' +
+      '<div class="settings-section-head">' +
+        '<div class="settings-section-icon"><i class="fa-solid fa-bell"></i></div>' +
+        '<div class="settings-section-title">' +
+          '<h3>الإشعارات</h3>' +
+          '<p>تحكم في الإشعارات والتنبيهات</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="settings-row">' +
+        '<div class="settings-row-info">' +
+          '<div class="settings-row-label"><i class="fa-solid fa-bell-on"></i> إشعارات المتصفح</div>' +
+          '<div class="settings-row-desc">تصلك إشعارات المراجعة والامتحانات</div>' +
+        '</div>' +
+        '<label class="switch">' +
+          '<input type="checkbox" ' + (('Notification' in window) && Notification.permission === 'granted' ? 'checked' : '') + ' onchange="toggleNotifPermission(this.checked)">' +
+          '<span class="switch-track"></span>' +
+        '</label>' +
+      '</div>' +
+    '</div>' +
+
+    // ===== البيانات =====
+    '<div class="settings-section">' +
+      '<div class="settings-section-head">' +
+        '<div class="settings-section-icon"><i class="fa-solid fa-database"></i></div>' +
+        '<div class="settings-section-title">' +
+          '<h3>البيانات</h3>' +
+          '<p>تصدير، استيراد، ومسح بياناتك</p>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 0">' +
+        '<button class="btn btn-ghost btn-sm" onclick="exportData()">' +
+          '<i class="fa-solid fa-download"></i> تصدير JSON' +
+        '</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="importData()">' +
+          '<i class="fa-solid fa-upload"></i> استيراد' +
+        '</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="clearCache()">' +
+          '<i class="fa-solid fa-broom"></i> مسح الـ Cache' +
+        '</button>' +
+      '</div>' +
+    '</div>' +
+
+    // ===== الحساب =====
+    '<div class="settings-section">' +
+      '<div class="settings-section-head">' +
+        '<div class="settings-section-icon"><i class="fa-solid fa-user"></i></div>' +
+        '<div class="settings-section-title">' +
+          '<h3>الحساب</h3>' +
+          '<p>معلومات حسابك</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="settings-row">' +
+        '<div class="settings-row-info">' +
+          '<div class="settings-row-label"><i class="fa-solid fa-envelope"></i> الإيميل</div>' +
+          '<div class="settings-row-desc">' + (currentUser ? escapeHtml(currentUser.email) : '-') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="settings-row">' +
+        '<div class="settings-row-info">' +
+          '<div class="settings-row-label"><i class="fa-solid fa-user-astronaut"></i> الصورة الرمزية</div>' +
+          '<div class="settings-row-desc">غيّر صورتك الرمزية</div>' +
+        '</div>' +
+        '<button class="btn btn-ghost btn-sm" onclick="openAvatarModal()">تغيير</button>' +
+      '</div>' +
+    '</div>' +
+
+    // ===== منطقة الخطر =====
+    '<div class="settings-section danger-zone">' +
+      '<div class="settings-section-head">' +
+        '<div class="settings-section-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>' +
+        '<div class="settings-section-title">' +
+          '<h3>منطقة الخطر</h3>' +
+          '<p>عمليات لا يمكن التراجع عنها</p>' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn btn-danger btn-sm" onclick="signOut()" style="margin-top:8px">' +
+        '<i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج' +
+      '</button>' +
+    '</div>' +
+
+    // ===== عن التطبيق =====
+    '<div class="settings-section" style="text-align:center">' +
+      '<div style="color:var(--muted);font-size:12px;line-height:1.8">' +
+        '<div style="font-size:20px;font-weight:900;color:var(--primary);margin-bottom:6px">مِذكَرتي</div>' +
+        '<div>الإصدار 2.0 · صُنع بحب في الجزائر 🇩🇿</div>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function toggleAutoTheme(val){
+  state.settings.autoTheme = val;
+  if(!val) localStorage.setItem('theme_manual', 'true');
+  else localStorage.removeItem('theme_manual');
+  applyTheme();
+  toast(val ? 'التبديل التلقائي مفعّل' : 'التبديل التلقائي معطّل', 'success');
+}
+
+function toggleSoundSetting(val){
+  soundEnabled = val;
+  state.settings.soundEnabled = val;
+  saveSettings();
+  toast(val ? 'الأصوات مفعّلة' : 'الأصوات مكتومة', 'success');
+}
+
+function toggleNotifPermission(val){
+  if(val){
+    if('Notification' in window){
+      Notification.requestPermission().then(function(perm){
+        if(perm === 'granted') toast('تم تفعيل الإشعارات', 'success');
+        else toast('تم رفض الإشعارات', 'warning');
+      });
+    }
+  } else {
+    toast('لإيقاف الإشعارات، ارجع لإعدادات المتصفح', 'info');
+  }
+}
+
+function exportData(){
+  var exportObj = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    user: currentUser ? currentUser.email : null,
+    settings: state.settings,
+    subjects: state.subjects,
+    schedule: state.schedule,
+    grades: state.grades,
+    tasks: state.tasks,
+    notifications: state.notifications,
+    userStats: state.userStats,
+    achievements: JSON.parse(localStorage.getItem('achievements') || '[]')
+  };
+
+  var blob = new Blob([JSON.stringify(exportObj, null, 2)], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'mizkarati_backup_' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('تم تصدير البيانات', 'success');
+}
+
+function importData(){
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try {
+        var data = JSON.parse(ev.target.result);
+        if(!data.subjects){
+          toast('ملف غير صالح', 'error');
+          return;
+        }
+        if(!confirm('استيراد البيانات؟ سيتم دمجها مع البيانات الحالية.')) return;
+
+        // يمكن إضافة عملية الدمج هنا
+        toast('تم قراءة الملف — سيتم الاستيراد قريباً', 'info');
+      } catch(err){
+        toast('خطأ في قراءة الملف', 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function clearCache(){
+  if(!confirm('مسح الـ Cache؟ ستحتاج تحميل بيانات جديدة.')) return;
+  localStorage.removeItem('ai_cache');
+  localStorage.removeItem('mizkarati_settings');
+  toast('تم مسح الـ Cache', 'success');
+  setTimeout(function(){ location.reload(); }, 1000);
+}
+
+/* =====================================================
+   AVATAR
+===================================================== */
+var selectedAvatar = '';
+
+function openAvatarModal(){
+  selectedAvatar = localStorage.getItem('user_avatar_' + currentUser.id) || '';
+  var grid = document.getElementById('avatarGrid');
+  if(!grid) return;
+
+  grid.innerHTML = AVATARS.map(function(a){
+    return '<div style="aspect-ratio:1;border-radius:50%;cursor:pointer;border:3px solid ' + (a === selectedAvatar ? 'var(--primary)' : 'transparent') + ';transition:.2s;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--surface)" ' +
+      'onclick="pickAvatar(\'' + a + '\')" ' +
+      'onmouseover="this.style.transform=\'scale(1.1)\'" ' +
+      'onmouseout="this.style.transform=\'scale(1)\'">' +
+      a +
+    '</div>';
+  }).join('');
+
+  openModal('avatarModal');
+}
+
+function pickAvatar(a){
+  selectedAvatar = a;
+  var grid = document.getElementById('avatarGrid');
+  grid.querySelectorAll('div').forEach(function(el){
+    el.style.border = el.textContent.trim() === a ? '3px solid var(--primary)' : '3px solid transparent';
+  });
+  playSound('click');
+}
+
+function saveAvatar(){
+  if(!selectedAvatar){
+    closeModal('avatarModal');
+    return;
+  }
+  localStorage.setItem('user_avatar_' + currentUser.id, selectedAvatar);
+  renderUserInfo(currentUser);
+  closeModal('avatarModal');
+  playSound('success');
+  toast('تم حفظ الصورة الرمزية', 'success');
+}
+
+/* =====================================================
+   RIGHT PANEL
+===================================================== */
+function renderRightPanel(){
+  var body = document.getElementById('rightPanelBody');
+  if(!body) return;
+
+  var totalLessons = 0, dueCards = 0, memorizedCount = 0;
+  var now = Date.now();
+
+  state.subjects.forEach(function(s){
+    totalLessons += s.lessons.length;
+    s.lessons.forEach(function(l){
+      if(l.status === 'memorized') memorizedCount++;
+      l.cards.forEach(function(c){
+        if(!c.nextReview || c.nextReview <= now) dueCards++;
+      });
+    });
+  });
+
+  var today = new Date().toISOString().split('T')[0];
+  var challenge = state.challenges.find(function(c){ return c.challenge_date === today; });
+
+  body.innerHTML =
+    '<div class="mini-card">' +
+      '<div class="mini-card-title"><i class="fa-solid fa-chart-simple"></i> ملخص سريع</div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;font-size:13px">' +
+        '<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">مواد:</span><span style="font-weight:700">' + state.subjects.length + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">دروس:</span><span style="font-weight:700">' + totalLessons + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">محفوظ:</span><span style="font-weight:700;color:var(--green)">' + memorizedCount + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">بطاقات مستحقة:</span><span style="font-weight:700;color:var(--red)">' + dueCards + '</span></div>' +
+      '</div>' +
+    '</div>' +
+
+    (challenge ?
+      '<div class="mini-card" style="border:1px solid var(--primary)">' +
+        '<div class="mini-card-title"><i class="fa-solid fa-bullseye"></i> تحدي اليوم</div>' +
+        '<div style="font-size:13px;line-height:1.6;margin-bottom:8px">' + escapeHtml(challenge.challenge_text) + '</div>' +
+        '<div style="height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden">' +
+          '<div style="height:100%;width:' + Math.min(100, (challenge.progress / challenge.target * 100)) + '%;background:linear-gradient(90deg,var(--primary),var(--primary-dark));border-radius:4px;transition:.5s"></div>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center">' + challenge.progress + ' / ' + challenge.target + '</div>' +
+      '</div>' : '') +
+
+    '<div class="mini-card">' +
+      '<div class="mini-card-title"><i class="fa-solid fa-lightbulb"></i> نصيحة اليوم</div>' +
+      '<div style="font-size:13px;line-height:1.7;color:var(--text-2)">' +
+        'استعمل تقنية فاينمان: اشرح الدرس بصوت عال كأنك تعلّمه لطفل. إذا ما قدرت تبسطه، يعني ما فهمته بعد.' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="mini-card">' +
+      '<div class="mini-card-title"><i class="fa-solid fa-clock"></i> آخر نشاط</div>' +
+      '<div style="font-size:13px;color:var(--text-2);line-height:1.7">' +
+        (localStorage.getItem('last_study_date') === today ? '✅ درست اليوم' : '📚 لم تدرس اليوم بعد') +
+      '</div>' +
+    '</div>';
+}
+
+/* =====================================================
+   INIT
+===================================================== */
+function init(){
+  loadSettings();
+  applyTheme();
+  renderStreak();
+  updateTasksBadge();
+
+  if(localStorage.getItem('sidebar_collapsed') === 'true'){
+    document.getElementById('sidebar').classList.add('collapsed');
+  }
+
+  // Wallpaper حسب الوقت
+  updateTimeWallpaper();
+  setInterval(updateTimeWallpaper, 30 * 60 * 1000);
+}
+
+/* =====================================================
+   KEYBOARD SHORTCUTS
+===================================================== */
+document.addEventListener('keydown', function(e){
+  var tag = (e.target.tagName || '').toLowerCase();
+  if(tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if(e.target.isContentEditable) return;
+
+  if(e.key === 'Escape'){
+    document.querySelectorAll('.modal-overlay.show').forEach(function(m){
+      m.classList.remove('show');
+    });
+    var d = document.getElementById('dayEventsModal');
+    if(d) d.remove();
+    document.getElementById('notifPanel').classList.remove('show');
+    closePomodoro();
+    closeFlashcards();
+    closeCalculator();
+    return;
+  }
+
+  if(document.getElementById('fcOverlay').classList.contains('show')){
+    if(e.key === ' '){ e.preventDefault(); if(!fcFlipped) flipCard(); }
+    if(fcFlipped){
+      if(e.key === '1') rateCard(1);
+      if(e.key === '2') rateCard(2);
+      if(e.key === '3') rateCard(3);
+    }
+    return;
+  }
+
+  if(e.key === 'n' || e.key === 'N'){
+    if(currentPage === 'subject') openLessonModal();
+    else openSubjectModal();
+  }
+  if(e.key === 's' || e.key === 'S'){ openSubjectModal(); }
+  if(e.key === 't' || e.key === 'T'){ toggleThemeMode(); }
+  if(e.key === 'p' || e.key === 'P'){ openPomodoro(); }
+  if(e.key === 'm' || e.key === 'M'){
+    soundEnabled = !soundEnabled;
+    toast(soundEnabled ? 'الأصوات مفعّلة' : 'الأصوات مكتومة', 'info');
+  }
+  if(e.key === '?'){
+    alert(
+      '⌨️ اختصارات:\n\n' +
+      'N = إضافة جديد\n' +
+      'S = مادة جديدة\n' +
+      'T = تبديل الوضع\n' +
+      'P = بومودورو\n' +
+      'M = كتم الأصوات\n' +
+      'Esc = إغلاق\n' +
+      '? = هذي القائمة\n\n' +
+      'في المراجعة:\n' +
+      'Space = اكشف\n' +
+      '1/2/3 = صعب/متوسط/سهل'
+    );
+  }
+});
+
+/* =====================================================
+   START
+===================================================== */
+init();
+
+// عند إغلاق النافذة، نظف
+window.addEventListener('beforeunload', function(){
+  if(pomoInterval) clearInterval(pomoInterval);
+});
+
+// دعم Network للحالة
+window.addEventListener('online', function(){ toast('عاد الاتصال', 'success'); });
+window.addEventListener('offline', function(){ toast('انقطع الاتصال', 'warning'); });
+
+// PWA
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
