@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#FF7A00">
 <title>لوحة التحكم — مِذكَرتي</title>
 <link rel="icon" type="image/png" href="/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,317 +12,617 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --orange:#FF7A00;
-  --orange-dark:#E65100;
-  --orange-soft:rgba(255,122,0,.08);
-  --bg:#0F0F0F;
-  --bg2:#171717;
-  --card:#1E1E1E;
+  --primary:#FF7A00;
+  --primary-dark:#E65100;
+  --primary-glow:rgba(255,122,0,.25);
+  --primary-soft:rgba(255,122,0,.08);
+  --bg:#0A0A0A;
+  --bg-1:#0F0F0F;
+  --surface:#1E1E1E;
+  --surface-2:#242424;
   --text:#F5F5F5;
-  --muted:#8A8A8A;
-  --border:#2A2A2A;
-  --green:#4CAF50;
-  --red:#F44336;
-  --blue:#2196F3;
+  --text-2:#B0B0B0;
+  --muted:#7A7A7A;
+  --border:rgba(255,255,255,.08);
+  --green:#22C55E;
+  --yellow:#EAB308;
+  --blue:#3B82F6;
+  --red:#EF4444;
   --purple:#8B5CF6;
-  --font:'Tajawal',sans-serif;
+  --font:'Tajawal','Segoe UI',Tahoma,sans-serif;
+  --radius-sm:8px;
+  --radius:12px;
+  --radius-md:16px;
+  --radius-lg:20px;
+  --shadow:0 8px 24px rgba(0,0,0,.4);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.5);
+  --transition:.25s cubic-bezier(.4,0,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
+html,body{height:100%}
 body{
-  background:var(--bg);color:var(--text);min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
   background-image:
-    radial-gradient(circle at 20% 20%,var(--orange-soft) 0%,transparent 40%),
-    radial-gradient(circle at 80% 80%,var(--orange-soft) 0%,transparent 40%);
+    radial-gradient(circle at 20% 20%, var(--primary-soft) 0%, transparent 45%),
+    radial-gradient(circle at 80% 80%, var(--primary-soft) 0%, transparent 45%);
   background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
 }
-.app{display:flex;min-height:100vh}
+button,input,textarea,select{font-family:inherit;font-size:inherit;color:inherit;background:none;border:none;outline:none}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
 
-/* ============ Sidebar ============ */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+
+/* ============ LOADING SCREEN ============ */
+.loading-screen{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  background:var(--bg);
+  z-index:1000;
+}
+.spinner{
+  width:44px;height:44px;
+  border:3px solid var(--border);
+  border-top-color:var(--primary);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+.spinner.sm{width:20px;height:20px;border-width:2px}
+
+/* ============ LOGIN/DENIED SCREEN ============ */
+.center-wrap{
+  display:none;
+  min-height:100vh;
+  align-items:center;justify-content:center;
+  padding:20px;
+}
+.center-wrap.show{display:flex}
+
+.login-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:40px 32px;
+  max-width:440px;width:100%;
+  text-align:center;
+  box-shadow:var(--shadow-lg);
+  animation:popIn .4s;
+}
+.login-icon{
+  width:90px;height:90px;
+  border-radius:26px;margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:40px;
+  box-shadow:0 20px 60px var(--primary-glow);
+  animation:float 3s ease-in-out infinite;
+}
+.login-box h1{
+  color:var(--primary);font-size:26px;font-weight:900;margin-bottom:10px;
+}
+.login-box p{
+  color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:24px;
+}
+.login-box p b{color:var(--primary)}
+
+/* ============ APP LAYOUT ============ */
+.app{
+  display:none;
+  min-height:100vh;
+}
+.app.show{display:flex}
+
+/* ============ SIDEBAR ============ */
 .sidebar{
-  width:260px;background:var(--bg2);border-left:1px solid var(--border);
-  padding:20px;display:flex;flex-direction:column;gap:6px;
-  position:sticky;top:0;height:100vh;overflow-y:auto;
-  transition:.3s;
+  width:260px;
+  background:var(--bg-1);
+  border-left:1px solid var(--border);
+  padding:20px 12px;
+  display:flex;flex-direction:column;gap:6px;
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;
+  flex-shrink:0;
+  transition:transform .3s;
+  z-index:50;
 }
-.sidebar .brand{
-  display:flex;align-items:center;gap:10px;margin-bottom:20px;
-  padding-bottom:18px;border-bottom:1px solid var(--border);
+.brand{
+  display:flex;align-items:center;gap:12px;
+  padding:0 8px 18px;
+  margin-bottom:8px;
+  border-bottom:1px solid var(--border);
 }
-.sidebar .brand .logo{
-  width:42px;height:42px;border-radius:12px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--orange),var(--orange-dark));
+.brand-icon{
+  width:44px;height:44px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
   display:flex;align-items:center;justify-content:center;
   color:#fff;font-size:20px;
-  box-shadow:0 6px 20px rgba(255,122,0,.35);
+  flex-shrink:0;
+  box-shadow:0 6px 20px var(--primary-glow);
 }
-.sidebar .brand h1{font-size:16px;color:var(--orange);font-weight:900;line-height:1.2}
-.sidebar .brand small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
+.brand-text h1{font-size:16px;color:var(--primary);font-weight:900;line-height:1.2}
+.brand-text small{font-size:11px;color:var(--muted);display:block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+
 .nav-item{
-  padding:12px 14px;border-radius:10px;cursor:pointer;
-  display:flex;align-items:center;gap:10px;
-  font-size:14px;font-weight:600;color:var(--muted);
-  transition:.2s;text-decoration:none;
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;
+  border-radius:var(--radius);
+  font-size:14px;font-weight:600;
+  color:var(--text-2);
+  cursor:pointer;
+  transition:var(--transition);
+  user-select:none;
 }
-.nav-item:hover{background:var(--card);color:var(--text)}
-.nav-item.active{background:var(--orange);color:#fff;box-shadow:0 4px 15px rgba(255,122,0,.4)}
-.nav-item i{width:20px;text-align:center;font-size:15px}
-.sidebar-footer{margin-top:auto;padding-top:20px;border-top:1px solid var(--border)}
+.nav-item i{width:20px;text-align:center;font-size:16px;flex-shrink:0}
+.nav-item:hover{
+  background:var(--surface);color:var(--text);
+  transform:translateX(-3px);
+}
+.nav-item:hover i{color:var(--primary)}
+.nav-item.active{
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  box-shadow:0 6px 20px var(--primary-glow);
+}
+.nav-item.active i{color:#fff}
 
-/* ============ Main ============ */
-.main{flex:1;padding:26px;overflow-y:auto;min-width:0}
+.sidebar-footer{
+  margin-top:auto;
+  padding-top:16px;
+  border-top:1px solid var(--border);
+}
+
+/* ============ MAIN ============ */
+.main{
+  flex:1;
+  padding:24px;
+  overflow-x:hidden;
+  min-width:0;
+}
+
+/* Mobile topbar */
+.mobile-topbar{
+  display:none;
+  position:sticky;top:0;
+  background:var(--bg-1);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px;
+  z-index:40;
+  margin:-24px -24px 16px;
+  align-items:center;
+  gap:12px;
+}
+.mobile-menu-btn{
+  width:40px;height:40px;
+  border-radius:var(--radius-sm);
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.mobile-topbar-title{flex:1;font-weight:700;font-size:15px}
+
+/* Page header */
 .page-head{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:22px;flex-wrap:wrap;gap:12px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:24px;flex-wrap:wrap;
 }
-.page-head h2{font-size:22px;font-weight:800;color:var(--orange);display:flex;align-items:center;gap:10px}
-.page-head p{color:var(--muted);font-size:13px;margin-top:4px}
+.page-head h2{
+  font-size:24px;font-weight:900;color:var(--primary);
+  display:flex;align-items:center;gap:12px;
+}
+.page-head h2 i{font-size:22px}
+.page-head p{color:var(--muted);font-size:13px;margin-top:6px}
 
-/* ============ Cards ============ */
+/* ============ CARDS ============ */
 .card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:16px;padding:22px;margin-bottom:18px;
-  transition:.2s;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:22px;
+  margin-bottom:18px;
+  transition:var(--transition);
+  animation:slideUp .3s ease-out backwards;
 }
 .card:hover{border-color:rgba(255,122,0,.3)}
 .card h3{
-  font-size:16px;color:var(--orange);margin-bottom:16px;
-  display:flex;align-items:center;gap:10px;font-weight:700;
-}
-
-/* ============ Form ============ */
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.form-grid.full{grid-template-columns:1fr}
-label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
-input,select,textarea{
-  width:100%;padding:11px 14px;border-radius:10px;
-  border:1px solid var(--border);background:var(--bg);
-  color:var(--text);font-size:14px;font-family:var(--font);
-  outline:none;transition:.2s;
-}
-input:focus,select:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
-textarea{min-height:100px;resize:vertical;line-height:1.7}
-
-/* ============ Buttons ============ */
-.btn{
-  padding:11px 20px;border:none;border-radius:10px;
-  cursor:pointer;font-size:14px;font-weight:700;
-  transition:.2s;display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--font);
-}
-.btn-primary{background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff;box-shadow:0 4px 15px rgba(255,122,0,.3)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(255,122,0,.5)}
-.btn-ghost{background:var(--bg);color:var(--text);border:1px solid var(--border)}
-.btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
-.btn-danger{background:var(--red);color:#fff}
-.btn-danger:hover{opacity:.9;transform:translateY(-1px)}
-.btn-sm{padding:8px 14px;font-size:12px}
-
-/* ============ List Items ============ */
-.item{
-  background:var(--bg);border:1px solid var(--border);
-  border-radius:12px;padding:14px;margin-bottom:10px;
-  display:flex;gap:14px;align-items:flex-start;
-  transition:.2s;
-}
-.item:hover{border-color:var(--orange);transform:translateX(-2px)}
-.item .icon{
-  width:40px;height:40px;border-radius:10px;
-  background:var(--orange-soft);color:var(--orange);
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;flex-shrink:0;
-}
-.item .body{flex:1;min-width:0}
-.item .body .title{font-weight:700;margin-bottom:4px}
-.item .body .meta{font-size:12px;color:var(--muted);line-height:1.6}
-.item .actions{display:flex;gap:6px;flex-shrink:0}
-
-/* ============ Empty ============ */
-.empty-box{text-align:center;padding:40px 20px;color:var(--muted)}
-.empty-box i{font-size:40px;color:var(--orange);opacity:.4;margin-bottom:12px;display:block}
-.empty-box p{font-size:14px}
-
-/* ============ Loading / Login ============ */
-.center-wrap{
-  display:flex;align-items:center;justify-content:center;
-  min-height:100vh;padding:20px;
-}
-.login-box{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:20px;padding:40px;max-width:440px;width:100%;
-  text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);
-}
-.login-box .icon-big{
-  width:80px;height:80px;border-radius:24px;margin:0 auto 20px;
-  background:linear-gradient(135deg,var(--orange),var(--orange-dark));
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:36px;
-  animation:float 3s ease-in-out infinite;
-}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.login-box h1{color:var(--orange);font-size:24px;margin-bottom:8px;font-weight:900}
-.login-box p{color:var(--muted);font-size:13px;margin-bottom:24px;line-height:1.8}
-.login-box .back-link{
-  display:inline-flex;align-items:center;gap:6px;margin-top:20px;
-  color:var(--orange);text-decoration:none;font-size:13px;font-weight:600;
-  padding:8px 14px;border-radius:8px;transition:.2s;
-}
-.login-box .back-link:hover{background:var(--orange-soft)}
-
-/* ============ Alerts ============ */
-.alert{
-  padding:14px;border-radius:12px;margin-bottom:16px;
-  display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.6;
-}
-.alert.info{background:rgba(33,150,243,.1);border:1px solid rgba(33,150,243,.3);color:#64B5F6}
-.alert.success{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.3);color:#81C784}
-.alert.error{background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);color:#EF9A9A}
-.alert i{margin-top:2px}
-
-/* ============ Stats Grid ============ */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
-.stat-card{
-  background:var(--bg);border:1px solid var(--border);
-  border-radius:14px;padding:20px;text-align:center;
-  transition:.2s;
-}
-.stat-card:hover{border-color:var(--orange);transform:translateY(-3px)}
-.stat-card i{
-  font-size:26px;color:var(--orange);margin-bottom:10px;
-  width:52px;height:52px;border-radius:14px;
-  background:var(--orange-soft);display:inline-flex;
-  align-items:center;justify-content:center;
-}
-.stat-card .num{font-size:28px;font-weight:900;color:var(--orange);line-height:1}
-.stat-card .lbl{font-size:13px;color:var(--muted);margin-top:8px;font-weight:600}
-
-/* ============ Badge ============ */
-.badge{
-  font-size:11px;padding:3px 9px;border-radius:20px;font-weight:700;
-  background:var(--orange-soft);color:var(--orange);
-  display:inline-block;
-}
-.badge.high{background:rgba(244,67,54,.15);color:#EF9A9A}
-.badge.green{background:rgba(76,175,80,.15);color:#81C784}
-
-/* ============ Toast ============ */
-.toast{
-  position:fixed;bottom:20px;left:20px;
-  background:linear-gradient(135deg,var(--orange),var(--orange-dark));
-  color:#fff;padding:14px 22px;border-radius:12px;
-  font-size:14px;font-weight:600;z-index:300;
-  transform:translateY(100px);opacity:0;transition:.3s;
+  font-size:16px;color:var(--primary);font-weight:700;
+  margin-bottom:16px;
   display:flex;align-items:center;gap:10px;
-  box-shadow:0 10px 30px rgba(255,122,0,.5);
-  max-width:calc(100vw - 40px);
+}
+.card h3 i{
+  width:32px;height:32px;
+  border-radius:9px;
+  background:var(--primary-soft);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+}
+
+/* ============ FORMS ============ */
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:12px;
+}
+.form-grid.full{grid-template-columns:1fr}
+.form-group{margin-bottom:14px}
+.form-group:last-child{margin-bottom:0}
+label{
+  display:block;font-size:13px;color:var(--muted);
+  font-weight:600;margin-bottom:6px;
+}
+input,select,textarea{
+  width:100%;padding:11px 14px;
+  border-radius:var(--radius);
+  border:1.5px solid var(--border);
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;font-weight:500;
+  font-family:var(--font);
+  transition:var(--transition);
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px var(--primary-soft);
+}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+textarea{min-height:100px;resize:vertical;line-height:1.7}
+select{
+  cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:left 16px center;
+  padding-left:40px;
+}
+
+/* ============ BUTTONS ============ */
+.btn{
+  padding:11px 20px;
+  border-radius:var(--radius);
+  font-size:14px;font-weight:700;
+  font-family:var(--font);
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;
+  transition:var(--transition);
+  border:none;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  box-shadow:0 6px 20px var(--primary-glow);
+}
+.btn-primary:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 10px 28px var(--primary-glow);
+}
+.btn-ghost{
+  background:var(--bg);
+  color:var(--text);
+  border:1.5px solid var(--border);
+}
+.btn-ghost:hover:not(:disabled){
+  border-color:var(--primary);
+  color:var(--primary);
+  background:var(--primary-soft);
+}
+.btn-danger{
+  background:var(--red);
+  color:#fff;
+  box-shadow:0 6px 20px rgba(239,68,68,.3);
+}
+.btn-danger:hover:not(:disabled){
+  transform:translateY(-2px);
+}
+.btn-sm{padding:8px 14px;font-size:12px}
+.btn-sm i{font-size:11px}
+.btn-block{width:100%}
+
+/* ============ ALERT ============ */
+.alert{
+  padding:14px 16px;
+  border-radius:var(--radius);
+  margin-bottom:16px;
+  display:flex;gap:12px;align-items:flex-start;
+  font-size:13px;line-height:1.6;
+}
+.alert i{margin-top:2px;font-size:15px;flex-shrink:0}
+.alert.info{
+  background:rgba(59,130,246,.08);
+  border:1px solid rgba(59,130,246,.25);
+  color:#93C5FD;
+}
+.alert.success{
+  background:rgba(34,197,94,.08);
+  border:1px solid rgba(34,197,94,.25);
+  color:#86EFAC;
+}
+.alert.error{
+  background:rgba(239,68,68,.08);
+  border:1px solid rgba(239,68,68,.25);
+  color:#FCA5A5;
+}
+
+/* ============ LIST ITEMS ============ */
+.item{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  margin-bottom:10px;
+  display:flex;gap:14px;align-items:flex-start;
+  transition:var(--transition);
+}
+.item:hover{
+  border-color:var(--primary);
+  transform:translateX(-3px);
+}
+.item-icon{
+  width:42px;height:42px;
+  border-radius:10px;
+  background:var(--primary-soft);
+  color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;
+  flex-shrink:0;
+}
+.item-body{flex:1;min-width:0}
+.item-title{font-weight:700;font-size:14px;margin-bottom:5px;word-wrap:break-word}
+.item-meta{font-size:12px;color:var(--muted);line-height:1.6;display:flex;gap:12px;flex-wrap:wrap}
+.item-meta span{display:inline-flex;align-items:center;gap:5px}
+.item-actions{display:flex;gap:6px;flex-shrink:0}
+.item-delete{
+  width:34px;height:34px;
+  border-radius:var(--radius-sm);
+  background:rgba(239,68,68,.1);
+  color:var(--red);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:var(--transition);
+  border:none;font-size:14px;
+}
+.item-delete:hover{
+  background:var(--red);color:#fff;
+  transform:scale(1.1);
+}
+
+/* ============ EMPTY STATE ============ */
+.empty-box{
+  text-align:center;
+  padding:48px 24px;
+  color:var(--muted);
+}
+.empty-box i{
+  font-size:48px;
+  opacity:.3;
+  display:block;margin-bottom:14px;
+  color:var(--primary);
+}
+.empty-box p{font-size:14px;line-height:1.7}
+
+/* ============ STATS GRID ============ */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:14px;
+}
+.stat-card{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px 16px;
+  text-align:center;
+  transition:var(--transition);
+  position:relative;
+  overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+  transform:scaleX(0);transition:.3s;
+}
+.stat-card:hover{
+  border-color:var(--primary);
+  transform:translateY(-4px);
+  box-shadow:var(--shadow);
+}
+.stat-card:hover::before{transform:scaleX(1)}
+.stat-card i{
+  font-size:28px;color:var(--primary);
+  margin-bottom:12px;
+  width:56px;height:56px;
+  border-radius:14px;
+  background:var(--primary-soft);
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.stat-card .num{
+  font-size:30px;font-weight:900;color:var(--primary);line-height:1;
+}
+.stat-card .lbl{
+  font-size:12px;color:var(--muted);margin-top:8px;font-weight:600;
+}
+
+/* ============ TOAST ============ */
+.toast{
+  position:fixed;
+  bottom:24px;left:24px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  padding:14px 20px;
+  border-radius:var(--radius);
+  font-size:14px;font-weight:600;
+  z-index:300;
+  transform:translateY(120px);
+  opacity:0;
+  transition:var(--transition);
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 12px 40px var(--primary-glow);
+  max-width:calc(100vw - 48px);
 }
 .toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:linear-gradient(135deg,var(--green),#15803D)}
+.toast.error{background:linear-gradient(135deg,var(--red),#B91C1C)}
+.toast.warning{background:linear-gradient(135deg,var(--yellow),#B45309);color:#000}
 
-/* ============ Mobile Menu ============ */
-.menu-btn{
-  display:none;position:fixed;top:14px;left:14px;z-index:100;
-  width:44px;height:44px;border-radius:12px;border:1px solid var(--border);
-  background:var(--bg2);color:var(--orange);cursor:pointer;
-  align-items:center;justify-content:center;font-size:18px;
-  box-shadow:0 4px 15px rgba(0,0,0,.4);
+/* ============ BADGES ============ */
+.badge{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:10px;
+  font-weight:700;
+  background:var(--primary-soft);
+  color:var(--primary);
+  margin-right:6px;
 }
+.badge.high{background:rgba(239,68,68,.15);color:#FCA5A5}
+.badge.green{background:rgba(34,197,94,.15);color:#86EFAC}
+.badge.blue{background:rgba(59,130,246,.15);color:#93C5FD}
+.badge.purple{background:rgba(139,92,246,.15);color:#C4B5FD}
 
-/* ============ Scrollbar ============ */
-::-webkit-scrollbar{width:8px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
-::-webkit-scrollbar-thumb:hover{background:var(--orange)}
-
-/* ============ Media ============ */
-@media(max-width:768px){
+/* ============ MOBILE ============ */
+@media (max-width:768px){
   .sidebar{
-    position:fixed;right:0;top:0;height:100vh;z-index:50;
-    transform:translateX(100%);transition:.3s;width:280px;
+    position:fixed;right:0;top:0;height:100vh;
+    transform:translateX(100%);
+    z-index:60;
+    width:280px;max-width:88vw;
     box-shadow:-10px 0 40px rgba(0,0,0,.6);
   }
   .sidebar.show{transform:translateX(0)}
-  .main{padding:16px;padding-top:70px}
-  .menu-btn{display:flex}
-  .page-head h2{font-size:18px}
+  .mobile-topbar{display:flex}
+  .main{padding:16px}
+  .page-head h2{font-size:20px;gap:8px}
+  .page-head h2 i{font-size:18px}
+  .page-head p{font-size:12px}
   .card{padding:16px}
+  .card h3{font-size:14px}
+  .card h3 i{width:28px;height:28px;font-size:12px}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat-card{padding:14px 10px}
+  .stat-card i{font-size:22px;width:44px;height:44px;margin-bottom:8px}
+  .stat-card .num{font-size:22px}
+  .stat-card .lbl{font-size:11px}
   .form-grid{grid-template-columns:1fr}
+  .toast{bottom:auto;top:16px;left:12px;right:12px;transform:translateY(-120px)}
+  .toast.show{transform:translateY(0)}
+  .item{padding:12px}
+  .item-icon{width:36px;height:36px;font-size:15px}
+  .item-title{font-size:13px}
+  .item-meta{font-size:11px;gap:8px}
 }
 </style>
 </head>
 <body>
 
-<!-- ========== LOADING ========== -->
-<div id="loading" class="center-wrap">
-  <div style="text-align:center">
-    <i class="fa-solid fa-spinner" style="font-size:48px;color:var(--orange);animation:spin 1s linear infinite"></i>
-    <p style="color:var(--muted);margin-top:16px;font-size:14px">جاري التحقق من الصلاحيات...</p>
-  </div>
+<!-- ============ LOADING SCREEN ============ -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+  <p style="color:var(--muted);font-size:13px">جاري التحقق من الصلاحيات...</p>
 </div>
 
-<!-- ========== ACCESS DENIED / LOGIN ========== -->
-<div id="accessDenied" class="center-wrap" style="display:none">
+<!-- ============ LOGIN/DENIED ============ -->
+<div class="center-wrap" id="deniedWrap">
   <div class="login-box">
-    <div class="icon-big"><i class="fa-solid fa-shield-halved"></i></div>
-    <h1>لوحة التحكم</h1>
-    <p id="deniedMessage">هذي الصفحة للمشرفين فقط.<br>سجّل دخول بحسابك المصرّح.</p>
-    <button id="signInBtn" class="btn btn-primary" style="width:100%;justify-content:center" onclick="signIn()">
+    <div class="login-icon"><i class="fa-solid fa-shield-halved"></i></div>
+    <h1 id="deniedTitle">لوحة التحكم</h1>
+    <p id="deniedMsg">هذي الصفحة للمشرفين فقط.<br>سجّل دخول بحساب مصرّح.</p>
+    <button class="btn btn-primary btn-block" id="signInBtn" onclick="signIn()">
       <i class="fa-brands fa-google"></i> تسجيل الدخول بجوجل
     </button>
-    <a href="/" class="back-link">
+    <a href="/" style="display:inline-flex;align-items:center;gap:8px;margin-top:20px;color:var(--primary);font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;transition:.2s" onmouseover="this.style.background='var(--primary-soft)'" onmouseout="this.style.background='transparent'">
       <i class="fa-solid fa-arrow-right"></i> رجوع للموقع
     </a>
   </div>
 </div>
 
-<!-- ========== ADMIN PANEL ========== -->
-<div id="adminPanel" class="app" style="display:none">
-  <button class="menu-btn" onclick="document.getElementById('adminSidebar').classList.toggle('show')">
-    <i class="fa-solid fa-bars"></i>
-  </button>
+<!-- ============ ADMIN APP ============ -->
+<div class="app" id="adminApp">
 
-  <aside class="sidebar" id="adminSidebar">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="logo"><i class="fa-solid fa-shield-halved"></i></div>
-      <div>
+      <div class="brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="brand-text">
         <h1>لوحة التحكم</h1>
-        <small id="adminEmail">admin@studymate</small>
+        <small id="adminEmail">admin</small>
       </div>
     </div>
 
-    <div class="nav-item active" data-page="exams" onclick="switchPage('exams')">
-      <i class="fa-solid fa-file-pen"></i> الامتحانات
-    </div>
-    <div class="nav-item" data-page="news" onclick="switchPage('news')">
-      <i class="fa-solid fa-newspaper"></i> الأخبار
+    <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')">
+      <i class="fa-solid fa-gauge-high"></i>
+      <span>الرئيسية</span>
     </div>
     <div class="nav-item" data-page="announcements" onclick="switchPage('announcements')">
-      <i class="fa-solid fa-bullhorn"></i> الإعلانات
+      <i class="fa-solid fa-bullhorn"></i>
+      <span>الإعلانات</span>
+    </div>
+    <div class="nav-item" data-page="news" onclick="switchPage('news')">
+      <i class="fa-solid fa-newspaper"></i>
+      <span>الأخبار</span>
+    </div>
+    <div class="nav-item" data-page="exams" onclick="switchPage('exams')">
+      <i class="fa-solid fa-file-pen"></i>
+      <span>الامتحانات</span>
     </div>
     <div class="nav-item" data-page="stats" onclick="switchPage('stats')">
-      <i class="fa-solid fa-chart-line"></i> الإحصائيات
+      <i class="fa-solid fa-chart-line"></i>
+      <span>الإحصائيات</span>
     </div>
     <div class="nav-item" data-page="admins" onclick="switchPage('admins')">
-      <i class="fa-solid fa-users-gear"></i> المشرفون
+      <i class="fa-solid fa-users-gear"></i>
+      <span>المشرفون</span>
     </div>
 
     <div class="sidebar-footer">
       <a href="/" class="nav-item">
-        <i class="fa-solid fa-house"></i> الموقع الرئيسي
+        <i class="fa-solid fa-house"></i>
+        <span>الموقع الرئيسي</span>
       </a>
       <div class="nav-item" onclick="signOut()">
-        <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>تسجيل الخروج</span>
       </div>
     </div>
   </aside>
 
-  <main class="main" id="mainContent"></main>
+  <!-- Main -->
+  <main class="main">
+    <div class="mobile-topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="mobile-topbar-title" id="mobileTitle">لوحة التحكم</div>
+    </div>
+
+    <div id="content"></div>
+  </main>
+
 </div>
 
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
 /* =====================================================
-   SUPABASE CONFIG
+   SUPABASE
 ===================================================== */
 var SUPABASE_URL = 'https://ncrycgbrstafdouvipzc.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_6t2dkU27Rkinsoo8MhYAEQ_FSgj4G73';
@@ -329,104 +630,121 @@ var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 var currentUser = null;
 var isAdmin = false;
-var currentPage = 'exams';
-var data = { exams: [], news: [], announcements: [], admins: [], stats: {} };
+var currentPage = 'dashboard';
+var data = {
+  announcements: [],
+  news: [],
+  exams: [],
+  admins: [],
+  stats: {}
+};
 
 /* =====================================================
    HELPERS
 ===================================================== */
-function toast(msg, icon){
-  icon = icon || 'fa-check-circle';
+function toast(msg, type){
+  type = type || 'success';
   var t = document.getElementById('toast');
-  t.innerHTML = '<i class="fa-solid ' + icon + '"></i> <span>' + msg + '</span>';
+  var icons = {success:'fa-check-circle', error:'fa-triangle-exclamation', warning:'fa-exclamation-circle'};
+  t.className = 'toast ' + type;
+  t.innerHTML = '<i class="fa-solid ' + (icons[type]||icons.success) + '"></i> ' + escapeHtml(msg);
   t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
 
 function escapeHtml(s){
-  return (s || '').replace(/[&<>"]/g, function(c){
+  return (s||'').replace(/[&<>"]/g, function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
   });
 }
 
 function fmtDate(s){
-  try {
-    var d = new Date(s);
-    return d.toLocaleDateString('ar-DZ', {year:'numeric', month:'long', day:'numeric'});
-  } catch(e){ return s; }
+  try{ return new Date(s).toLocaleDateString('ar-DZ'); }catch(e){ return ''; }
 }
 
 function fmtDateTime(s){
-  try {
+  try{
     var d = new Date(s);
-    return d.toLocaleDateString('ar-DZ') + ' - ' + d.toLocaleTimeString('ar-DZ', {hour:'2-digit', minute:'2-digit'});
-  } catch(e){ return s; }
+    return d.toLocaleDateString('ar-DZ') + ' · ' + d.toLocaleTimeString('ar-DZ',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){ return ''; }
+}
+
+function timeAgo(ts){
+  var diff = Date.now() - ts;
+  var m = Math.floor(diff/60000);
+  if(m < 1) return 'الآن';
+  if(m < 60) return 'قبل ' + m + ' دقيقة';
+  var h = Math.floor(m/60);
+  if(h < 24) return 'قبل ' + h + ' ساعة';
+  var d = Math.floor(h/24);
+  return 'قبل ' + d + ' يوم';
 }
 
 /* =====================================================
    AUTH
 ===================================================== */
 async function signIn(){
-  var result = await sb.auth.signInWithOAuth({
+  await sb.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: window.location.href }
   });
-  if(result.error) alert('خطأ: ' + result.error.message);
 }
 
 async function signOut(){
   if(!confirm('تسجيل الخروج؟')) return;
   await sb.auth.signOut();
-  location.reload();
+  location.href = '/';
 }
 
 async function checkAdmin(user){
-  var result = await sb.from('admins').select('id').eq('user_id', user.id).maybeSingle();
-  return !!result.data;
+  try {
+    var r = await sb.from('admins').select('id').eq('user_id', user.id).maybeSingle();
+    return !!r.data;
+  } catch(e){
+    return false;
+  }
 }
 
 function showLoading(){
-  document.getElementById('loading').style.display = 'flex';
-  document.getElementById('accessDenied').style.display = 'none';
-  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('loadingScreen').style.display = 'flex';
+  document.getElementById('deniedWrap').classList.remove('show');
+  document.getElementById('adminApp').classList.remove('show');
 }
 
-function showDenied(message, showSignIn){
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('accessDenied').style.display = 'flex';
-  document.getElementById('adminPanel').style.display = 'none';
-  if(message) document.getElementById('deniedMessage').innerHTML = message;
-  document.getElementById('signInBtn').style.display = showSignIn ? 'inline-flex' : 'none';
+function showDenied(msg){
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('deniedWrap').classList.add('show');
+  document.getElementById('adminApp').classList.remove('show');
+  if(msg) document.getElementById('deniedMsg').innerHTML = msg;
 }
 
-function showPanel(user){
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('accessDenied').style.display = 'none';
-  document.getElementById('adminPanel').style.display = 'flex';
+function showApp(user){
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('deniedWrap').classList.remove('show');
+  document.getElementById('adminApp').classList.add('show');
   document.getElementById('adminEmail').textContent = user.email || 'admin';
 }
 
+/* ============ AUTH STATE ============ */
 sb.auth.onAuthStateChange(async function(event, session){
-  showLoading();
+  if(event === 'PASSWORD_RECOVERY') return;
+
   if(session && session.user){
     currentUser = session.user;
     var admin = await checkAdmin(session.user);
     if(admin){
       isAdmin = true;
-      showPanel(session.user);
+      showApp(session.user);
       await loadAllData();
-      renderPage();
+      switchPage('dashboard');
     } else {
-      isAdmin = false;
-      showDenied(
-        'إيميلك <b style="color:var(--orange)">' + escapeHtml(session.user.email) + '</b><br>مو مسجل كمشرف في النظام.<br>تواصل مع المسؤول لإضافتك.',
-        false
-      );
+      showDenied('إيميلك <b>' + escapeHtml(session.user.email) + '</b><br>مو مسجل كمشرف في النظام.');
+      document.getElementById('signInBtn').style.display = 'none';
     }
   } else {
     currentUser = null;
     isAdmin = false;
-    showDenied(null, true);
+    showDenied();
   }
 });
 
@@ -436,296 +754,157 @@ sb.auth.onAuthStateChange(async function(event, session){
 async function loadAllData(){
   try {
     var results = await Promise.all([
-      sb.from('exams').select('*').order('exam_date', {ascending:true}),
-      sb.from('news').select('*').order('created_at', {ascending:false}),
       sb.from('announcements').select('*').order('created_at', {ascending:false}),
+      sb.from('news').select('*').order('created_at', {ascending:false}),
+      sb.from('exams').select('*').order('exam_date', {ascending:true}),
       sb.from('admins').select('*').order('created_at', {ascending:false})
     ]);
-    data.exams = results[0].data || [];
+    data.announcements = results[0].data || [];
     data.news = results[1].data || [];
-    data.announcements = results[2].data || [];
+    data.exams = results[2].data || [];
     data.admins = results[3].data || [];
   } catch(e){
-    console.error('Load error:', e);
-    toast('خطأ في تحميل البيانات', 'fa-triangle-exclamation');
+    console.error(e);
   }
 }
 
 /* =====================================================
    NAVIGATION
 ===================================================== */
+var PAGE_TITLES = {
+  dashboard: 'لوحة التحكم',
+  announcements: 'الإعلانات',
+  news: 'الأخبار',
+  exams: 'الامتحانات',
+  stats: 'الإحصائيات',
+  admins: 'المشرفون'
+};
+
 function switchPage(page){
   currentPage = page;
-  document.querySelectorAll('.nav-item').forEach(function(el){
+  document.querySelectorAll('.nav-item[data-page]').forEach(function(el){
     el.classList.toggle('active', el.dataset.page === page);
   });
-  document.getElementById('adminSidebar').classList.remove('show');
+  document.getElementById('mobileTitle').textContent = PAGE_TITLES[page] || 'لوحة التحكم';
+  document.getElementById('sidebar').classList.remove('show');
   renderPage();
 }
 
+function toggleMobileSidebar(){
+  document.getElementById('sidebar').classList.toggle('show');
+}
+
 function renderPage(){
-  var main = document.getElementById('mainContent');
-  if(currentPage === 'exams') renderExams(main);
-  else if(currentPage === 'news') renderNews(main);
-  else if(currentPage === 'announcements') renderAnnouncements(main);
-  else if(currentPage === 'stats') renderStats(main);
-  else if(currentPage === 'admins') renderAdmins(main);
+  var c = document.getElementById('content');
+  if(currentPage === 'dashboard') renderDashboard(c);
+  else if(currentPage === 'announcements') renderAnnouncements(c);
+  else if(currentPage === 'news') renderNews(c);
+  else if(currentPage === 'exams') renderExams(c);
+  else if(currentPage === 'stats') renderStats(c);
+  else if(currentPage === 'admins') renderAdmins(c);
 }
 
 /* =====================================================
-   EXAMS
+   DASHBOARD
 ===================================================== */
-function renderExams(main){
-  main.innerHTML =
+function renderDashboard(el){
+  el.innerHTML =
     '<div class="page-head">' +
       '<div>' +
-        '<h2><i class="fa-solid fa-file-pen"></i> الامتحانات والفروض</h2>' +
-        '<p>أضف مواعيد الامتحانات لتظهر لكل المستخدمين</p>' +
+        '<h2><i class="fa-solid fa-gauge-high"></i> لوحة التحكم</h2>' +
+        '<p>مرحباً ' + escapeHtml(currentUser.email) + '</p>' +
       '</div>' +
     '</div>' +
 
     '<div class="alert info">' +
       '<i class="fa-solid fa-info-circle"></i>' +
-      '<span>الامتحانات راح تظهر لكل المستخدمين في صفحة "التقويم" تلقائياً.</span>' +
+      '<span>من هنا تقدر تنشر إعلانات وأخبار لكل المستخدمين، وتضيف مواعيد الامتحانات والفروض.</span>' +
     '</div>' +
 
-    '<div class="card">' +
-      '<h3><i class="fa-solid fa-plus"></i> إضافة امتحان جديد</h3>' +
-      '<div class="form-grid">' +
-        '<div><label>العنوان</label><input id="exTitle" placeholder="مثال: فرض الرياضيات"></div>' +
-        '<div><label>المادة</label><input id="exSubject" placeholder="مثال: رياضيات"></div>' +
-        '<div><label>التاريخ</label><input type="date" id="exDate"></div>' +
-        '<div><label>الوقت</label><input id="exTime" placeholder="مثال: 8:00 - 10:00"></div>' +
-        '<div><label>المستوى</label>' +
-          '<select id="exLevel">' +
-            '<option value="1AM">1 متوسط</option>' +
-            '<option value="2AM">2 متوسط</option>' +
-            '<option value="3AM">3 متوسط</option>' +
-            '<option value="4AM" selected>4 متوسط</option>' +
-            '<option value="all">الكل</option>' +
-          '</select>' +
-        '</div>' +
+    '<div class="stats-grid">' +
+      '<div class="stat-card">' +
+        '<i class="fa-solid fa-bullhorn"></i>' +
+        '<div class="num">' + data.announcements.length + '</div>' +
+        '<div class="lbl">إعلان</div>' +
       '</div>' +
-      '<div style="margin-top:12px">' +
-        '<label>ملاحظات (اختياري)</label>' +
-        '<textarea id="exNotes" placeholder="مثال: يشمل الوحدة 1 و 2"></textarea>' +
+      '<div class="stat-card">' +
+        '<i class="fa-solid fa-newspaper"></i>' +
+        '<div class="num">' + data.news.length + '</div>' +
+        '<div class="lbl">خبر</div>' +
       '</div>' +
-      '<div style="margin-top:14px">' +
-        '<button class="btn btn-primary" onclick="addExam()">' +
-          '<i class="fa-solid fa-check"></i> إضافة الامتحان' +
+      '<div class="stat-card">' +
+        '<i class="fa-solid fa-file-pen"></i>' +
+        '<div class="num">' + data.exams.length + '</div>' +
+        '<div class="lbl">امتحان</div>' +
+      '</div>' +
+      '<div class="stat-card">' +
+        '<i class="fa-solid fa-users-gear"></i>' +
+        '<div class="num">' + data.admins.length + '</div>' +
+        '<div class="lbl">مشرف</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="card" style="margin-top:20px">' +
+      '<h3><i class="fa-solid fa-bolt"></i> إجراءات سريعة</h3>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<button class="btn btn-primary" onclick="switchPage(\'announcements\')">' +
+          '<i class="fa-solid fa-bullhorn"></i> إرسال إعلان' +
+        '</button>' +
+        '<button class="btn btn-ghost" onclick="switchPage(\'news\')">' +
+          '<i class="fa-solid fa-newspaper"></i> نشر خبر' +
+        '</button>' +
+        '<button class="btn btn-ghost" onclick="switchPage(\'exams\')">' +
+          '<i class="fa-solid fa-file-pen"></i> إضافة امتحان' +
         '</button>' +
       '</div>' +
     '</div>' +
 
     '<div class="card">' +
-      '<h3><i class="fa-solid fa-list"></i> الامتحانات (' + data.exams.length + ')</h3>' +
-      (data.exams.length === 0 ?
-        '<div class="empty-box"><i class="fa-solid fa-file-pen"></i><p>لا امتحانات بعد</p></div>' :
-        data.exams.map(function(e){
+      '<h3><i class="fa-solid fa-clock-rotate-left"></i> آخر الإعلانات</h3>' +
+      (data.announcements.length === 0 ?
+        '<div class="empty-box"><i class="fa-solid fa-bullhorn"></i><p>لا إعلانات بعد</p></div>' :
+        data.announcements.slice(0,3).map(function(a){
           return '<div class="item">' +
-            '<div class="icon"><i class="fa-solid fa-file-pen"></i></div>' +
-            '<div class="body">' +
-              '<div class="title">' + escapeHtml(e.title) + '</div>' +
-              '<div class="meta">' +
-                '<i class="fa-regular fa-calendar"></i> ' + fmtDate(e.exam_date) +
-                (e.exam_time ? ' · <i class="fa-regular fa-clock"></i> ' + escapeHtml(e.exam_time) : '') +
-                (e.subject ? ' · ' + escapeHtml(e.subject) : '') +
-                (e.level ? ' · ' + e.level : '') +
-              '</div>' +
-              (e.notes ? '<div class="meta" style="margin-top:6px"><i class="fa-solid fa-note-sticky"></i> ' + escapeHtml(e.notes) + '</div>' : '') +
-            '</div>' +
-            '<div class="actions">' +
-              '<button class="btn btn-danger btn-sm" onclick="delExam(\'' + e.id + '\')" title="حذف">' +
-                '<i class="fa-solid fa-trash"></i>' +
-              '</button>' +
+            '<div class="item-icon"><i class="fa-solid fa-bullhorn"></i></div>' +
+            '<div class="item-body">' +
+              '<div class="item-title">' + escapeHtml(a.title) + '</div>' +
+              '<div class="item-meta"><span><i class="fa-regular fa-clock"></i> ' + timeAgo(new Date(a.created_at).getTime()) + '</span></div>' +
             '</div>' +
           '</div>';
-        }).join('')
-      ) +
+        }).join('')) +
     '</div>';
-}
-
-async function addExam(){
-  var title = document.getElementById('exTitle').value.trim();
-  var subject = document.getElementById('exSubject').value.trim();
-  var exam_date = document.getElementById('exDate').value;
-  var exam_time = document.getElementById('exTime').value.trim();
-  var level = document.getElementById('exLevel').value;
-  var notes = document.getElementById('exNotes').value.trim();
-
-  if(!title || !exam_date){
-    toast('العنوان والتاريخ مطلوبين', 'fa-triangle-exclamation');
-    return;
-  }
-
-  var result = await sb.from('exams').insert({
-    title: title, subject: subject, exam_date: exam_date,
-    exam_time: exam_time, level: level, notes: notes
-  }).select().single();
-
-  if(result.error){
-    toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation');
-    return;
-  }
-
-  data.exams.push(result.data);
-  data.exams.sort(function(a,b){ return new Date(a.exam_date) - new Date(b.exam_date); });
-  toast('تمت إضافة الامتحان بنجاح');
-  renderPage();
-}
-
-async function delExam(id){
-  if(!confirm('حذف هذا الامتحان؟')) return;
-  var result = await sb.from('exams').delete().eq('id', id);
-  if(result.error){ toast('خطأ في الحذف', 'fa-triangle-exclamation'); return; }
-  data.exams = data.exams.filter(function(e){ return e.id !== id; });
-  toast('تم الحذف');
-  renderPage();
-}
-
-/* =====================================================
-   NEWS
-===================================================== */
-function renderNews(main){
-  main.innerHTML =
-    '<div class="page-head">' +
-      '<div>' +
-        '<h2><i class="fa-solid fa-newspaper"></i> الأخبار</h2>' +
-        '<p>انشر أخباراً تعليمية تظهر لكل المستخدمين</p>' +
-      '</div>' +
-    '</div>' +
-
-    '<div class="card">' +
-      '<h3><i class="fa-solid fa-plus"></i> إضافة خبر جديد</h3>' +
-      '<div class="form-grid">' +
-        '<div><label>العنوان</label><input id="nwTitle" placeholder="عنوان الخبر"></div>' +
-        '<div><label>الأيقونة</label>' +
-          '<select id="nwIcon">' +
-            '<option value="fa-newspaper">📰 صحيفة</option>' +
-            '<option value="fa-bullhorn">📢 إعلان</option>' +
-            '<option value="fa-calendar-check">📅 موعد</option>' +
-            '<option value="fa-star">⭐ مهم</option>' +
-            '<option value="fa-info-circle">ℹ️ معلومة</option>' +
-            '<option value="fa-graduation-cap">🎓 تعليمي</option>' +
-            '<option value="fa-trophy">🏆 إنجاز</option>' +
-            '<option value="fa-heart">❤️ تشجيع</option>' +
-          '</select>' +
-        '</div>' +
-        '<div><label>الأهمية</label>' +
-          '<select id="nwPriority">' +
-            '<option value="normal">عادي</option>' +
-            '<option value="high">مهم</option>' +
-          '</select>' +
-        '</div>' +
-      '</div>' +
-      '<div style="margin-top:12px">' +
-        '<label>المحتوى</label>' +
-        '<textarea id="nwContent" placeholder="اكتب الخبر كاملاً..."></textarea>' +
-      '</div>' +
-      '<div style="margin-top:14px">' +
-        '<button class="btn btn-primary" onclick="addNews()">' +
-          '<i class="fa-solid fa-paper-plane"></i> نشر الخبر' +
-        '</button>' +
-      '</div>' +
-    '</div>' +
-
-    '<div class="card">' +
-      '<h3><i class="fa-solid fa-list"></i> الأخبار المنشورة (' + data.news.length + ')</h3>' +
-      (data.news.length === 0 ?
-        '<div class="empty-box"><i class="fa-solid fa-newspaper"></i><p>لا أخبار بعد</p></div>' :
-        data.news.map(function(n){
-          return '<div class="item">' +
-            '<div class="icon"><i class="fa-solid ' + escapeHtml(n.icon || 'fa-newspaper') + '"></i></div>' +
-            '<div class="body">' +
-              '<div class="title">' + escapeHtml(n.title) +
-                (n.priority === 'high' ? ' <span class="badge high">مهم</span>' : '') +
-              '</div>' +
-              '<div class="meta" style="margin-top:6px">' +
-                escapeHtml(n.content).substring(0, 200) +
-                (n.content.length > 200 ? '...' : '') +
-              '</div>' +
-              '<div class="meta" style="margin-top:6px">' +
-                '<i class="fa-regular fa-clock"></i> ' + fmtDateTime(n.created_at) +
-              '</div>' +
-            '</div>' +
-            '<div class="actions">' +
-              '<button class="btn btn-danger btn-sm" onclick="delNews(\'' + n.id + '\')" title="حذف">' +
-                '<i class="fa-solid fa-trash"></i>' +
-              '</button>' +
-            '</div>' +
-          '</div>';
-        }).join('')
-      ) +
-    '</div>';
-}
-
-async function addNews(){
-  var title = document.getElementById('nwTitle').value.trim();
-  var content = document.getElementById('nwContent').value.trim();
-  var icon = document.getElementById('nwIcon').value;
-  var priority = document.getElementById('nwPriority').value;
-
-  if(!title || !content){
-    toast('العنوان والمحتوى مطلوبين', 'fa-triangle-exclamation');
-    return;
-  }
-
-  var result = await sb.from('news').insert({
-    title: title, content: content, icon: icon, priority: priority
-  }).select().single();
-
-  if(result.error){
-    toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation');
-    return;
-  }
-
-  data.news.unshift(result.data);
-  toast('تم نشر الخبر بنجاح');
-  renderPage();
-}
-
-async function delNews(id){
-  if(!confirm('حذف هذا الخبر؟')) return;
-  var result = await sb.from('news').delete().eq('id', id);
-  if(result.error){ toast('خطأ في الحذف', 'fa-triangle-exclamation'); return; }
-  data.news = data.news.filter(function(n){ return n.id !== id; });
-  toast('تم الحذف');
-  renderPage();
 }
 
 /* =====================================================
    ANNOUNCEMENTS
 ===================================================== */
-function renderAnnouncements(main){
-  main.innerHTML =
+function renderAnnouncements(el){
+  el.innerHTML =
     '<div class="page-head">' +
       '<div>' +
         '<h2><i class="fa-solid fa-bullhorn"></i> الإعلانات</h2>' +
-        '<p>أرسل إشعاراً يظهر لكل المستخدمين</p>' +
+        '<p>أرسل إعلاناً يظهر لكل المستخدمين في الإشعارات</p>' +
       '</div>' +
     '</div>' +
 
     '<div class="alert info">' +
       '<i class="fa-solid fa-info-circle"></i>' +
-      '<span>الإعلان راح يظهر كمصدر إشعار لكل مستخدم عند دخوله القادم للموقع.</span>' +
+      '<span>الإعلان راح يوصل لكل المستخدمين في إشعاراتهم عند دخولهم القادم.</span>' +
     '</div>' +
 
     '<div class="card">' +
       '<h3><i class="fa-solid fa-paper-plane"></i> إرسال إعلان جديد</h3>' +
-      '<div class="form-grid full">' +
-        '<div><label>عنوان الإعلان</label>' +
-          '<input id="anTitle" placeholder="مثال: تحديث مهم للجدول">' +
-        '</div>' +
+      '<div class="form-group">' +
+        '<label>عنوان الإعلان</label>' +
+        '<input type="text" id="annTitle" placeholder="مثال: تحديث مهم للجدول" maxlength="80">' +
       '</div>' +
-      '<div style="margin-top:12px">' +
+      '<div class="form-group">' +
         '<label>نص الرسالة</label>' +
-        '<textarea id="anMessage" placeholder="اكتب رسالتك هنا..."></textarea>' +
+        '<textarea id="annMsg" placeholder="اكتب رسالتك هنا..." maxlength="500"></textarea>' +
       '</div>' +
-      '<div style="margin-top:14px">' +
-        '<button class="btn btn-primary" onclick="addAnnouncement()">' +
-          '<i class="fa-solid fa-bullhorn"></i> إرسال للجميع' +
-        '</button>' +
-      '</div>' +
+      '<button class="btn btn-primary btn-block" onclick="addAnnouncement()">' +
+        '<i class="fa-solid fa-bullhorn"></i> إرسال للجميع' +
+      '</button>' +
     '</div>' +
 
     '<div class="card">' +
@@ -734,272 +913,396 @@ function renderAnnouncements(main){
         '<div class="empty-box"><i class="fa-solid fa-bullhorn"></i><p>لا إعلانات بعد</p></div>' :
         data.announcements.map(function(a){
           return '<div class="item">' +
-            '<div class="icon"><i class="fa-solid fa-bullhorn"></i></div>' +
-            '<div class="body">' +
-              '<div class="title">' + escapeHtml(a.title) + '</div>' +
-              '<div class="meta" style="margin-top:6px">' + escapeHtml(a.message) + '</div>' +
-              '<div class="meta" style="margin-top:6px">' +
-                '<i class="fa-regular fa-clock"></i> ' + fmtDateTime(a.created_at) +
-              '</div>' +
+            '<div class="item-icon"><i class="fa-solid fa-bullhorn"></i></div>' +
+            '<div class="item-body">' +
+              '<div class="item-title">' + escapeHtml(a.title) + '</div>' +
+              '<div class="item-meta" style="margin-top:6px;color:var(--text-2)">' + escapeHtml(a.message) + '</div>' +
+              '<div class="item-meta" style="margin-top:6px"><span><i class="fa-regular fa-clock"></i> ' + fmtDateTime(a.created_at) + '</span></div>' +
             '</div>' +
-            '<div class="actions">' +
-              '<button class="btn btn-danger btn-sm" onclick="delAnnouncement(\'' + a.id + '\')" title="حذف">' +
+            '<div class="item-actions">' +
+              '<button class="item-delete" onclick="delAnnouncement(\'' + a.id + '\')" title="حذف">' +
                 '<i class="fa-solid fa-trash"></i>' +
               '</button>' +
             '</div>' +
           '</div>';
-        }).join('')
-      ) +
+        }).join('')) +
     '</div>';
 }
 
 async function addAnnouncement(){
-  var title = document.getElementById('anTitle').value.trim();
-  var message = document.getElementById('anMessage').value.trim();
+  var title = document.getElementById('annTitle').value.trim();
+  var msg = document.getElementById('annMsg').value.trim();
+  if(!title || !msg){ toast('املأ العنوان والرسالة', 'warning'); return; }
 
-  if(!title || !message){
-    toast('العنوان والرسالة مطلوبين', 'fa-triangle-exclamation');
-    return;
-  }
+  var r = await sb.from('announcements').insert({title:title, message:msg}).select().single();
+  if(r.error){ toast('خطأ: ' + r.error.message, 'error'); return; }
 
-  var result = await sb.from('announcements').insert({
-    title: title, message: message
-  }).select().single();
-
-  if(result.error){
-    toast('خطأ: ' + result.error.message, 'fa-triangle-exclamation');
-    return;
-  }
-
-  data.announcements.unshift(result.data);
-  toast('تم الإرسال لكل المستخدمين');
-  renderPage();
+  data.announcements.unshift(r.data);
+  toast('تم الإرسال للجميع');
+  switchPage('announcements');
 }
 
 async function delAnnouncement(id){
   if(!confirm('حذف هذا الإعلان؟')) return;
-  var result = await sb.from('announcements').delete().eq('id', id);
-  if(result.error){ toast('خطأ في الحذف', 'fa-triangle-exclamation'); return; }
+  await sb.from('announcements').delete().eq('id', id);
   data.announcements = data.announcements.filter(function(a){ return a.id !== id; });
   toast('تم الحذف');
-  renderPage();
+  switchPage('announcements');
 }
 
 /* =====================================================
-   ADMINS MANAGEMENT
+   NEWS
 ===================================================== */
-function renderAdmins(main){
-  main.innerHTML =
+function renderNews(el){
+  el.innerHTML =
     '<div class="page-head">' +
       '<div>' +
-        '<h2><i class="fa-solid fa-users-gear"></i> المشرفون</h2>' +
-        '<p>أضف أو احذف المشرفين للوحة التحكم</p>' +
+        '<h2><i class="fa-solid fa-newspaper"></i> الأخبار</h2>' +
+        '<p>انشر أخباراً تعليمية تظهر في إشعارات المستخدمين</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-plus"></i> نشر خبر جديد</h3>' +
+      '<div class="form-group">' +
+        '<label>عنوان الخبر</label>' +
+        '<input type="text" id="newsTitle" placeholder="عنوان الخبر" maxlength="80">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label>المحتوى</label>' +
+        '<textarea id="newsContent" placeholder="اكتب الخبر كاملاً..." maxlength="1000"></textarea>' +
+      '</div>' +
+      '<div class="form-grid">' +
+        '<div class="form-group">' +
+          '<label>الأيقونة</label>' +
+          '<select id="newsIcon">' +
+            '<option value="fa-newspaper">📰 صحيفة</option>' +
+            '<option value="fa-bullhorn">📢 إعلان</option>' +
+            '<option value="fa-calendar-check">📅 موعد</option>' +
+            '<option value="fa-star">⭐ مهم</option>' +
+            '<option value="fa-info-circle">ℹ️ معلومة</option>' +
+            '<option value="fa-graduation-cap">🎓 تعليمي</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>الأهمية</label>' +
+          '<select id="newsPriority">' +
+            '<option value="normal">عادي</option>' +
+            '<option value="high">مهم</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn btn-primary btn-block" onclick="addNews()">' +
+        '<i class="fa-solid fa-paper-plane"></i> نشر الخبر' +
+      '</button>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-list"></i> الأخبار المنشورة (' + data.news.length + ')</h3>' +
+      (data.news.length === 0 ?
+        '<div class="empty-box"><i class="fa-solid fa-newspaper"></i><p>لا أخبار بعد</p></div>' :
+        data.news.map(function(n){
+          var icon = n.icon || 'fa-newspaper';
+          return '<div class="item">' +
+            '<div class="item-icon"><i class="fa-solid ' + icon + '"></i></div>' +
+            '<div class="item-body">' +
+              '<div class="item-title">' + escapeHtml(n.title) +
+                (n.priority === 'high' ? ' <span class="badge high">مهم</span>' : '') +
+              '</div>' +
+              '<div class="item-meta" style="margin-top:6px;color:var(--text-2)">' + escapeHtml(n.content).substring(0, 150) + (n.content.length > 150 ? '...' : '') + '</div>' +
+              '<div class="item-meta" style="margin-top:6px"><span><i class="fa-regular fa-clock"></i> ' + fmtDateTime(n.created_at) + '</span></div>' +
+            '</div>' +
+            '<div class="item-actions">' +
+              '<button class="item-delete" onclick="delNews(\'' + n.id + '\')" title="حذف">' +
+                '<i class="fa-solid fa-trash"></i>' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        }).join('')) +
+    '</div>';
+}
+
+async function addNews(){
+  var title = document.getElementById('newsTitle').value.trim();
+  var content = document.getElementById('newsContent').value.trim();
+  var icon = document.getElementById('newsIcon').value;
+  var priority = document.getElementById('newsPriority').value;
+  if(!title || !content){ toast('املأ العنوان والمحتوى', 'warning'); return; }
+
+  var r = await sb.from('news').insert({title:title, content:content, icon:icon, priority:priority}).select().single();
+  if(r.error){ toast('خطأ: ' + r.error.message, 'error'); return; }
+
+  data.news.unshift(r.data);
+  toast('تم نشر الخبر');
+  switchPage('news');
+}
+
+async function delNews(id){
+  if(!confirm('حذف هذا الخبر؟')) return;
+  await sb.from('news').delete().eq('id', id);
+  data.news = data.news.filter(function(n){ return n.id !== id; });
+  toast('تم الحذف');
+  switchPage('news');
+}
+
+/* =====================================================
+   EXAMS
+===================================================== */
+function renderExams(el){
+  el.innerHTML =
+    '<div class="page-head">' +
+      '<div>' +
+        '<h2><i class="fa-solid fa-file-pen"></i> الامتحانات</h2>' +
+        '<p>أضف مواعيد الفروض والاختبارات لتظهر في التقويم</p>' +
       '</div>' +
     '</div>' +
 
     '<div class="alert info">' +
       '<i class="fa-solid fa-info-circle"></i>' +
-      '<span>المشرف لازم يكون <b>سجّل دخول في الموقع</b> قبل ما تضيفه. ابحث عن إيميله في قائمة المستخدمين.</span>' +
+      '<span>الامتحان راح يظهر لكل المستخدمين في التقويم تلقائياً.</span>' +
     '</div>' +
 
     '<div class="card">' +
-      '<h3><i class="fa-solid fa-user-plus"></i> إضافة مشرف جديد</h3>' +
-      '<div class="form-grid full">' +
-        '<div><label>إيميل المشرف</label>' +
-          '<input id="admEmail" type="email" placeholder="example@gmail.com">' +
+      '<h3><i class="fa-solid fa-calendar-plus"></i> إضافة امتحان جديد</h3>' +
+      '<div class="form-grid">' +
+        '<div class="form-group">' +
+          '<label>العنوان</label>' +
+          '<input type="text" id="examTitle" placeholder="مثال: فرض الرياضيات" maxlength="80">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>المادة</label>' +
+          '<input type="text" id="examSubject" placeholder="مثال: رياضيات" maxlength="40">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>التاريخ</label>' +
+          '<input type="date" id="examDate">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>الوقت (اختياري)</label>' +
+          '<input type="text" id="examTime" placeholder="مثال: 8:00 - 10:00" maxlength="30">' +
         '</div>' +
       '</div>' +
-      '<div style="margin-top:14px">' +
-        '<button class="btn btn-primary" onclick="addAdmin()">' +
-          '<i class="fa-solid fa-plus"></i> إضافة كمشرف' +
-        '</button>' +
-      '</div>' +
+      '<button class="btn btn-primary btn-block" onclick="addExam()">' +
+        '<i class="fa-solid fa-plus"></i> إضافة الامتحان' +
+      '</button>' +
     '</div>' +
 
     '<div class="card">' +
-      '<h3><i class="fa-solid fa-list"></i> المشرفون الحاليون (' + data.admins.length + ')</h3>' +
-      (data.admins.length === 0 ?
-        '<div class="empty-box"><i class="fa-solid fa-users-gear"></i><p>لا مشرفين بعد</p></div>' :
-        data.admins.map(function(a){
-          var isMe = currentUser && a.user_id === currentUser.id;
+      '<h3><i class="fa-solid fa-list"></i> الامتحانات (' + data.exams.length + ')</h3>' +
+      (data.exams.length === 0 ?
+        '<div class="empty-box"><i class="fa-solid fa-file-pen"></i><p>لا امتحانات بعد</p></div>' :
+        data.exams.map(function(ex){
           return '<div class="item">' +
-            '<div class="icon"><i class="fa-solid fa-user-shield"></i></div>' +
-            '<div class="body">' +
-              '<div class="title">' + escapeHtml(a.email) +
-                (isMe ? ' <span class="badge green">أنت</span>' : '') +
-              '</div>' +
-              '<div class="meta">' +
-                '<i class="fa-regular fa-clock"></i> أضيف: ' + fmtDateTime(a.created_at) +
+            '<div class="item-icon"><i class="fa-solid fa-file-pen"></i></div>' +
+            '<div class="item-body">' +
+              '<div class="item-title">' + escapeHtml(ex.title) + '</div>' +
+              '<div class="item-meta">' +
+                '<span><i class="fa-regular fa-calendar"></i> ' + fmtDate(ex.exam_date) + '</span>' +
+                (ex.exam_time ? '<span><i class="fa-regular fa-clock"></i> ' + escapeHtml(ex.exam_time) + '</span>' : '') +
+                (ex.subject ? '<span>' + escapeHtml(ex.subject) + '</span>' : '') +
               '</div>' +
             '</div>' +
-            '<div class="actions">' +
-              (isMe ? '' :
-                '<button class="btn btn-danger btn-sm" onclick="delAdmin(\'' + a.id + '\', \'' + escapeHtml(a.email) + '\')" title="حذف">' +
-                  '<i class="fa-solid fa-trash"></i>' +
-                '</button>') +
+            '<div class="item-actions">' +
+              '<button class="item-delete" onclick="delExam(\'' + ex.id + '\')" title="حذف">' +
+                '<i class="fa-solid fa-trash"></i>' +
+              '</button>' +
             '</div>' +
           '</div>';
-        }).join('')
-      ) +
+        }).join('')) +
     '</div>';
 }
 
-async function addAdmin(){
-  var email = document.getElementById('admEmail').value.trim().toLowerCase();
-  if(!email || email.indexOf('@') === -1){
-    toast('اكتب إيميل صحيح', 'fa-triangle-exclamation');
-    return;
-  }
+async function addExam(){
+  var title = document.getElementById('examTitle').value.trim();
+  var subject = document.getElementById('examSubject').value.trim();
+  var date = document.getElementById('examDate').value;
+  var time = document.getElementById('examTime').value.trim();
+  if(!title || !date){ toast('املأ العنوان والتاريخ', 'warning'); return; }
 
-  // ابحث عن المستخدم في auth.users
-  // ملاحظة: ما نقدر نوصل لـ auth.users مباشرة، لكن نقدر نبحث في subjects
-  // بدلاً من ذلك، نطلب من المستخدم إنه سجل دخول، ونضيفه بـ user_id
+  var r = await sb.from('exams').insert({
+    title:title, subject:subject, exam_date:date, exam_time:time, level:'4AM', notes:''
+  }).select().single();
 
-  // للأسف Supabase ما يسمح بالوصول لـ auth.users من الواجهة
-  // الحل: الأدمن الحالي يضيف الإيميل، والمستخدم يسجل دخول بعدين
-  // لكن الـ user_id ما نعرفه إلا بعد تسجيل الدخول
+  if(r.error){ toast('خطأ: ' + r.error.message, 'error'); return; }
 
-  toast('هذي الميزة تحتاج إعداد إضافي في Supabase', 'fa-triangle-exclamation');
-  alert(
-    '📌 لإضافة مشرف جديد:\n\n' +
-    '1. اطلب من المشرف يسجل دخول في الموقع مرة وحدة\n' +
-    '2. روح Supabase → SQL Editor\n' +
-    '3. شغّل:\n\n' +
-    "insert into admins (user_id, email)\n" +
-    "select id, email from auth.users\n" +
-    "where email = '" + email + "';\n\n" +
-    '4. ارجع هنا واعمل تحديث للصفحة'
-  );
+  data.exams.push(r.data);
+  data.exams.sort(function(a,b){ return new Date(a.exam_date) - new Date(b.exam_date); });
+  toast('تمت إضافة الامتحان');
+  switchPage('exams');
 }
 
-async function delAdmin(id, email){
-  if(!confirm('حذف "' + email + '" من المشرفين؟')) return;
-  var result = await sb.from('admins').delete().eq('id', id);
-  if(result.error){ toast('خطأ في الحذف', 'fa-triangle-exclamation'); return; }
-  data.admins = data.admins.filter(function(a){ return a.id !== id; });
+async function delExam(id){
+  if(!confirm('حذف هذا الامتحان؟')) return;
+  await sb.from('exams').delete().eq('id', id);
+  data.exams = data.exams.filter(function(e){ return e.id !== id; });
   toast('تم الحذف');
-  renderPage();
+  switchPage('exams');
 }
 
 /* =====================================================
    STATS
 ===================================================== */
-async function renderStats(main){
-  main.innerHTML =
+async function renderStats(el){
+  el.innerHTML =
     '<div class="page-head">' +
       '<div>' +
         '<h2><i class="fa-solid fa-chart-line"></i> إحصائيات الموقع</h2>' +
         '<p>نظرة عامة على استخدام الموقع</p>' +
       '</div>' +
     '</div>' +
-    '<div id="statsContent">' +
+    '<div id="statsBody">' +
       '<div class="empty-box">' +
-        '<i class="fa-solid fa-spinner" style="animation:spin 1s linear infinite"></i>' +
+        '<i class="fa-solid fa-spinner" style="animation:spin 1s linear infinite;opacity:1"></i>' +
         '<p>جاري تحميل الإحصائيات...</p>' +
       '</div>' +
     '</div>';
 
   try {
-    var results = await Promise.all([
-      sb.from('subjects').select('*'),
-      sb.from('lessons').select('*'),
-      sb.from('cards').select('*'),
-      sb.from('notifications').select('*'),
-      sb.from('grades').select('*'),
-      sb.from('tasks').select('*')
+    var r = await Promise.all([
+      sb.from('subjects').select('user_id, id'),
+      sb.from('lessons').select('user_id, status, id'),
+      sb.from('cards').select('user_id, id'),
+      sb.from('tasks').select('user_id, id'),
+      sb.from('grades').select('user_id, id'),
+      sb.from('notifications').select('id')
     ]);
 
-    var subjects = results[0].data || [];
-    var lessons = results[1].data || [];
-    var cards = results[2].data || [];
-    var notifications = results[3].data || [];
-    var grades = results[4].data || [];
-    var tasks = results[5].data || [];
+    var subjects = r[0].data || [];
+    var lessons = r[1].data || [];
+    var cards = r[2].data || [];
+    var tasks = r[3].data || [];
+    var grades = r[4].data || [];
+    var notifications = r[5].data || [];
 
     var usersSet = {};
-    subjects.forEach(function(s){ if(s.user_id) usersSet[s.user_id] = true; });
-    lessons.forEach(function(l){ if(l.user_id) usersSet[l.user_id] = true; });
-    cards.forEach(function(c){ if(c.user_id) usersSet[c.user_id] = true; });
+    [subjects, lessons, cards, tasks, grades].forEach(function(arr){
+      arr.forEach(function(x){ if(x.user_id) usersSet[x.user_id] = true; });
+    });
     var usersCount = Object.keys(usersSet).length;
 
     var memorized = lessons.filter(function(l){ return l.status === 'memorized'; }).length;
 
-    var content = document.getElementById('statsContent');
-    content.innerHTML =
+    document.getElementById('statsBody').innerHTML =
       '<div class="stats-grid">' +
-        '<div class="stat-card">' +
-          '<i class="fa-solid fa-users"></i>' +
-          '<div class="num">' + usersCount + '</div>' +
-          '<div class="lbl">مستخدم نشط</div>' +
-        '</div>' +
-        '<div class="stat-card">' +
-          '<i class="fa-solid fa-book"></i>' +
-          '<div class="num">' + subjects.length + '</div>' +
-          '<div class="lbl">مادة إجمالاً</div>' +
-        '</div>' +
-        '<div class="stat-card">' +
-          '<i class="fa-solid fa-file-lines"></i>' +
-          '<div class="num">' + lessons.length + '</div>' +
-          '<div class="lbl">درس إجمالاً</div>' +
-        '</div>' +
-        '<div class="stat-card">' +
-          '<i class="fa-solid fa-circle-check"></i>' +
-          '<div class="num">' + memorized + '</div>' +
-          '<div class="lbl">درس محفوظ</div>' +
-        '</div>' +
-        '<div class="stat-card">' +
-          '<i class="fa-solid fa-layer-group"></i>' +
-          '<div class="num">' + cards.length + '</div>' +
-          '<div class="lbl">بطاقة حفظ</div>' +
-        '</div>' +
-        '<div class="stat-card">' +
-          '<i class="fa-solid fa-bell"></i>' +
-          '<div class="num">' + notifications.length + '</div>' +
-          '<div class="lbl">إشعار</div>' +
-        '</div>' +
-        '<div class="stat-card">' +
-          '<i class="fa-solid fa-calculator"></i>' +
-          '<div class="num">' + grades.length + '</div>' +
-          '<div class="lbl">علامة مسجلة</div>' +
-        '</div>' +
-        '<div class="stat-card">' +
-          '<i class="fa-solid fa-list-check"></i>' +
-          '<div class="num">' + tasks.length + '</div>' +
-          '<div class="lbl">مهمة</div>' +
-        '</div>' +
-      '</div>' +
-
-      '<div class="card" style="margin-top:20px">' +
-        '<h3><i class="fa-solid fa-database"></i> محتوى الأدمن</h3>' +
-        '<div class="stats-grid">' +
-          '<div class="stat-card">' +
-            '<i class="fa-solid fa-file-pen"></i>' +
-            '<div class="num">' + data.exams.length + '</div>' +
-            '<div class="lbl">امتحان</div>' +
-          '</div>' +
-          '<div class="stat-card">' +
-            '<i class="fa-solid fa-newspaper"></i>' +
-            '<div class="num">' + data.news.length + '</div>' +
-            '<div class="lbl">خبر</div>' +
-          '</div>' +
-          '<div class="stat-card">' +
-            '<i class="fa-solid fa-bullhorn"></i>' +
-            '<div class="num">' + data.announcements.length + '</div>' +
-            '<div class="lbl">إعلان</div>' +
-          '</div>' +
-          '<div class="stat-card">' +
-            '<i class="fa-solid fa-users-gear"></i>' +
-            '<div class="num">' + data.admins.length + '</div>' +
-            '<div class="lbl">مشرف</div>' +
-          '</div>' +
-        '</div>' +
+        '<div class="stat-card"><i class="fa-solid fa-users"></i><div class="num">' + usersCount + '</div><div class="lbl">مستخدم نشط</div></div>' +
+        '<div class="stat-card"><i class="fa-solid fa-book"></i><div class="num">' + subjects.length + '</div><div class="lbl">مادة</div></div>' +
+        '<div class="stat-card"><i class="fa-solid fa-file-lines"></i><div class="num">' + lessons.length + '</div><div class="lbl">درس</div></div>' +
+        '<div class="stat-card"><i class="fa-solid fa-circle-check"></i><div class="num">' + memorized + '</div><div class="lbl">درس محفوظ</div></div>' +
+        '<div class="stat-card"><i class="fa-solid fa-layer-group"></i><div class="num">' + cards.length + '</div><div class="lbl">بطاقة</div></div>' +
+        '<div class="stat-card"><i class="fa-solid fa-list-check"></i><div class="num">' + tasks.length + '</div><div class="lbl">مهمة</div></div>' +
+        '<div class="stat-card"><i class="fa-solid fa-calculator"></i><div class="num">' + grades.length + '</div><div class="lbl">علامة</div></div>' +
+        '<div class="stat-card"><i class="fa-solid fa-bell"></i><div class="num">' + notifications.length + '</div><div class="lbl">إشعار</div></div>' +
       '</div>';
-
   } catch(e){
-    document.getElementById('statsContent').innerHTML =
-      '<div class="alert error"><i class="fa-solid fa-triangle-exclamation"></i> خطأ في تحميل الإحصائيات</div>';
+    document.getElementById('statsBody').innerHTML =
+      '<div class="alert error"><i class="fa-solid fa-triangle-exclamation"></i><span>خطأ في التحميل</span></div>';
   }
 }
+
+/* =====================================================
+   ADMINS
+===================================================== */
+function renderAdmins(el){
+  el.innerHTML =
+    '<div class="page-head">' +
+      '<div>' +
+        '<h2><i class="fa-solid fa-users-gear"></i> المشرفون</h2>' +
+        '<p>إدارة من عنده صلاحية الوصول للوحة</p>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="alert info">' +
+      '<i class="fa-solid fa-info-circle"></i>' +
+      '<span>لإضافة مشرف جديد: اطلب منه يسجل دخول في الموقع أولاً، بعدها استعمل SQL في Supabase (التفاصيل أسفل).</span>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-plus"></i> إضافة مشرف</h3>' +
+      '<div class="form-group">' +
+        '<label>إيميل المشرف</label>' +
+        '<input type="email" id="adminEmailInput" placeholder="example@gmail.com">' +
+      '</div>' +
+      '<button class="btn btn-primary btn-block" onclick="addAdmin()">' +
+        '<i class="fa-solid fa-user-plus"></i> إضافة' +
+      '</button>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-users"></i> المشرفون الحاليون (' + data.admins.length + ')</h3>' +
+      (data.admins.length === 0 ?
+        '<div class="empty-box"><i class="fa-solid fa-users-gear"></i><p>لا مشرفين بعد</p></div>' :
+        data.admins.map(function(a){
+          var isMe = currentUser && a.user_id === currentUser.id;
+          return '<div class="item">' +
+            '<div class="item-icon"><i class="fa-solid fa-user-shield"></i></div>' +
+            '<div class="item-body">' +
+              '<div class="item-title">' + escapeHtml(a.email) + (isMe ? ' <span class="badge green">أنت</span>' : '') + '</div>' +
+              '<div class="item-meta"><span><i class="fa-regular fa-clock"></i> أضيف: ' + fmtDateTime(a.created_at) + '</span></div>' +
+            '</div>' +
+            (isMe ? '' :
+              '<div class="item-actions">' +
+                '<button class="item-delete" onclick="delAdmin(\'' + a.id + '\', \'' + escapeHtml(a.email) + '\')" title="حذف">' +
+                  '<i class="fa-solid fa-trash"></i>' +
+                '</button>' +
+              '</div>') +
+          '</div>';
+        }).join('')) +
+    '</div>' +
+
+    '<div class="card">' +
+      '<h3><i class="fa-solid fa-code"></i> إضافة مشرف عبر SQL</h3>' +
+      '<p style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:12px">' +
+        'روح Supabase → SQL Editor → شغّل:' +
+      '</p>' +
+      '<pre style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:12px;overflow-x:auto;direction:ltr;text-align:left;color:#86EFAC;font-family:Courier New,monospace;line-height:1.6">insert into admins (user_id, email)\nselect id, email from auth.users\nwhere email = \'user@example.com\';</pre>' +
+    '</div>';
+}
+
+function addAdmin(){
+  var email = document.getElementById('adminEmailInput').value.trim().toLowerCase();
+  if(!email || email.indexOf('@') === -1){
+    toast('اكتب إيميل صحيح', 'warning');
+    return;
+  }
+  alert(
+    '📌 لإضافة المشرف:\n\n' +
+    '1. اطلب منه يسجّل دخول في الموقع أولاً\n' +
+    '2. روح Supabase → SQL Editor\n' +
+    '3. شغّل:\n\n' +
+    "insert into admins (user_id, email)\n" +
+    "select id, email from auth.users\n" +
+    "where email = '" + email + "';\n\n" +
+    '4. حدّث الصفحة'
+  );
+}
+
+async function delAdmin(id, email){
+  if(!confirm('حذف "' + email + '" من المشرفين؟')) return;
+  await sb.from('admins').delete().eq('id', id);
+  data.admins = data.admins.filter(function(a){ return a.id !== id; });
+  toast('تم الحذف');
+  switchPage('admins');
+}
+
+/* =====================================================
+   INIT
+===================================================== */
+window.addEventListener('resize', function(){
+  if(window.innerWidth >= 768){
+    document.getElementById('sidebar').classList.remove('show');
+  }
+});
+
+document.addEventListener('click', function(e){
+  var sidebar = document.getElementById('sidebar');
+  if(sidebar && sidebar.classList.contains('show')){
+    if(!sidebar.contains(e.target) && !e.target.closest('.mobile-menu-btn')){
+      sidebar.classList.remove('show');
+    }
+  }
+});
+
+console.log('%c🛡️ Admin Panel v2.0', 'color:#FF7A00;font-size:16px;font-weight:bold');
 </script>
 </body>
 </html>
