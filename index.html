@@ -6233,10 +6233,78 @@ function renderCalendarPage(el){
     );
 }
 
+var currentCalendarFilter = 'all';
+
 function filterCalendar(tab, filter){
   document.querySelectorAll('.filter-tab').forEach(function(t){ t.classList.remove('active'); });
   tab.classList.add('active');
-  toast('الفلتر: ' + filter, 'info');
+  currentCalendarFilter = filter;
+
+  var now = Date.now();
+  var upcoming = [];
+
+  state.subjects.forEach(function(s){
+    s.lessons.forEach(function(l){
+      if(l.spaced && l.spaced.nextReview && l.spaced.nextReview > now){
+        upcoming.push({
+          type: 'review',
+          title: 'مراجعة: ' + l.title,
+          date: l.spaced.nextReview,
+          subj: s.name,
+          icon: s.icon,
+          color: s.color,
+          subjectId: s.id,
+          lessonId: l.id
+        });
+      }
+    });
+  });
+
+  var today = DAYS[(new Date().getDay() + 1) % 7];
+  (state.schedule || []).filter(function(x){ return x.type === 'exam'; }).forEach(function(x){
+    upcoming.push({
+      type: 'exam',
+      title: 'فرض/اختبار: ' + x.title,
+      date: now,
+      subj: x.day + (x.day === today ? ' (اليوم)' : ''),
+      icon: 'fa-file-pen',
+      color: '#EF4444'
+    });
+  });
+
+  if(filter === 'review'){
+    upcoming = upcoming.filter(function(u){ return u.type === 'review'; });
+  } else if(filter === 'exam'){
+    upcoming = upcoming.filter(function(u){ return u.type === 'exam'; });
+  }
+
+  upcoming.sort(function(a, b){ return a.date - b.date; });
+
+  var list = document.getElementById('calendarList');
+  if(!list) return;
+
+  if(upcoming.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
+      '<i class="fa-solid fa-calendar-xmark" style="font-size:36px;opacity:.4;display:block;margin-bottom:10px"></i>' +
+      '<p style="font-size:13px">لا مواعيد في هذا الفلتر</p>' +
+    '</div>';
+    return;
+  }
+
+  list.innerHTML = upcoming.map(function(u){
+    return '<div class="lesson-card" style="--status-color:' + (u.color || '#FF7A00') + ';margin-bottom:8px" ' +
+      (u.lessonId ? 'onclick="openLesson(\'' + u.lessonId + '\')"' : '') + '>' +
+      '<div class="lesson-status" style="background:' + (u.color || '#FF7A00') + '"></div>' +
+      '<div class="lesson-content">' +
+        '<div class="lesson-title">' + escapeHtml(u.title) + '</div>' +
+        '<div class="lesson-meta">' +
+          '<span><i class="fa-solid fa-book"></i> ' + escapeHtml(u.subj) + '</span>' +
+          '<span><i class="fa-regular fa-calendar"></i> ' + fmtDate(u.date) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<i class="fa-solid fa-chevron-left lesson-chev"></i>' +
+    '</div>';
+  }).join('');
 }
 
 function openScheduleModal(){
