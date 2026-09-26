@@ -4369,9 +4369,14 @@ function showLoading(){
   document.getElementById('loadingScreen').classList.add('show');
 }
 
+/* =====================================================
+   AUTH STATE
+===================================================== */
 sb.auth.onAuthStateChange(async function(event, session){
-  // في index.html ما نتعامل مع recovery
-  // صفحات recovery لها ملف منفصل
+  if(event === 'PASSWORD_RECOVERY'){
+    showLoginMsg('يمكنك تغيير كلمة السر الآن', 'info');
+    return;
+  }
 
   if(session && session.user){
     currentUser = session.user;
@@ -8984,66 +8989,287 @@ function renderMemoryPalaceUI(container){
 function startMemoryPalace(){
   toast('🚧 قريباً — سيتم إضافة الغرف والمعلومات', 'info');
 }
-   <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>إعادة تعيين كلمة السر — مِذكَرتي</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Tajawal',sans-serif}
-body{background:#0A0A0A;color:#F5F5F5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background-image:radial-gradient(circle at 50% 30%,rgba(255,122,0,.08) 0%,transparent 60%)}
-.box{background:#1E1E1E;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:40px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.icon{width:80px;height:80px;border-radius:24px;margin:0 auto 20px;background:linear-gradient(135deg,#FF7A00,#E65100);display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px;animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-h1{color:#FF7A00;font-size:24px;margin-bottom:8px}
-p{color:#8A8A8A;font-size:13px;margin-bottom:24px;line-height:1.8}
-input{width:100%;padding:14px;border-radius:12px;background:#0F0F0F;border:1.5px solid rgba(255,255,255,.08);color:#F5F5F5;font-size:15px;font-family:inherit;outline:none;margin-bottom:14px}
-input:focus{border-color:#FF7A00;box-shadow:0 0 0 4px rgba(255,122,0,.08)}
-button{width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,#FF7A00,#E65100);color:#fff;border:none;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 8px 24px rgba(255,122,0,.25)}
-button:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(255,122,0,.4)}
-.msg{padding:12px;border-radius:12px;font-size:13px;margin-bottom:14px;display:none}
-.msg.show{display:block}
-.msg.error{background:rgba(239,68,68,.1);color:#FCA5A5;border:1px solid rgba(239,68,68,.3)}
-.msg.success{background:rgba(34,197,94,.1);color:#86EFAC;border:1px solid rgba(34,197,94,.3)}
-a{color:#FF7A00;text-decoration:none;font-size:13px;font-weight:600;margin-top:20px;display:inline-block}
-</style>
-</head>
-<body>
-<div class="box">
-  <div class="icon"><i class="fa-solid fa-key"></i></div>
-  <h1>إعادة تعيين كلمة السر</h1>
-  <p>اكتب كلمة السر الجديدة</p>
-  <div class="msg" id="msg"></div>
-  <input type="password" id="newPass" placeholder="كلمة السر الجديدة">
-  <input type="password" id="newPass2" placeholder="تأكيد كلمة السر">
-  <button onclick="updatePass()">حفظ كلمة السر</button>
-  <a href="/"><i class="fa-solid fa-arrow-right"></i> رجوع للموقع</a>
-</div>
-<script>
-const sb = window.supabase.createClient(
-  'https://ncrycgbrstafdouvipzc.supabase.co',
-  'sb_publishable_6t2dkU27Rkinsoo8MhYAEQ_FSgj4G73'
-);
-function showMsg(text, type){
-  const m = document.getElementById('msg');
-  m.textContent = text;
-  m.className = 'msg show ' + type;
+   /* =====================================================
+   FIXES & GLOBAL HANDLERS
+===================================================== */
+
+/* ---------- Close modals on Escape ---------- */
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){
+    document.querySelectorAll('.modal-overlay.show').forEach(function(m){
+      m.classList.remove('show');
+    });
+    var d = document.getElementById('dayEventsModal');
+    if(d) d.remove();
+    var s = document.getElementById('searchOverlay');
+    if(s) s.remove();
+    document.getElementById('notifPanel').classList.remove('show');
+  }
+});
+
+/* ---------- Click outside to close sidebar on mobile ---------- */
+document.addEventListener('touchstart', function(e){
+  var sidebar = document.getElementById('sidebar');
+  if(sidebar && sidebar.classList.contains('show')){
+    if(!sidebar.contains(e.target) && !e.target.closest('.topbar-mobile-menu')){
+      sidebar.classList.remove('show');
+    }
+  }
+}, {passive: true});
+
+/* ---------- Prevent body scroll when modal open ---------- */
+var _bodyObserver = new MutationObserver(function(){
+  var anyModal = document.querySelector('.modal-overlay.show');
+  if(anyModal){
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+});
+_bodyObserver.observe(document.body, {childList: true, subtree: true, attributes: true, attributeFilter: ['class']});
+
+/* ---------- Auto-hide sidebar on very small screens ---------- */
+window.addEventListener('resize', function(){
+  if(window.innerWidth >= 768){
+    document.getElementById('sidebar').classList.remove('show');
+  }
+});
+
+/* ---------- Scroll to top button (mobile) ---------- */
+var _scrollBtn = null;
+document.getElementById('content') && document.getElementById('content').addEventListener('scroll', function(e){
+  var content = e.target;
+  if(content.scrollTop > 400){
+    if(!_scrollBtn){
+      _scrollBtn = document.createElement('button');
+      _scrollBtn.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
+      _scrollBtn.style.cssText = 'position:fixed;bottom:80px;left:20px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none;cursor:pointer;font-size:16px;z-index:50;box-shadow:0 8px 24px var(--primary-glow);transition:.3s';
+      _scrollBtn.onclick = function(){ content.scrollTo({top: 0, behavior: 'smooth'}); };
+      document.body.appendChild(_scrollBtn);
+    }
+    _scrollBtn.style.opacity = '1';
+    _scrollBtn.style.pointerEvents = 'auto';
+  } else if(_scrollBtn){
+    _scrollBtn.style.opacity = '0';
+    _scrollBtn.style.pointerEvents = 'none';
+  }
+});
+
+/* ---------- Handle Enter key in modals ---------- */
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Enter') return;
+  var tag = (e.target.tagName || '').toLowerCase();
+  if(tag !== 'input' && tag !== 'textarea') return;
+
+  var modal = e.target.closest('.modal-overlay.show');
+  if(!modal) return;
+
+  if(modal.id === 'subjectModal'){ e.preventDefault(); saveSubject(); }
+  else if(modal.id === 'lessonModal'){ e.preventDefault(); saveLesson(); }
+  else if(modal.id === 'cardModal'){ e.preventDefault(); saveCard(); }
+  else if(modal.id === 'taskModal'){ e.preventDefault(); saveTask(); }
+  else if(modal.id === 'scheduleModal'){ e.preventDefault(); saveSchedule(); }
+});
+
+/* ---------- Auto focus inputs ---------- */
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.modal-overlay').forEach(function(modal){
+    modal.addEventListener('transitionend', function(){
+      if(modal.classList.contains('show')){
+        var input = modal.querySelector('input:not([type="hidden"]):not([type="date"]), textarea, select');
+        if(input && window.innerWidth > 768){
+          setTimeout(function(){ input.focus(); }, 100);
+        }
+      }
+    });
+  });
+});
+
+/* =====================================================
+   NETWORK STATUS
+===================================================== */
+window.addEventListener('online', function(){ 
+  toast('✅ عاد الاتصال بالإنترنت', 'success'); 
+});
+window.addEventListener('offline', function(){ 
+  toast('⚠️ انقطع الاتصال بالإنترنت', 'warning'); 
+});
+
+/* =====================================================
+   SERVICE WORKER (PWA)
+===================================================== */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(reg){
+        console.log('✅ Service Worker registered');
+      })
+      .catch(function(err){
+        console.log('⚠️ Service Worker registration failed:', err);
+      });
+  });
 }
-async function updatePass(){
-  const p1 = document.getElementById('newPass').value;
-  const p2 = document.getElementById('newPass2').value;
-  if(!p1 || p1.length < 8){ showMsg('كلمة السر لازم 8 أحرف على الأقل', 'error'); return; }
-  if(p1 !== p2){ showMsg('كلمتا السر ما متطابقتين', 'error'); return; }
-  const {error} = await sb.auth.updateUser({password: p1});
-  if(error){ showMsg('خطأ: ' + error.message, 'error'); return; }
-  showMsg('✅ تم تغيير كلمة السر! جاري التحويل...', 'success');
-  setTimeout(() => location.href = '/', 2000);
+
+/* =====================================================
+   PWA INSTALL PROMPT
+===================================================== */
+var deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner(){
+  if(localStorage.getItem('install_dismissed') === 'true') return;
+  if(document.getElementById('installBanner')) return;
+
+  var banner = document.createElement('div');
+  banner.id = 'installBanner';
+  banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:14px 16px;border-radius:14px;display:flex;align-items:center;gap:12px;z-index:150;box-shadow:0 12px 40px var(--primary-glow);animation:slideUp .4s;max-width:500px;margin:0 auto';
+  banner.innerHTML =
+    '<i class="fa-solid fa-download" style="font-size:22px;flex-shrink:0"></i>' +
+    '<div style="flex:1;min-width:0">' +
+      '<div style="font-weight:800;font-size:14px;margin-bottom:2px">ثبّت مِذكَرتي</div>' +
+      '<div style="font-size:12px;opacity:.9">تطبيق على جوالك، يشتغل بدون إنترنت</div>' +
+    '</div>' +
+    '<button onclick="installPWA()" style="background:#fff;color:var(--primary-dark);border:none;padding:8px 14px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font);white-space:nowrap">تثبيت</button>' +
+    '<button onclick="dismissInstallBanner()" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;padding:4px;opacity:.7;flex-shrink:0"><i class="fa-solid fa-xmark"></i></button>';
+
+  document.body.appendChild(banner);
 }
+
+function installPWA(){
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(choice){
+    if(choice.outcome === 'accepted'){
+      toast('✅ تم تثبيت التطبيق', 'success');
+    }
+    deferredPrompt = null;
+    var banner = document.getElementById('installBanner');
+    if(banner) banner.remove();
+  });
+}
+
+function dismissInstallBanner(){
+  localStorage.setItem('install_dismissed', 'true');
+  var banner = document.getElementById('installBanner');
+  if(banner) banner.remove();
+}
+
+/* =====================================================
+   ACCESSIBILITY & UX IMPROVEMENTS
+===================================================== */
+
+/* Add aria-labels to buttons */
+document.querySelectorAll('.icon-btn').forEach(function(btn, i){
+  if(!btn.getAttribute('aria-label')){
+    btn.setAttribute('aria-label', 'زر ' + (i + 1));
+  }
+});
+
+/* =====================================================
+   ERROR HANDLING
+===================================================== */
+window.addEventListener('error', function(e){
+  console.error('Global error:', e.error);
+});
+
+window.addEventListener('unhandledrejection', function(e){
+  console.error('Unhandled promise rejection:', e.reason);
+});
+
+/* =====================================================
+   PERFORMANCE
+===================================================== */
+/* Debounce for search input */
+function debounce(fn, delay){
+  var timer = null;
+  return function(){
+    var context = this, args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function(){ fn.apply(context, args); }, delay);
+  };
+}
+
+/* =====================================================
+   FINAL INIT
+===================================================== */
+(async function finalInit(){
+  loadSettings();
+  applyTheme();
+  renderStreak();
+  updateTasksBadge();
+
+  if(localStorage.getItem('sidebar_collapsed') === 'true'){
+    var sidebar = document.getElementById('sidebar');
+    if(sidebar) sidebar.classList.add('collapsed');
+  }
+
+  updateTimeWallpaper();
+  setInterval(updateTimeWallpaper, 30 * 60 * 1000);
+
+  console.log('%c🟠 مِذكَرتي v2.0', 'color:#FF7A00;font-size:24px;font-weight:900;text-shadow:0 2px 8px rgba(255,122,0,.4)');
+  console.log('%cمشروع دراسة ذكي — جاهز! 🚀', 'color:#FF7A00;font-size:14px');
+  console.log('%cاختصارات: N، S، T، P، M، K، ?', 'color:#8A8A8A;font-size:12px');
+})();
+
+/* =====================================================
+   WELCOME MESSAGE
+===================================================== */
+setTimeout(function(){
+  if(currentUser && !localStorage.getItem('welcome_shown_' + currentUser.id)){
+    localStorage.setItem('welcome_shown_' + currentUser.id, '1');
+    setTimeout(function(){
+      toast('👋 أهلاً بك في مِذكَرتي!', 'success');
+    }, 500);
+    setTimeout(function(){
+      toast('💡 ابدأ بإضافة مادة جديدة', 'info');
+    }, 3000);
+  }
+}, 2000);
+
+/* =====================================================
+   DAILY GREETING
+===================================================== */
+function getGreeting(){
+  var hour = new Date().getHours();
+  if(hour >= 5 && hour < 12) return 'صباح الخير ☀️';
+  if(hour >= 12 && hour < 17) return 'مساء النور 🌤️';
+  if(hour >= 17 && hour < 21) return 'مساء الخير 🌇';
+  return 'ليلة سعيدة 🌙';
+}
+
+setTimeout(function(){
+  if(currentUser){
+    console.log('%c' + getGreeting(), 'color:#FF7A00;font-size:14px;font-weight:bold');
+  }
+}, 3000);
+
+/* =====================================================
+   AUTO SYNC (كل 5 دقائق)
+===================================================== */
+setInterval(function(){
+  if(currentUser && !document.hidden){
+    syncAdminContent();
+  }
+}, 5 * 60 * 1000);
+
+/* =====================================================
+   VISIBILITY CHANGE
+===================================================== */
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && currentUser){
+    checkAchievements();
+    renderChallengeBadge();
+  }
+});
+
+/* =====================================================
+   END OF SCRIPT
+===================================================== */
 </script>
 </body>
 </html>
-   
